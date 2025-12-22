@@ -128,7 +128,7 @@ function renderMatchUI(mode, rivalName, rivalDesc, reward) {
         <div class="max-w-3xl mx-auto h-full flex flex-col items-center justify-center animate-fade-in relative z-10">
             <div class="glass-panel p-8 rounded-xl border border-red-900/50 bg-black/80 w-full text-center relative overflow-hidden">
                 <!-- Background decoration -->
-                <div class="absolute inset-0 bg-[url('img/hub/arena_bg.png')] bg-cover bg-center opacity-20 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-[url('/img/hub/arena_bg.png')] bg-cover bg-center opacity-20 pointer-events-none"></div>
                 
                 <h3 class="text-red-500 font-bold tracking-widest uppercase text-sm mb-2">CARTEL DEL COMBATE</h3>
                 <h2 class="text-4xl font-cinzel text-white font-bold mb-6">${mode === 'duel' ? 'DUELO DE HONOR' : (mode === 'beast' ? 'LA JAULA' : 'GUANTELETE')}</h2>

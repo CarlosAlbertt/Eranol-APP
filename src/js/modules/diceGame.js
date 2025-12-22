@@ -238,17 +238,17 @@ function openNPCSelector() {
 
     // Pool of NPCs
     const npcPool = [
-        { name: "Ratko", avatar: "img/npcs/ratko.png", desc: "Goblin Tramposo" },
-        { name: "Brutus", avatar: "img/npcs/brutus.png", desc: "Orco Gorila" },
-        { name: "Sombra", avatar: "img/npcs/sombra.png", desc: "Ladrón Silencioso" },
-        { name: "Gix", avatar: "img/npcs/gix.png", desc: "Kobold Nervioso" },
-        { name: "Vora", avatar: "img/npcs/vora.png", desc: "Bruja de Pantano" },
-        { name: "Krunk", avatar: "img/npcs/krunk.png", desc: "Gigante Tonto" },
-        { name: "Dagger", avatar: "img/npcs/dagger.png", desc: "Asesino" },
-        { name: "Seda", avatar: "img/npcs/seda.png", desc: "Cortesana Espía" },
-        { name: "Borg", avatar: "img/npcs/borg.png", desc: "Dueño del Bar" },
-        { name: "Zora", avatar: "img/npcs/zora.png", desc: "Mercenaria" },
-        { name: "Dedos Vance", avatar: "img/npcs/vance.png", desc: "Informante" }
+        { name: "Ratko", avatar: "/img/npcs/ratko.png", desc: "Goblin Tramposo" },
+        { name: "Brutus", avatar: "/img/npcs/brutus.png", desc: "Orco Gorila" },
+        { name: "Sombra", avatar: "/img/npcs/sombra.png", desc: "Ladrón Silencioso" },
+        { name: "Gix", avatar: "/img/npcs/gix.png", desc: "Kobold Nervioso" },
+        { name: "Vora", avatar: "/img/npcs/vora.png", desc: "Bruja de Pantano" },
+        { name: "Krunk", avatar: "/img/npcs/krunk.png", desc: "Gigante Tonto" },
+        { name: "Dagger", avatar: "/img/npcs/dagger.png", desc: "Asesino" },
+        { name: "Seda", avatar: "/img/npcs/seda.png", desc: "Cortesana Espía" },
+        { name: "Borg", avatar: "/img/npcs/borg.png", desc: "Dueño del Bar" },
+        { name: "Zora", avatar: "/img/npcs/zora.png", desc: "Mercenaria" },
+        { name: "Dedos Vance", avatar: "/img/npcs/vance.png", desc: "Informante" }
     ];
 
     container.innerHTML = '';
@@ -468,17 +468,17 @@ function triggerDebtEvent(debtAmount, specificCreditor) {
     const debtModal = document.getElementById('debt-modal');
     if (debtModal) {
         let creditorName = "El Sindicato";
-        let creditorAvatar = "img/npcs/borg.png"; // Default House
+        let creditorAvatar = "/img/npcs/borg.png"; // Default House
 
         if (specificCreditor) {
             creditorName = specificCreditor.name;
-            creditorAvatar = specificCreditor.avatar || "img/npcs/borg.png";
+            creditorAvatar = specificCreditor.avatar || "/img/npcs/borg.png";
         } else {
             // Fallback for Solitaire play
             const creditors = ["Borg", "Zora 'La Cicatriz'", "Dedos Vance"];
             creditorName = creditors[Math.floor(Math.random() * creditors.length)];
-            if (creditorName.includes("Zora")) creditorAvatar = "img/npcs/zora.png";
-            if (creditorName.includes("Dedos")) creditorAvatar = "img/npcs/vance.png";
+            if (creditorName.includes("Zora")) creditorAvatar = "/img/npcs/zora.png";
+            if (creditorName.includes("Dedos")) creditorAvatar = "/img/npcs/vance.png";
         }
 
         const deadline = Math.floor(Math.random() * 5) + 2; // 2-7 days
