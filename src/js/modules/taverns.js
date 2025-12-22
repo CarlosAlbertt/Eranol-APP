@@ -10,14 +10,14 @@ export const tavernsData = {
         icon: "fa-beer",
         theme: "border-red-900/50 bg-red-950/90",
         themeClass: "theme-grifo",
-        bgImage: "img/hub/tavern_low.png",
+        bgImage: "/img/hub/tavern_low.png",
         npcs: [
 
             {
                 id: 'owner_g',
                 name: "Borg",
                 role: "Dueño",
-                avatar: "img/npcs/borg.png",
+                avatar: "/img/npcs/borg.png",
                 desc: "Gladiador retirado con una escopeta recortada bajo la barra.",
                 type: "owner",
                 dialogue: "Si rompes algo, lo pagas. Si te rompen algo, te aguantas. ¿Qué vas a beber?"
@@ -26,7 +26,7 @@ export const tavernsData = {
                 id: 'npc_zora',
                 name: "Zora 'La Cicatriz'",
                 role: "Mercenaria",
-                avatar: "img/npcs/zora.png",
+                avatar: "/img/npcs/zora.png",
                 desc: "Ex-Capitana de Ignis. Limpia una espada de aspecto vorpal mientras observa la puerta.",
                 type: "quest",
                 dialogue: "Ignis caerá. Si buscas gloria (o muerte), siéntate."
@@ -35,7 +35,7 @@ export const tavernsData = {
                 id: 'npc_vance',
                 name: "'Dedos' Vance",
                 role: "Parroquiano",
-                avatar: "img/npcs/vance.png",
+                avatar: "/img/npcs/vance.png",
                 desc: "Juega con una moneda de oro que desaparece y reaparece.",
                 type: "info",
                 dialogue: "¿Buscas entrar a las alcantarillas? Tengo la llave... por un precio."
@@ -44,7 +44,7 @@ export const tavernsData = {
                 id: 'npc_grumm',
                 name: "Grumm",
                 role: "Cocinero",
-                avatar: "img/npcs/grumm.png",
+                avatar: "/img/npcs/grumm.png",
                 desc: "Huele a azufre y especias picantes. Tiene frascos inestables en el delantal.",
                 type: "vendor",
                 dialogue: "¡Prueba el estofado! Si sobrevives, te vendo pociones baratas."
@@ -52,25 +52,25 @@ export const tavernsData = {
         ],
         // Pool for Daily Rotation (d12)
         npcPool: [
-            { id: 'pool_1', name: "Myla", role: "Brujo Loco", avatar: "img/npcs/myla.png", desc: "Dibuja mapas de túneles antiguos en la mesa con cerveza.", dialogue: "¡Las ratas hablan! Dicen que el subsuelo arderá..." },
-            { id: 'pool_2', name: "Krug", role: "Portero Poeta", avatar: "img/npcs/krug.png", desc: "Un ogro que recita versos mientras rompe jarras.", dialogue: "La sangre es roja, la espada es gris... págadme la ronda o os haré trizas. (Rima asonante)." },
-            { id: 'pool_3', name: "Sasha", role: "Arquera Tuerta", avatar: "img/npcs/sasha.png", desc: "Vende flechas mágicas de dudosa procedencia.", dialogue: "Tengo una flecha que persigue al que te debe dinero. ¿Interesa?" },
-            { id: 'pool_4', name: "Viejo Rorn", role: "Minero", avatar: "img/npcs/rorn.png", desc: "Jura haber encontrado una veta de plata en las alcantarillas.", dialogue: "¡Es verdad! ¡Brillaba! Pero las sombras se movían..." },
-            { id: 'pool_5', name: "Trixie", role: "Hada en Tarro", avatar: "img/npcs/trixie.png", desc: "Está atrapada en un tarro de cristal en la barra. Insulta a todos.", dialogue: "¡Sácame de aquí, gigante estúpido! ¡Te daré tres deseos! (Mentira)." },
-            { id: 'pool_6', name: "Garra", role: "Tabaxi Yonqui", avatar: "img/npcs/garra.png", desc: "Tiembla y se rasca. Vende secretos de la guardia.", dialogue: "Tengo... tengo info buena. Cambio de turno... puerta trasera... ¿tienes 'polvo de sueño'?" },
-            { id: 'pool_7', name: "Silas", role: "Falso Cura", avatar: "img/npcs/silas.png", desc: "Vende reliquias falsas y perdona pecados por monedas.", dialogue: "Por 10 oros, los dioses perdonan ese robo. Por 20, perdonan el asesinato." },
-            { id: 'pool_8', name: "Brunhilda", role: "Campeona", avatar: "img/npcs/brunhilda.png", desc: "La mujer más fuerte del foso. Reta a pulsos.", dialogue: "¿Crees que tienes brazo? Si me ganas, te doy mis guanteletes. Si pierdes, pagas la ronda." },
-            { id: 'pool_9', name: "El Mudo", role: "Kenku Espía", avatar: "img/npcs/elmudo.png", desc: "Imita sonidos de monstruos que ha visto recientemente.", dialogue: "*Sonido de una Hidra rugiendo y monedas cayendo*" },
-            { id: 'pool_10', name: "Rey Riko", role: "Halfling", avatar: "img/npcs/reyriko.png", desc: "Dice controlar a todas las ratas de la ciudad.", dialogue: "Mis pequeñas ojos lo ven todo. Cuidado donde pisas." },
-            { id: 'pool_11', name: "Vex", role: "Brujo Dracónido", avatar: "img/npcs/vex.png", desc: "Busca romper su pacto. Vende pergaminos oscuros.", dialogue: "No leas eso en voz alta. A menos que quieras invocar algo que no puedas matar." },
-            { id: 'pool_12', name: "La Encapuchada", role: "Drow", avatar: "img/npcs/encapuchada.png", desc: "Vende veneno drow letal. Muy peligrosa.", dialogue: "Una gota basta para parar un corazón de ogro. 200 oros. Sin preguntas." }
+            { id: 'pool_1', name: "Myla", role: "Brujo Loco", avatar: "/img/npcs/myla.png", desc: "Dibuja mapas de túneles antiguos en la mesa con cerveza.", dialogue: "¡Las ratas hablan! Dicen que el subsuelo arderá..." },
+            { id: 'pool_2', name: "Krug", role: "Portero Poeta", avatar: "/img/npcs/krug.png", desc: "Un ogro que recita versos mientras rompe jarras.", dialogue: "La sangre es roja, la espada es gris... págadme la ronda o os haré trizas. (Rima asonante)." },
+            { id: 'pool_3', name: "Sasha", role: "Arquera Tuerta", avatar: "/img/npcs/sasha.png", desc: "Vende flechas mágicas de dudosa procedencia.", dialogue: "Tengo una flecha que persigue al que te debe dinero. ¿Interesa?" },
+            { id: 'pool_4', name: "Viejo Rorn", role: "Minero", avatar: "/img/npcs/rorn.png", desc: "Jura haber encontrado una veta de plata en las alcantarillas.", dialogue: "¡Es verdad! ¡Brillaba! Pero las sombras se movían..." },
+            { id: 'pool_5', name: "Trixie", role: "Hada en Tarro", avatar: "/img/npcs/trixie.png", desc: "Está atrapada en un tarro de cristal en la barra. Insulta a todos.", dialogue: "¡Sácame de aquí, gigante estúpido! ¡Te daré tres deseos! (Mentira)." },
+            { id: 'pool_6', name: "Garra", role: "Tabaxi Yonqui", avatar: "/img/npcs/garra.png", desc: "Tiembla y se rasca. Vende secretos de la guardia.", dialogue: "Tengo... tengo info buena. Cambio de turno... puerta trasera... ¿tienes 'polvo de sueño'?" },
+            { id: 'pool_7', name: "Silas", role: "Falso Cura", avatar: "/img/npcs/silas.png", desc: "Vende reliquias falsas y perdona pecados por monedas.", dialogue: "Por 10 oros, los dioses perdonan ese robo. Por 20, perdonan el asesinato." },
+            { id: 'pool_8', name: "Brunhilda", role: "Campeona", avatar: "/img/npcs/brunhilda.png", desc: "La mujer más fuerte del foso. Reta a pulsos.", dialogue: "¿Crees que tienes brazo? Si me ganas, te doy mis guanteletes. Si pierdes, pagas la ronda." },
+            { id: 'pool_9', name: "El Mudo", role: "Kenku Espía", avatar: "/img/npcs/elmudo.png", desc: "Imita sonidos de monstruos que ha visto recientemente.", dialogue: "*Sonido de una Hidra rugiendo y monedas cayendo*" },
+            { id: 'pool_10', name: "Rey Riko", role: "Halfling", avatar: "/img/npcs/reyriko.png", desc: "Dice controlar a todas las ratas de la ciudad.", dialogue: "Mis pequeñas ojos lo ven todo. Cuidado donde pisas." },
+            { id: 'pool_11', name: "Vex", role: "Brujo Dracónido", avatar: "/img/npcs/vex.png", desc: "Busca romper su pacto. Vende pergaminos oscuros.", dialogue: "No leas eso en voz alta. A menos que quieras invocar algo que no puedas matar." },
+            { id: 'pool_12', name: "La Encapuchada", role: "Drow", avatar: "/img/npcs/encapuchada.png", desc: "Vende veneno drow letal. Muy peligrosa.", dialogue: "Una gota basta para parar un corazón de ogro. 200 oros. Sin preguntas." }
         ],
         zones: [
             {
                 id: 'zone_foso',
                 name: "Foso de Arena",
                 icon: "fa-fist-raised",
-                image: "img/hub/arena_portrait.png",
+                image: "/img/hub/arena_portrait.png",
                 desc: "Peleas sin armas letales. Apuestas y gloria.",
                 action: "fight"
             },

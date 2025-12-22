@@ -16,7 +16,7 @@ const dialogueData = {
     'owner_g': {
         name: "Borg",
         role: "Dueño del Grifo",
-        avatar: "img/npcs/borg.png",
+        avatar: "/img/npcs/borg.png",
         greeting: "Borg deja un vaso sucio sobre la barra con un golpe seco. Su único ojo te escanea buscando problemas. 'Si vas a potar, hazlo fuera. ¿Qué quieres?'",
         options: [
             {
@@ -50,7 +50,7 @@ const dialogueData = {
     'npc_zora': {
         name: "Zora 'La Cicatriz'",
         role: "Veterana de Ignis",
-        avatar: "img/npcs/zora.png",
+        avatar: "/img/npcs/zora.png",
         greeting: "Zora no levanta la vista de su espada. Pasa el trapo lentamente por el filo mellao. 'Si buscas compañía, te has equivocado de mesa. Si buscas sangre, espera tu turno.'",
         options: [
             {
@@ -79,7 +79,7 @@ const dialogueData = {
     'npc_vance': {
         name: "'Dedos' Vance",
         role: "Informante",
-        avatar: "img/npcs/vance.png",
+        avatar: "/img/npcs/vance.png",
         greeting: "La moneda baila entre sus nudillos. Ahora la ves, ahora no. Vance te guiña un ojo. '¿Negocios o placer? Aunque aquí, suelen ser lo mismo...'",
         options: [
             {
