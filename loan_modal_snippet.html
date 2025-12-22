@@ -1,0 +1,20 @@
+<!-- LOAN CONFIRMATION MODAL -->
+<div id="loan-confirm-modal"
+    class="fixed inset-0 z-[70] hidden flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 opacity-0 transition-opacity duration-300">
+    <div
+        class="glass-modal max-w-sm w-full rounded-2xl border border-red-600 shadow-[0_0_100px_rgba(220,38,38,0.4)] p-8 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-red-900/10 animate-pulse"></div>
+        <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-4 relative z-10"></i>
+        <h2 class="text-2xl font-cinzel font-bold text-white mb-2 relative z-10">¿Aceptar el Pacto?</h2>
+        <p class="text-gray-400 text-sm mb-6 relative z-10">Recibirás <span id="loan-confirm-amount"
+                class="text-red-500 font-bold text-lg">0</span> Monedas de Sangre.</p>
+        <p class="text-[10px] text-red-400/70 uppercase tracking-widest mb-8 relative z-10">La deuda es eterna.</p>
+
+        <div class="flex gap-4 relative z-10">
+            <button onclick="closeLoanConfirm()"
+                class="flex-1 py-3 rounded border border-white/10 hover:bg-white/5 text-gray-400 text-xs font-bold uppercase tracking-widest transition-colors">Cancelar</button>
+            <button onclick="confirmLoan()"
+                class="flex-1 py-3 rounded bg-red-700 hover:bg-red-600 text-white text-xs font-bold uppercase tracking-widest shadow-lg transition-all hover:scale-105">Firmar</button>
+        </div>
+    </div>
+</div>

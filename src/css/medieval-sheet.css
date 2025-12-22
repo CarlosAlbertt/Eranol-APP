@@ -1,0 +1,703 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Roboto:wght@300;400;500;700&family=Orbitron:wght@500&display=swap');
+
+/* --- MODAL WRAPPER --- */
+#character-sheet-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(8, 10, 15, 0.9);
+    /* Deep Mystic Dark */
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#character-sheet-modal.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#character-sheet-modal.active .sheet-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* --- MAIN CONTAINER (ARCANE INTERFACE) --- */
+.sheet-container {
+    width: 1400px;
+    max-width: 95vw;
+    width: 1400px;
+    max-width: 95vw;
+    height: auto;
+    min-height: 700px;
+    max-height: 90vh;
+    position: relative;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Layout */
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden;
+
+    /* Style: Arcane Modern */
+    background: linear-gradient(135deg, #0f1219, #1a1e29);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    /* Pale Gold Border */
+    border-radius: 8px;
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        inset 0 0 100px rgba(0, 0, 0, 0.5);
+
+    font-family: 'Roboto', sans-serif;
+    color: #e2e8f0;
+}
+
+/* --- DECORATIONS --- */
+.sheet-container::before {
+    /* Top Accent Line */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #c5a059, transparent);
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.5);
+    z-index: 10;
+}
+
+/* --- HEADER --- */
+.sheet-header {
+    padding: 30px 40px 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(to bottom, rgba(15, 18, 25, 1), transparent);
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+}
+
+.system-id {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    color: #c5a059;
+    /* Gold */
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+#char-name {
+    font-family: 'Cinzel', serif;
+    /* Restored Fantasy Font */
+    font-size: 56px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #f1f5f9;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    line-height: 1.1;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.char-meta {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.level-badge {
+    background: linear-gradient(135deg, #c5a059, #8d7032);
+    color: #0f1219;
+    padding: 3px 14px;
+    border-radius: 4px;
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 14px;
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
+}
+
+/* --- CLOSE BUTTON --- */
+.close-sheet {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.close-sheet:hover {
+    background: rgba(255, 77, 77, 0.1);
+    border-color: #ff4d4d;
+    color: #ff4d4d;
+    transform: rotate(90deg);
+}
+
+/* --- BODY (Flexbox) --- */
+.sheet-body {
+    display: flex !important;
+    flex-direction: row !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 0;
+    padding: 0;
+
+}
+
+/* --- LEFT COLUMN: STATS --- */
+.col-stats {
+    width: 380px !important;
+    flex-shrink: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    /* More breathing room */
+    overflow-y: auto !important;
+    height: 100% !important;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.03);
+
+    scrollbar-width: thin;
+    scrollbar-color: #c5a059 rgba(0, 0, 0, 0.1);
+}
+
+/* XP BAR (Hybird Style) */
+.progress-section {
+    order: -1;
+    padding-bottom: 20px;
+}
+
+.xp-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Roboto', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #c5a059;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    position: static;
+    background: none;
+    /* Reset */
+}
+
+.xp-bar-container {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c5a059, #fcd34d);
+    /* Gold Energy */
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
+    border-radius: 3px;
+}
+
+/* STATS GRID - RESTORED HEXAGONS but Modernized */
+.stats-hex-grid {
+    display: grid;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 20px;
+    perspective: 1000px;
+}
+
+.stat-hex {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    /* Hex mode */
+    margin: 0 auto;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-hex:hover {
+    transform: scale(1.05);
+}
+
+/* The Hexagon Shape */
+.stat-hex::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    /* Subtle default border */
+    transition: all 0.3s ease;
+    z-index: 0;
+}
+
+.stat-hex:hover::before {
+    background: linear-gradient(135deg, rgba(197, 160, 89, 0.1), rgba(197, 160, 89, 0.02));
+    border-color: #c5a059;
+    /* Gold on hover */
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.15);
+}
+
+/* Inner Content */
+.hex-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.stat-label {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 36px;
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.stat-mod {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    color: #c5a059;
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* CURRENCY */
+.currency-panel {
+    background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.05), transparent);
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid rgba(197, 160, 89, 0.1);
+    border-bottom: 1px solid rgba(197, 160, 89, 0.1);
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.coin-icon {
+    font-size: 24px;
+    color: #ffd700;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
+}
+
+.coin-amount {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    color: #e2e8f0;
+}
+
+/* --- RIGHT COLUMN: INVENTORY & EQUIPMENT --- */
+.col-inventory {
+    flex: 1 !important;
+    display: flex;
+    flex-direction: column;
+    height: 100% !important;
+    overflow: hidden !important;
+    padding: 40px;
+    gap: 30px;
+}
+
+/* --- DYNAMIC EQUIPMENT GRID --- */
+.equipment-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Rows */
+.equip-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Main Grid (Middle Section) */
+.equip-main-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.weapon-col,
+.right-col,
+.body-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.body-col {
+    margin-top: -20px;
+}
+
+/* Shift head up slightly */
+
+/* SLOTS */
+.equip-slot-dynamic {
+    width: 60px;
+    height: 60px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.equip-slot-dynamic:hover {
+    border-color: #c5a059;
+    background: rgba(197, 160, 89, 0.05);
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.1);
+    transform: translateY(-2px);
+}
+
+.slot-icon-bg {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.1);
+    /* Faint placeholder */
+    pointer-events: none;
+}
+
+/* Special Sizes */
+.slot-jewelry {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+/* Round amulets */
+.slot-ring {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.slot-armor {
+    width: 70px;
+    height: 70px;
+}
+
+/* Bigger armor pieces */
+.slot-weapon {
+    width: 70px;
+    height: 90px;
+}
+
+/* Tall weapon slots */
+
+/* Equipped State */
+.equip-slot-dynamic.equipped {
+    border-color: #c5a059;
+    background: #0f1219;
+}
+
+.equip-slot-dynamic.equipped .slot-icon-bg {
+    opacity: 0;
+}
+
+/* Hide icon if equipped */
+
+/* --- RIGHT COLUMN: INVENTORY & EQUIPMENT --- */
+.col-inventory {
+    flex: 1 !important;
+    display: flex;
+    flex-direction: column;
+    height: 100% !important;
+    overflow-y: auto !important;
+    /* Enable Scroll */
+    padding: 40px;
+    gap: 30px;
+    scrollbar-width: thin;
+    scrollbar-color: #c5a059 rgba(0, 0, 0, 0.1);
+}
+
+/* --- DYNAMIC EQUIPMENT GRID --- */
+.equipment-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+    /* Prevent squishing */
+}
+
+/* Rows */
+.equip-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Main Grid (Middle Section) */
+.equip-main-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 10px 0;
+}
+
+.weapon-col,
+.right-col,
+.body-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.body-col {
+    margin-top: -20px;
+}
+
+/* SLOTS */
+.equip-slot-dynamic {
+    width: 60px;
+    height: 60px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.equip-slot-dynamic:hover {
+    border-color: #c5a059;
+    background: rgba(197, 160, 89, 0.05);
+    box-shadow: 0 0 15px rgba(197, 160, 89, 0.1);
+    transform: translateY(-2px);
+}
+
+.slot-icon-bg {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+}
+
+/* Special Sizes */
+.slot-jewelry {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.slot-ring {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.slot-armor {
+    width: 70px;
+    height: 70px;
+}
+
+.slot-weapon {
+    width: 70px;
+    height: 90px;
+}
+
+/* Equipped State */
+.equip-slot-dynamic.equipped {
+    border-color: #c5a059;
+    background: #0f1219;
+}
+
+.equip-slot-dynamic.equipped .slot-icon-bg {
+    opacity: 0;
+}
+
+/* --- INVENTORY LIST --- */
+.inventory-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    /* Allow expand */
+    flex-shrink: 0;
+}
+
+.inventory-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.inventory-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    color: #c5a059;
+    margin: 0;
+}
+
+.inv-tabs {
+    display: flex;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.inv-tab {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.inv-tab.active {
+    background: #c5a059;
+    color: #0f1219;
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+}
+
+.inv-tab:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+}
+
+/* Grid */
+.inventory-grid {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 15px;
+    /* No internal scroll, allow full page scroll */
+}
+
+.inv-slot {
+    aspect-ratio: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.inv-slot:hover {
+    transform: translateY(-4px);
+    border-color: #c5a059;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.inv-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.inv-slot:hover img {
+    opacity: 1;
+}
+
+/* Item Rarities */
+.inv-slot.rarity-common {
+    border-bottom: 2px solid #64748b;
+}
+
+.inv-slot.rarity-rare {
+    border-bottom: 2px solid #3b82f6;
+}
+
+.inv-slot.rarity-legendary {
+    border-bottom: 2px solid #eab308;
+    box-shadow: 0 0 15px rgba(234, 179, 8, 0.1);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

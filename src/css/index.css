@@ -1,0 +1,332 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Fonts */
+.font-cinzel {
+    font-family: 'Cinzel', serif;
+}
+
+.font-inter {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6a6a6a;
+}
+
+/* Animations */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(-2px, -2px);
+    }
+
+    60% {
+        transform: translate(2px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-fade-out {
+    animation: fadeOut 0.5s ease-in forwards;
+}
+
+.animate-glitch {
+    animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+    background: rgba(20, 20, 25, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-modal {
+    background: rgba(15, 15, 20, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- RARITY CARD STYLES --- */
+@keyframes glow-pulse {
+    0% {
+        box-shadow: 0 0 5px var(--rarity-color), inset 0 0 5px var(--rarity-color);
+    }
+
+    50% {
+        box-shadow: 0 0 25px 2px var(--rarity-color), inset 0 0 15px var(--rarity-color);
+    }
+
+    100% {
+        box-shadow: 0 0 5px var(--rarity-color), inset 0 0 5px var(--rarity-color);
+    }
+}
+
+@keyframes countdown-pop {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+.animate-countdown {
+    animation: countdown-pop 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.item-card {
+    transition: transform 0.3s ease, background 0.3s ease;
+    --rarity-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--rarity-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 0 2px var(--rarity-color);
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
+}
+
+.item-card:hover {
+    transform: translateY(-7px) scale(1.02);
+    background-color: rgba(40, 40, 50, 0.95);
+    animation: glow-pulse 2s infinite ease-in-out;
+    z-index: 10;
+}
+
+.item-card.has-image {
+    background-color: rgba(20, 20, 30, 0.85);
+}
+
+.item-card.has-image:hover {
+    background-color: rgba(40, 40, 50, 0.7);
+}
+
+/* --- WHEEL STYLES (Fortune Wheel) --- */
+.wheel-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    border-radius: 50%;
+    border: 4px solid #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+    overflow: hidden;
+    transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+.wheel-text {
+    position: absolute;
+    left: 60%;
+    top: 40%;
+    transform: rotate(45deg);
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    font-family: 'Cinzel', serif;
+    z-index: 20;
+    width: 100px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid #fbbf24;
+    z-index: 30;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* --- THEMES --- */
+.theme-black-market .accent-text {
+    color: #ef4444;
+}
+
+.theme-black-market .accent-bg {
+    background: linear-gradient(135deg, #450a0a, #7f1d1d);
+}
+
+.theme-black-market #main-container {
+    background: radial-gradient(circle at center, #1a0505 0%, #000000 100%);
+}
+
+.theme-fragua .accent-text {
+    color: #fca5a5;
+}
+
+.theme-fragua .accent-bg {
+    background: linear-gradient(135deg, #7f1d1d, #b91c1c);
+}
+
+.theme-dragon .accent-text {
+    color: #5eead4;
+}
+
+.theme-dragon .accent-bg {
+    background: linear-gradient(135deg, #134e4a, #0f766e);
+}
+
+.theme-vivarium .accent-text {
+    color: #86efac;
+}
+
+.theme-vivarium .accent-bg {
+    background: linear-gradient(135deg, #14532d, #166534);
+}
+
+.theme-cronos .accent-text {
+    color: #fcd34d;
+}
+
+.theme-cronos .accent-bg {
+    background: linear-gradient(135deg, #78350f, #b45309);
+}
+
+.theme-liquida .accent-text {
+    color: #d8b4fe;
+}
+
+.theme-liquida .accent-bg {
+    background: linear-gradient(135deg, #4c1d95, #6d28d9);
+}
+
+.theme-arcano .accent-text {
+    color: #c4b5fd;
+}
+
+.theme-arcano .accent-bg {
+    background: linear-gradient(135deg, #312e81, #4338ca);
+}
+
+.theme-hilos .accent-text {
+    color: #e5e7eb;
+}
+
+.theme-hilos .accent-bg {
+    background: linear-gradient(135deg, #374151, #4b5563);
+}
+
+.theme-gold .accent-text {
+    color: #fbbf24;
+}
+
+.theme-gold .accent-bg {
+    background: linear-gradient(135deg, #b45309, #f59e0b);
+}
+
+.theme-gold #main-container {
+    background: radial-gradient(circle at center, #2e1065 0%, #000000 100%);
+}
+
+/* --- ANILLO 0 (MERCADO NEGRO) --- */
+.ring0-bg-pattern {
+    background-color: #050000;
+    background-image: radial-gradient(#3a0000 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.ring0-card {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: grayscale(100%) contrast(1.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+}
+
+.ring0-card:hover,
+.ring0-card.active {
+    transform: scale(1.1) rotate(0deg) !important;
+    z-index: 50;
+    filter: grayscale(0%) contrast(1);
+    border-color: #ef4444;
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.4), 0 20px 25px -5px rgba(0, 0, 0, 0.8);
+}
