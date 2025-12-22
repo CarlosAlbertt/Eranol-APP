@@ -104,13 +104,13 @@ export const tavernsData = {
         icon: "fa-mask",
         theme: "border-gray-700/50 bg-gray-900/90",
         themeClass: "theme-mudo",
-        bgImage: "img/hub/tavern_mudo.png",
+        bgImage: "/img/hub/library.png",
         npcs: [
             {
                 id: 'owner_m',
                 name: "Silas 'El Mudo'",
                 role: "Dueño",
-                avatar: "img/npcs/silas_mudo.png",
+                avatar: "/img/npcs/silas.png",
                 desc: "Un kenku que se comunica con sonidos y gestos. Nadie sabe su verdadero nombre.",
                 type: "owner",
                 dialogue: "*Sonido de monedas cayendo y un gruñido de bienvenida*"
@@ -119,7 +119,7 @@ export const tavernsData = {
                 id: 'npc_whisper',
                 name: "Susurros",
                 role: "Informante",
-                avatar: "img/npcs/whisper.png",
+                avatar: "/img/npcs/encapuchada.png",
                 desc: "Siempre en las sombras, siempre escuchando. Vende rumores y secretos.",
                 type: "info",
                 dialogue: "Tengo algo que te interesa... si el precio es justo."
@@ -155,7 +155,7 @@ export const tavernsData = {
                 id: 'owner_c',
                 name: "Lady Elara",
                 role: "Dueña",
-                avatar: "img/npcs/elara.png",
+                avatar: "/img/npcs/sasha.png",
                 desc: "Una elfa de alta cuna que gestiona el local con magia.",
                 type: "owner",
                 dialogue: "Bienvenido al Cáliz. Por favor, no molestes a la clientela selecta."
@@ -164,7 +164,7 @@ export const tavernsData = {
                 id: 'npc_3',
                 name: "Vizconde Pompous",
                 role: "Noble",
-                avatar: "img/npcs/noble.png",
+                avatar: "/img/npcs/borg.png",
                 desc: "Observa a todos con desdén a través de un monóculo.",
                 type: "quest",
                 dialogue: "¡Tú! Pareces... útil. He perdido mi broche en las alcantarillas. Recupéralo."
