@@ -48,6 +48,42 @@ export const tavernsData = {
                 desc: "Huele a azufre y especias picantes. Tiene frascos inestables en el delantal.",
                 type: "vendor",
                 dialogue: "¡Prueba el estofado! Si sobrevives, te vendo pociones baratas."
+            },
+            {
+                id: 'npc_myla',
+                name: "Myla",
+                role: "Brujo Loco",
+                avatar: "/img/npcs/myla.png",
+                desc: "Dibuja mapas de túneles antiguos en la mesa con cerveza. Tiene la mirada perdida.",
+                type: "info",
+                dialogue: "Las ratas susurran... dicen que el subsuelo va a arder. ¿Lo oyes?"
+            },
+            {
+                id: 'npc_krug',
+                name: "Krug",
+                role: "Portero Poeta",
+                avatar: "/img/npcs/krug.png",
+                desc: "Un ogro de 3 metros que recita versos mientras aplasta jarras con la mano.",
+                type: "guard",
+                dialogue: "La sangre es roja, la espada es gris... paga la ronda o te parto la nariz."
+            },
+            {
+                id: 'npc_silas',
+                name: "Silas",
+                role: "Falso Cura",
+                avatar: "/img/npcs/silas.png",
+                desc: "Vende reliquias falsas y perdona pecados por monedas de oro.",
+                type: "vendor",
+                dialogue: "Por 10 oros los dioses perdonan ese robo. Por 20, perdonan... cosas peores."
+            },
+            {
+                id: 'npc_brunhilda',
+                name: "Brunhilda",
+                role: "Campeona",
+                avatar: "/img/npcs/brunhilda.png",
+                desc: "La mujer más fuerte del foso. Exhibe músculos de acero y una sonrisa desafiante.",
+                type: "quest",
+                dialogue: "¿Crees que tienes brazo? Si me ganas, te respeto. Si pierdes, pagas tú."
             }
         ],
         // Pool for Daily Rotation (d12)

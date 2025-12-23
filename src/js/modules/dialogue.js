@@ -150,6 +150,179 @@ const dialogueData = {
                 failure: "*Silas te hace un corte de manga y grazna como un cuervo. Claramente piensa que eres idiota.*"
             }
         ]
+    },
+
+    // --- NUEVOS NPC'S (EXPANSIÓN) ---
+
+    // 5. MYLA (Brujo Loco)
+    'npc_myla': {
+        name: "Myla",
+        role: "Brujo del Subsuelo",
+        avatar: "/img/npcs/myla.png",
+        greeting: "Myla dibuja espirales en la cerveza derramada. Sus ojos no enfocan nada en particular. 'Están cavando... abajo. ¿Lo oyes? Rascan la piedra.'",
+        options: [
+            {
+                label: "👂 [Escuchar] (Percepción CD 12) Intentar oír lo que ella oye.",
+                check: { skill: "Percepción", dc: 12 },
+                success: "Te concentras. Por un momento, sientes una vibración sutil en el suelo. Algo enorme se mueve en las profundidades. (Ganas Pista)",
+                failure: "Solo oyes borrachos y gritos. Myla se ríe de ti. 'Estás sordo. Todos estáis sordos.'",
+                successNext: 'myla_stage2',
+                failureNext: 'myla_stage2'
+            },
+            {
+                label: "💊 [Medicina] (Medicina CD 10) Parece enferma. Ofrecer ayuda.",
+                check: { skill: "Medicina", dc: 10 },
+                success: "Le tomas el pulso. Su piel arde. No es fiebre normal, es corrupción mágica. 'No me toques... se contagia la verdad.'",
+                failure: "Te muerde la mano. '¡Aléjate! ¡Eres uno de ellos!'",
+                successNext: 'myla_stage2'
+            }
+        ]
+    },
+    'myla_stage2': {
+        name: "Myla",
+        role: "Profeta de la Ruina",
+        avatar: "/img/npcs/myla.png",
+        greeting: "Se calma un poco, pero tiembla. 'La 'Cosa' en el pozo... tiene hambre. Antes comía basura. Ahora quiere... otra cosa. He visto los planos.'",
+        options: [
+            { label: "🗺️ ¿Qué planos? (Historia)", check: { skill: "Historia", dc: 14 }, success: "Dibuja un mapa tosco. 'Túneles prohibidos. Debajo de la Arena. Conectan con la Antigua Prisón.'", failure: "Borra el dibujo. 'No... me miran.'" },
+            { label: "👋 Volver", nextDialogue: 'npc_myla' }
+        ]
+    },
+
+    // 6. KRUG (Portero Poeta)
+    'npc_krug': {
+        name: "Krug",
+        role: "Portero Poeta",
+        avatar: "/img/npcs/krug.png",
+        greeting: "El ogro te bloquea el paso con un brazo del tamaño de un tronco. 'La luna es blanca, tu cara es pálida... si entras aquí, la salida es cálida (y sangrienta).'",
+        options: [
+            {
+                label: "📜 [Poesía] (Interpretación CD 13) Completar la rima.",
+                check: { skill: "Interpretación", dc: 13 },
+                success: "'...Pero mi espada es dura y mi sed es válida!' Krug suelta una carcajada sísmica. '¡HERMANO DE VERSO! Pasa.'",
+                failure: "'...Eh... ¿tu madre es gorda?' Krug te mira inexpresivo. 'Mala métrica. Y ofensivo.'",
+                successNext: 'krug_stage2'
+            },
+            {
+                label: "💪 [Fuerza] (Atletismo CD 16) Mover su brazo.",
+                check: { skill: "Atletismo", dc: 16 },
+                success: "Empujas con todo. El brazo se mueve dos centímetros. Krug asiente. 'Respeto. Eres fuerte para ser pequeñajo.'",
+                failure: "Es como empujar una montaña. Krug te da un empujoncito y vuelas tres metros.",
+                onFailure: 'fight'
+            }
+        ]
+    },
+    'krug_stage2': {
+        name: "Krug",
+        role: "Amante del Arte",
+        avatar: "/img/npcs/krug.png",
+        greeting: "'Pocos aprecian el arte del mamporro y la rima. ¿Buscas entrar al Club de Lucha Privado?'",
+        options: [
+            { label: "🥊 ¿Club Privado?", nextDialogue: 'zone_foso' }, // Link to Arena logic? Or text.
+            { label: "👋 Hasta luego", nextDialogue: 'npc_krug' }
+        ]
+    },
+
+    // 7. SILAS (Falso Cura) (Updated from previous pool)
+    'npc_silas': {
+        name: "Silas",
+        role: "Clérigo de la Moneda",
+        avatar: "/img/npcs/silas.png",
+        greeting: "Silas hace tintinear una bolsa de monedas. 'Los dioses están ocupados, hijo. Pero yo tengo línea directa. ¿Tienes pecados? Tengo tarifas.'",
+        options: [
+            {
+                label: "💰 [Comercio] Ver mercancía 'sagrada'.",
+                type: "shop",
+                action: "openShop",
+                shopId: "el-mudo-reidor" // Reuse Mudo shop for now or unique Silas shop
+            },
+            {
+                label: "🛐 [Religión] (Religión CD 12) Cuestionar su fe.",
+                check: { skill: "Religión", dc: 12 },
+                success: "Notas que su símbolo sagrado es una chapa de cerveza aplastada. 'Detalles, detalles. La fe está en el oro.' Te guiña un ojo.",
+                failure: "Te suelta un sermón incomprensible y te cobra 5 monedas por 'escuchar'.",
+                successNext: 'silas_stage2'
+            }
+        ]
+    },
+    'silas_stage2': {
+        name: "Silas",
+        role: "Estafador Maestro",
+        avatar: "/img/npcs/silas.png",
+        greeting: "'Mira, entre tú y yo... estoy organizando una 'peregrinación' a la cámara del tesoro del Banco Gnomo. Solo para fieles VIP. ¿Te interesa?'",
+        options: [
+            { label: "🕵️ Cuéntame más (Investigación)", check: { skill: "Investigación", dc: 16 }, success: "Te revela que tiene planos de los conductos de ventilación. '50% para cada uno.'", failure: "'Olvídalo. Tienes cara de guardia.'" },
+            { label: "👋 Paso", nextDialogue: 'npc_silas' }
+        ]
+    },
+
+    // 8. BRUNHILDA (Campeona)
+    'npc_brunhilda': {
+        name: "Brunhilda",
+        role: "La Invicto",
+        avatar: "/img/npcs/brunhilda.png",
+        greeting: "Brunhilda está doblando una herradura con una mano. Te mira aburrida. '¿Vienes a retarme o a invitarme? Espero que sea lo primero, tengo sed de violencia.'",
+        options: [
+            {
+                label: "💪 [Reto] (Atletismo CD 18) ¡Pulso! Ahora mismo.",
+                check: { skill: "Atletismo", dc: 18 },
+                success: "Las mesas tiemblan. Las venas se hinchan. ¡PAM! Estampas su mano contra la madera. Todo el bar se calla. '...Nadie... me había ganado. Tienes mi respeto.' (Ganas Aliado)",
+                failure: "Te rompe la muñeca (casi). 'Vuelve cuando tomes tu leche, niño.' -2 HP.",
+                successNext: 'brunhilda_stage2'
+            },
+            {
+                label: "🍺 [Invitar] (Constitución CD 14) Bebamos hasta caer.",
+                check: { skill: "Constitución", dc: 14 },
+                success: "Cinco jarras después, sigues en pie (apenas). Brunhilda se ríe y te da una palmada que te saca el aire. '¡Buen hígado!'",
+                failure: "Te despiertas 3 horas después en el callejón sin pantalones. Brunhilda te ganó.",
+                successNext: 'brunhilda_stage2'
+            }
+        ]
+    },
+    'brunhilda_stage2': {
+        name: "Brunhilda",
+        role: "Aliada Potencial",
+        avatar: "/img/npcs/brunhilda.png",
+        greeting: "'No estás mal. Oye, hay un torneo de dobles la semana que viene en la Arena. Busco pareja que no muera en 5 segundos. ¿Te apuntas?'",
+        options: [
+            { label: "⚔️ ¡Cuenta conmigo!", nextDialogue: 'zone_foso' },
+            { label: "👋 Quizás luego", nextDialogue: 'npc_brunhilda' }
+        ]
+    },
+
+    // --- DIÁLOGOS ANIDADOS (STAGE 2) PARA NPCS ORIGINALES ---
+
+    'borg_stage2': {
+        name: "Borg",
+        role: "Dueño del Grifo",
+        avatar: "/img/npcs/borg.png",
+        greeting: "'Veo que sabes cuidarte. Escucha... tengo un problema de 'plagas' en el sótano. No son ratas. Son cosas que Zora trajo y se escaparon. ¿Te interesa un trabajo sucio?'",
+        options: [
+            { label: "⚔️ [Misión] Matar a las bestias.", success: "Marked as Quest Accepted (WIP). 'Bien. Habla conmigo cuando tengas sus cabezas.'", check: { skill: "Supervivencia", dc: 10 } },
+            { label: "👋 Volver", nextDialogue: 'owner_g' }
+        ]
+    },
+
+    'zora_stage2': {
+        name: "Zora 'La Cicatriz'",
+        role: "Veterana Cínica",
+        avatar: "/img/npcs/zora.png",
+        greeting: "'Sobrevives. Eso es raro aquí. ¿Buscas trabajo de verdad? El Gremio de Cazadores paga bien por trofeos de monstruos del Abismo.'",
+        options: [
+            { label: "📜 ¿Dónde me apunto?", check: { skill: "Persuasión", dc: 12 }, success: "Te entrega una moneda negra. 'Enséñale esto al tablón de anuncios. Te darán las misiones difíciles.' (Desbloquea Contratos)" },
+            { label: "👋 Luego", nextDialogue: 'npc_zora' }
+        ]
+    },
+
+    'vance_stage2': {
+        name: "'Dedos' Vance",
+        role: "Socio Comercial",
+        avatar: "/img/npcs/vance.png",
+        greeting: "'Bien, bien... parece que podemos confiar (un poco) en ti. Tengo un mapa de una ruta segura para contrabando en el Anillo 3. ¿Lo quieres? 500 oros.'",
+        options: [
+            { label: "💰 Comprar Mapa (500 MO)", check: { skill: "Persuasión", dc: 15 }, success: "Vance te da un papel arrugado. 'No digas que te lo di yo.'", failure: "'¿Sin oro? No hay mapa. El capitalismo es así.'" },
+            { label: "👋 Volver", nextDialogue: 'npc_vance' }
+        ]
     }
 };
 
@@ -286,6 +459,12 @@ export function handleDialogueOption(optionIndex) {
         return;
     }
 
+    // Is it a simple branching option?
+    if (opt.nextDialogue) {
+        startDialogue(opt.nextDialogue);
+        return;
+    }
+
     // Is it a skill check?
     if (opt.check) {
         renderManualRollInput(optionIndex, opt);
@@ -331,6 +510,7 @@ function resolveManualRoll(optionIndex) {
     }
 
     const isSuccess = val >= opt.check.dc;
+    const nextStep = isSuccess ? opt.successNext : opt.failureNext;
 
     // Render Result
     const resultContainer = document.getElementById('dialogue-result');
@@ -350,24 +530,35 @@ function resolveManualRoll(optionIndex) {
                 </div>
             </div>
         </div>
-        <p class="text-sm ${isSuccess ? 'text-green-200' : 'text-red-200'} italic leading-relaxed">
+        <p class="text-sm ${isSuccess ? 'text-green-200' : 'text-red-200'} italic leading-relaxed mb-4">
             "${isSuccess ? opt.success : opt.failure}"
         </p>
     `;
-
-    resultContainer.classList.remove('hidden');
 
     // Trigger Fight logic if failed
     if (!isSuccess && opt.onFailure === 'fight') {
         setTimeout(() => {
             triggerFight(data.name);
             closeDialogue();
-        }, 1500); // Small delay to read the failure message
+        }, 1500);
         return;
     }
 
-    // Restore Options (so they can continue or leave)
-    renderOptions(data.options);
+    // Render Next Action Button if chain exists, else restore options
+    if (nextStep) {
+        resultContainer.innerHTML += `
+            <button onclick="startDialogue('${nextStep}')" class="w-full py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-center uppercase tracking-widest text-sm font-bold transition-all">
+                Continuar <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        `;
+        // Clear options to focus user on result
+        document.getElementById('dialogue-options').innerHTML = '';
+    } else {
+        // Restore Options (so they can continue or leave)
+        renderOptions(data.options);
+    }
+
+    resultContainer.classList.remove('hidden');
 }
 
 function triggerFight(opponentName) {
