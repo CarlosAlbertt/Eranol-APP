@@ -1,4 +1,4 @@
-import { PlayerRepository } from './repository.js';
+import { PlayerRepository } from './_lib/repository.js';
 import { knownUsers } from '../src/js/data/users.js';
 
 export default async function handler(request, response) {
