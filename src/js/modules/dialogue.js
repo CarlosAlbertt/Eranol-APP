@@ -710,16 +710,29 @@ function resolveManualRoll(optionIndex) {
         // End of branch: Offer choice to Close or Return
         document.getElementById('dialogue-options').innerHTML = '';
 
-        resultContainer.innerHTML += `
-            <div class="flex flex-col gap-2 mt-4 animate-fade-in">
-                <button onclick="event.stopPropagation(); closeDialogue()" class="w-full py-3 bg-red-900/50 hover:bg-red-800 border-2 border-red-500 rounded text-center uppercase tracking-widest text-sm font-bold text-white shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all transform hover:scale-[1.02]">
-                    👋 Terminar Conversación
-                </button>
-                <button onclick="renderOptions(dialogueData['${currentNpcId}'].options); document.getElementById('dialogue-result').classList.add('hidden')" class="w-full py-2 text-gray-400 hover:text-white text-xs uppercase tracking-widest transition-colors">
-                    <i class="fas fa-undo mr-1"></i> Hacer otra pregunta
-                </button>
-            </div>
-        `;
+        // If it was a success (e.g. Mission Accepted), force a cleanup option to avoid looping
+        if (isSuccess) {
+            resultContainer.innerHTML += `
+                <div class="flex flex-col gap-2 mt-4 animate-fade-in">
+                    <button onclick="event.stopPropagation(); closeDialogue()" class="w-full py-3 bg-green-900/50 hover:bg-green-800 border-2 border-green-500 rounded text-center uppercase tracking-widest text-sm font-bold text-white shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all transform hover:scale-[1.02]">
+                        ✅ ¡Hecho! (Cerrar)
+                    </button>
+                </div>
+            `;
+        } else {
+            // Failure or neutral end: allow retry if appropriate (or close)
+            resultContainer.innerHTML += `
+                <div class="flex flex-col gap-2 mt-4 animate-fade-in">
+                    <button onclick="event.stopPropagation(); closeDialogue()" class="w-full py-3 bg-red-900/50 hover:bg-red-800 border-2 border-red-500 rounded text-center uppercase tracking-widest text-sm font-bold text-white shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all transform hover:scale-[1.02]">
+                        👋 Terminar Conversación
+                    </button>
+                    ${!opt.onFailure ? `
+                    <button onclick="renderOptions(dialogueData['${currentNpcId}'].options); document.getElementById('dialogue-result').classList.add('hidden')" class="w-full py-2 text-gray-400 hover:text-white text-xs uppercase tracking-widest transition-colors">
+                        <i class="fas fa-undo mr-1"></i> Intentar otra cosa
+                    </button>` : ''}
+                </div>
+            `;
+        }
     }
 
     resultContainer.classList.remove('hidden');
