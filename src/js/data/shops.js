@@ -386,7 +386,7 @@ export const allShops = [
             { name: 'Bomba "Purpurina"', price: 150, type: 'Consumible', desc: 'Ciega y revela invisibles 10 pies.', rarity: 'Común' }
         ]
     },
-    ,
+
     // ANILLO 2
     {
         id: 'vivarium',
