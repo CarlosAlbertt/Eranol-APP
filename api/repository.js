@@ -1,4 +1,4 @@
-import sql from './lib/db.js';
+import sql from './db.js';
 
 const toCodeId = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '_');
 

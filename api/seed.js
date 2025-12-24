@@ -1,4 +1,4 @@
-import sql from './lib/db.js';
+import sql from './db.js';
 import { allShops } from '../src/js/data/shops.js';
 // We would also import npcs/quests if they were in a clear data file.
 // For now, let's focus on Items primarily, as they are the most critical for inventory.
