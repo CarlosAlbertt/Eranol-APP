@@ -1,5 +1,4 @@
-import { state } from '../../state.js';
-
+import { addItem, playerState } from './player.js';
 
 /*
     DIALOGUE MODULE
@@ -12,8 +11,8 @@ let currentNpcId = null;
 // --- DATA: DIALOGUE TREES ---
 // Hardcoded here for now, could be moved to src/js/data/dialogues.js later
 const dialogueData = {
-    // 1. BORG (Dueño)
-    'owner_g': {
+    // 1. BORG (Tabernero)
+    'npc_borg': {
         name: "Borg",
         role: "Dueño del Grifo",
         avatar: "/img/npcs/borg.png",
@@ -28,20 +27,24 @@ const dialogueData = {
                 label: "🤝 [Amistoso] (Persuasión CD 12) Buen local. Debiste ser un grande en la Arena.",
                 check: { skill: "Persuasión", dc: 12 },
                 success: "Borg sonríe, mostrando dientes de oro. '¡JA! El mejor. Aplasté tres cabezas de ogro en una tarde. La clave es el equilibrio... y golpear primero. Toma, la primera invita la casa.' (Ganas una Cerveza)",
-                failure: "Borg gruñe. 'No me hagas la pelota. Cómprame algo o lárgate.'"
+                failure: "Borg gruñe. 'No me hagas la pelota. Cómprame algo o lárgate.'",
+                successNext: 'borg_stage2_glory'
             },
             {
                 label: "🧐 [Investigar] (Investigación CD 14) ¿Quién es esa tal Zora?",
                 check: { skill: "Investigación", dc: 14 },
                 success: "Baja la voz. 'Zora... es peligrosa. Ex-Ignis. Busca algo o a alguien. Si yo fuera tú, no la molestaría a menos que tengas oro o una sentencia de muerte.'",
-                failure: "Te mira con desconfianza. 'Es una clienta. Yo no vendo información, vendo alcohol. Calla y bebe.'"
+                failure: "Te mira con desconfianza. 'Es una clienta. Yo no vendo información, vendo alcohol. Calla y bebe.'",
+                successNext: 'borg_stage2_zora'
             },
             {
                 label: "😡 [Amenaza] (Intimidación CD 18) Dame lo mejor que tengas, gratis. Ahora.",
                 check: { skill: "Intimidación", dc: 18 },
                 success: "Borg se tensa, luego suelta una carcajada. '¡HUEVOS! Me gustas. Tienes agallas. Toma este 'Matarratas', invita la casa. Pero no lo vuelvas a hacer.'",
+                reward: { name: "Orujo Matarratas", desc: "Arde al bajar. Arde al subir. +5 FUE, -2 INT durante 1 hora.", type: "consumable", rarity: "uncommon", image: "" },
                 failure: "En un parpadeo, Borg saca una escopeta recortada y te apunta a la nariz. '¿Decías? Fuera de mi vista antes de que decore la pared con tus sesos.'",
-                onFailure: "fight"
+                onFailure: "fight",
+                successNext: 'borg_stage2_threat'
             }
         ]
     },
@@ -57,20 +60,23 @@ const dialogueData = {
                 label: "❓ [Pregunta] (Historia CD 13) Esa espada es de oficial de Ignis...",
                 check: { skill: "Historia", dc: 13 },
                 success: "Se detiene. Te mira a los ojos. 'Observador. Sí. Era de mi capitán. Murió gritando órdenes que nadie escuchó. Ahora corto cabezas por dinero, no por banderas.'",
-                failure: "Te ignora. 'Es una espada. Corta. Eso es todo lo que necesitas saber.'"
+                failure: "Te ignora. 'Es una espada. Corta. Eso es todo lo que necesitas saber.'",
+                successNext: 'zora_stage2_history'
             },
             {
                 label: "🤝 [Amistoso] (Persuasión CD 15) Invitar a un trago.",
                 check: { skill: "Persuasión", dc: 15 },
                 success: "Acepta la jarra. 'Gracias. Pocos se atreven a acercarse. Dicen que traigo mala suerte. Tal vez tengan razón... o tal vez soy la única que sobrevive.'",
-                failure: "Empuja la jarra lejos. 'No bebo con desconocidos. Se pierde el pulso.'"
+                failure: "Empuja la jarra lejos. 'No bebo con desconocidos. Se pierde el pulso.'",
+                successNext: 'zora_stage2_persuasion'
             },
             {
                 label: "⚔️ [Duelo] (Atletismo CD 16) Apuesto a que soy más rápido que tú.",
                 check: { skill: "Atletismo", dc: 16 },
                 success: "Se ríe y en un borrón su daga está clavada entre tus dedos en la mesa. 'Rápido. Pero ruidoso. Me caes bien, chico. Ten cuidado en el Foso.'",
                 failure: "Ni la ves moverse. Tienes su hoja en tu garganta. 'Muerto. Estarías muerto. Lárgate.'",
-                onFailure: "fight"
+                onFailure: "fight",
+                successNext: 'zora_stage2_duel'
             }
         ]
     },
@@ -86,13 +92,15 @@ const dialogueData = {
                 label: "🧐 [Dudoso] (Juego de Manos CD 14) ¿Dónde está la moneda?",
                 check: { skill: "Juego de Manos", dc: 14 },
                 success: "Atrapas su mano en el aire revelando la moneda en su manga. Vance silba impresionado. '¡Vaya! Ojos de halcón. Vale, hablemos. Sé cosas sobre las alcantarillas...'",
-                failure: "Señala tu oreja y saca la moneda de ahí. 'Lento. Demasiado lento. ¿Te falta oro, amigo?'"
+                failure: "Señala tu oreja y saca la moneda de ahí. 'Lento. Demasiado lento. ¿Te falta oro, amigo?'",
+                successNext: 'vance_stage2'
             },
             {
                 label: "🔎 [Investigar] (Investigación CD 12) Busco rumores del Mercado Negro.",
                 check: { skill: "Investigación", dc: 12 },
                 success: "'Shhh... no tan alto. Busca la puerta marcada con el Ojo Azul, tras la medianoche. Di que Vance te envía... si quieres un descuento.'",
-                failure: "'¿Mercado Negro? No sé de qué hablas. Aquí somos ciudadanos honrados.' (Se ríe)"
+                failure: "'¿Mercado Negro? No sé de qué hablas. Aquí somos ciudadanos honrados.' (Se ríe)",
+                successNext: 'vance_stage2'
             },
             {
                 label: "😡 [Acusación] (Intimidación CD 15) ¡Devuélveme la bolsa!",
@@ -107,7 +115,7 @@ const dialogueData = {
     'npc_grumm': {
         name: "Grumm",
         role: "Chef Alquimista",
-        avatar: "img/npcs/grumm.png",
+        avatar: "/img/npcs/grumm.png",
         greeting: "Grumm revuelve una olla que burbujea color verde. Huele a podrido y a... ¿canela? '¡NO TOCAR! ¡Explota! Digo... ¡Se cocina!'",
         options: [
             {
@@ -134,7 +142,7 @@ const dialogueData = {
     'owner_m': {
         name: "Silas 'El Mudo'",
         role: "Dueño Kenku",
-        avatar: "img/npcs/silas_mudo.png",
+        avatar: "/img/npcs/silas.png",
         greeting: "*Silas te mira con ojos de cuervo. Hace un gesto de beber y señala un cartel tosco que dice 'ORO = TRAGO'. Luego imita el sonido de una bolsa de monedas cayendo.*",
         options: [
             {
@@ -292,25 +300,68 @@ const dialogueData = {
 
     // --- DIÁLOGOS ANIDADOS (STAGE 2) PARA NPCS ORIGINALES ---
 
-    'borg_stage2': {
+    // BORG BRANCHES
+    'borg_stage2_glory': {
         name: "Borg",
-        role: "Dueño del Grifo",
+        role: "Veterano Nostálgico",
         avatar: "/img/npcs/borg.png",
-        greeting: "'Veo que sabes cuidarte. Escucha... tengo un problema de 'plagas' en el sótano. No son ratas. Son cosas que Zora trajo y se escaparon. ¿Te interesa un trabajo sucio?'",
+        greeting: "'Esos eran días de gloria. Oye, aún guardo mi viejo equipo en el almacén. Si traes cuero de Basilisco, podría pedirle al herrero que te haga algo decente. ¿Te interesa?'",
         options: [
-            { label: "⚔️ [Misión] Matar a las bestias.", success: "Marked as Quest Accepted (WIP). 'Bien. Habla conmigo cuando tengas sus cabezas.'", check: { skill: "Supervivencia", dc: 10 } },
+            { label: "🛡️ [Misión] Buscaré ese cuero.", success: "Misión Aceptada: Piel de Basilisco. 'Suerte. Tienen mal aliento.'", check: { skill: "Supervivencia", dc: 10 } },
             { label: "👋 Volver", nextDialogue: 'owner_g' }
         ]
     },
+    'borg_stage2_zora': {
+        name: "Borg",
+        role: "Informante Cauteloso",
+        avatar: "/img/npcs/borg.png",
+        greeting: "'Zora busca a un desertor. Un tal 'Fantasma'. Si te enteras de algo, díselo a ella, no a mí. Pero ten cuidado, chico. En Eranol, el conocimiento pesa más que el hierro.'",
+        options: [
+            { label: "🕵️ ¿Quién es el Fantasma?", check: { skill: "Historia", dc: 15 }, success: "Borg susurra: 'Un asesino de magos. Dicen que puede caminar entre las sombras.'", failure: "'Ya he dicho demasiado. Bebe tu trago.'" },
+            { label: "👋 Volver", nextDialogue: 'owner_g' }
+        ]
+    },
+    'borg_stage2_threat': {
+        name: "Borg",
+        role: "Respeto Ganado",
+        avatar: "/img/npcs/borg.png",
+        greeting: "'Me recuerdas a mí de joven. Imprudente. Estúpido. Fuerte. Escucha, necesito a alguien que 'cobre' unas deudas a unos clientes morosos en el Anillo 3. ¿Te apuntas?'",
+        options: [
+            { label: "💰 [Misión] Iré a cobrar.", success: "Misión Aceptada: El Cobrador. Borg te da una lista. 'No los mates... si no es necesario.'", check: { skill: "Intimidación", dc: 10 }, mission: { id: 'el_cobrador', title: 'El Cobrador', desc: 'Borg necesita que alguien le recuerde a sus deudores quién manda.', obj: 'Cobra 3 deudas en el Anillo 3', reward: { name: 'Escopeta Recortada', rarity: 'rare' } } },
+            { label: "👋 No soy un matón.", nextDialogue: 'owner_g' }
+        ]
+    },
 
-    'zora_stage2': {
+    'zora_stage2_persuasion': {
         name: "Zora 'La Cicatriz'",
-        role: "Veterana Cínica",
+        role: "Contacto del Gremio",
         avatar: "/img/npcs/zora.png",
         greeting: "'Sobrevives. Eso es raro aquí. ¿Buscas trabajo de verdad? El Gremio de Cazadores paga bien por trofeos de monstruos del Abismo.'",
         options: [
-            { label: "📜 ¿Dónde me apunto?", check: { skill: "Persuasión", dc: 12 }, success: "Te entrega una moneda negra. 'Enséñale esto al tablón de anuncios. Te darán las misiones difíciles.' (Desbloquea Contratos)" },
+            { label: "📜 ¿Dónde me apunto?", check: { skill: "Persuasión", dc: 12 }, success: "Te entrega una moneda negra. 'Enséñale esto al tablón de anuncios. Te darán las misiones difíciles.' (Desbloquea Contratos)", reward: { name: "Moneda de Sangre", desc: "Una moneda negra y pesada con el símbolo del Gremio. Abre puertas oscuras.", type: "quest", rarity: "rare", image: "" } },
             { label: "👋 Luego", nextDialogue: 'npc_zora' }
+        ]
+    },
+
+    'zora_stage2_history': {
+        name: "Zora 'La Cicatriz'",
+        role: "Veterana de Guerra",
+        avatar: "/img/npcs/zora.png",
+        greeting: "'No mucha gente conoce los viejos regimientos. ¿También serviste? Hay un alijo de armas viejas en las ruinas del Anillo 4. Me vendría bien alguien que cubra mi espalda.'",
+        options: [
+            { label: "🛡️ [Misión] Ayudar a recuperar las armas.", success: "Misión Aceptada: Ecos de Ignis. 'Bien. Nos movemos al anochecer.'", check: { skill: "Historia", dc: 12 }, mission: { id: 'ecos_ignis', title: 'Ecos de Ignis', desc: 'Zora busca el viejo arsenal de su regimiento perdido.', obj: 'Localiza el búnker en las Ruinas.', reward: { name: 'Medalla de Honor', rarity: 'epic' } } },
+            { label: "👋 No soy soldado.", nextDialogue: 'npc_zora' }
+        ]
+    },
+
+    'zora_stage2_duel': {
+        name: "Zora 'La Cicatriz'",
+        role: "Duelista Impresionada",
+        avatar: "/img/npcs/zora.png",
+        greeting: "'Tienes buenos reflejos. Me recuerdas a... alguien. Escucha, necesito sparring para un torneo clandestino. La paga es buena, si no te importa sangrar.'",
+        options: [
+            { label: "⚔️ [Misión] Seré tu sparring.", success: "Misión Aceptada: Sangre y Arena. 'Intenta no morir el primer día.'", check: { skill: "Atletismo", dc: 14 }, mission: { id: 'sangre_arena', title: 'Sangre y Arena', desc: 'Sobrevive al entrenamiento de Zora y entra en el torneo.', obj: 'Gana 3 combates de práctica', canvas: 'arena' } },
+            { label: "👋 Prefiero mis dientes intactos.", nextDialogue: 'npc_zora' }
         ]
     },
 
@@ -320,7 +371,7 @@ const dialogueData = {
         avatar: "/img/npcs/vance.png",
         greeting: "'Bien, bien... parece que podemos confiar (un poco) en ti. Tengo un mapa de una ruta segura para contrabando en el Anillo 3. ¿Lo quieres? 500 oros.'",
         options: [
-            { label: "💰 Comprar Mapa (500 MO)", check: { skill: "Persuasión", dc: 15 }, success: "Vance te da un papel arrugado. 'No digas que te lo di yo.'", failure: "'¿Sin oro? No hay mapa. El capitalismo es así.'" },
+            { label: "💰 Comprar Mapa (500 MO)", check: { skill: "Persuasión", dc: 15 }, success: "Vance te da un papel arrugado. 'No digas que te lo di yo.'", reward: { name: "Mapa de Contrabandista", desc: "Rutas seguras a través de las alcantarillas del Anillo 3.", type: "quest", rarity: "rare", image: "" }, failure: "'¿Sin oro? No hay mapa. El capitalismo es así.'" },
             { label: "👋 Volver", nextDialogue: 'npc_vance' }
         ]
     }
@@ -382,32 +433,97 @@ export function initDialogueSystem() {
     window.closeDialogue = closeDialogue;
     window.handleDialogueOption = handleDialogueOption;
     window.resolveManualRoll = resolveManualRoll;
+    window.handleReward = handleReward; // Expose for Mission Debug
 }
 
 export function startDialogue(npcId, fallbackData = null) {
     currentNpcId = npcId;
-    const data = dialogueData[npcId] || fallbackData;
+    console.log("Starting dialogue for ID:", npcId);
+
+    let data = dialogueData[npcId];
 
     if (!data) {
-        console.error("No dialogue data for", npcId);
-        return;
+        console.warn(`Dialogue data not found for ${npcId}. Using fallback.`);
+        console.log("Available IDs:", Object.keys(dialogueData)); // Debug help
+
+        if (fallbackData) {
+            data = fallbackData;
+        } else {
+            console.error("No data and no fallback for", npcId);
+            return;
+        }
     }
 
     // Populate UI
     document.getElementById('dialogue-name').innerText = data.name;
     document.getElementById('dialogue-role').innerText = data.role || 'Habitante';
+
+    // TRUST SYSTEM
+    // Ensure player has trust record
+    if (!playerState.npcStatus) playerState.npcStatus = {};
+    if (!playerState.npcStatus[npcId]) {
+        playerState.npcStatus[npcId] = { trust: 50, encountered: true };
+    }
+    const trust = playerState.npcStatus[npcId].trust;
+
+    // Render Trust Bar (Injecting into the role container if possible, or appending)
+    // We assume there's a container. Let's append to dialogue-role's parent or replace content if needed.
+    // Simpler: Target the #dialogue-portrait container or similar. 
+    // Actually, user wants it visible. Let's put it below role.
+    const roleEl = document.getElementById('dialogue-role');
+    // Check if bar already exists to avoid dupes
+    let trustBar = document.getElementById('dialogue-trust-bar');
+    if (!trustBar) {
+        trustBar = document.createElement('div');
+        trustBar.id = 'dialogue-trust-bar';
+        trustBar.className = "w-full max-w-[120px] bg-black/50 h-1 rounded-full mt-3 border border-white/10 relative overflow-hidden group mx-auto";
+        roleEl.parentNode.insertBefore(trustBar, roleEl.nextSibling);
+
+        // Label below
+        const label = document.createElement('div');
+        label.className = "text-[8px] text-gray-500 uppercase tracking-widest mt-1 text-center font-mono";
+        label.innerText = "AFINIDAD";
+        trustBar.parentNode.insertBefore(label, trustBar.nextSibling);
+    }
+
+    // Color logic
+    let barColor = "bg-white"; // Neutral
+    if (trust < 30) barColor = "bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)]";
+    else if (trust < 70) barColor = "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]";
+    else barColor = "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]";
+
+    trustBar.innerHTML = `
+        <div class="h-full ${barColor} transition-all duration-1000 ease-out relative" style="width: ${trust}%">
+           <div class="absolute right-0 top-0 bottom-0 w-[1px] bg-white/50 shadow-[0_0_5px_white]"></div>
+        </div>
+    `;
+
     document.getElementById('dialogue-portrait').style.backgroundImage = `url('${data.avatar}')`;
-    document.getElementById('dialogue-text').innerText = `"${data.greeting}"`;
+
+    // Robust text handling: prefer greeting, then dialogue, then default
+    const text = data.greeting || data.dialogue || "*Te mira en silencio.*";
+    document.getElementById('dialogue-text').innerText = `"${text}"`;
+
     document.getElementById('dialogue-result').classList.add('hidden');
 
-    renderOptions(data.options);
+    // If falling back to simple NPC object, it might not have 'options'. 
+    // We should render a default "Leave" option.
+    if (!data.options) {
+        renderOptions([{ label: "👋 Adiós", action: "close" }]);
+    } else {
+        renderOptions(data.options);
+    }
 
     // Show Modal
     dialogueModal.classList.remove('hidden');
 }
 
+
+
 export function closeDialogue() {
     dialogueModal.classList.add('hidden');
+    document.getElementById('dialogue-result').classList.add('hidden'); // Ensure result is hidden next time
+    document.getElementById('dialogue-options').innerHTML = ''; // Clear options
     currentNpcId = null;
 }
 
@@ -444,18 +560,35 @@ export function handleDialogueOption(optionIndex) {
     const opt = data.options[optionIndex];
     if (!opt) return;
 
+    // Reward Handling
+    if (opt.reward) {
+        handleReward(opt.reward);
+    }
+
+    // Mission Trigger
+    if (opt.mission) {
+        if (window.addMission) {
+            window.addMission(opt.mission);
+        } else {
+            console.warn("addMission not found globally");
+        }
+    }
+
     // Is it a shop action?
     if (opt.type === 'shop') {
         closeDialogue();
         if (opt.action === 'openShop') {
-            // We need to pass the proper NPC ID for the shop function to know which menu
-            // Assuming openTavernMenu handles this or valid shop logic
             if (window.openTavernMenu) {
-                // Pass ID string for best compatibility with Back button logic
                 const shopId = opt.shopId || 'grifo-tuerto';
                 window.openTavernMenu(shopId);
             }
         }
+        return;
+    }
+
+    // Is it a close action?
+    if (opt.action === 'close') {
+        closeDialogue();
         return;
     }
 
@@ -512,6 +645,23 @@ function resolveManualRoll(optionIndex) {
     const isSuccess = val >= opt.check.dc;
     const nextStep = isSuccess ? opt.successNext : opt.failureNext;
 
+    // UPDATE TRUST
+    if (playerState.npcStatus && playerState.npcStatus[currentNpcId]) {
+        const change = isSuccess ? 10 : -5;
+        let newTrust = playerState.npcStatus[currentNpcId].trust + change;
+        newTrust = Math.max(0, Math.min(100, newTrust)); // Clamp 0-100
+        playerState.npcStatus[currentNpcId].trust = newTrust;
+
+        // Refresh Trust Bar visually immediate
+        const trustBarInner = document.querySelector('#dialogue-trust-bar div');
+        if (trustBarInner) {
+            trustBarInner.style.width = `${newTrust}%`;
+            if (newTrust < 30) trustBarInner.className = "h-full bg-red-600 transition-all duration-700 ease-out";
+            else if (newTrust < 70) trustBarInner.className = "h-full bg-yellow-500 transition-all duration-700 ease-out";
+            else trustBarInner.className = "h-full bg-green-500 transition-all duration-700 ease-out";
+        }
+    }
+
     // Render Result
     const resultContainer = document.getElementById('dialogue-result');
 
@@ -544,18 +694,32 @@ function resolveManualRoll(optionIndex) {
         return;
     }
 
-    // Render Next Action Button if chain exists, else restore options
+    // Render Next Action Button or Auto-Transition
+    // Render Next Action Button (Manual)
     if (nextStep) {
         resultContainer.innerHTML += `
-            <button onclick="startDialogue('${nextStep}')" class="w-full py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded text-center uppercase tracking-widest text-sm font-bold transition-all">
-                Continuar <i class="fas fa-arrow-right ml-2"></i>
-            </button>
+            <div class="mt-4 flex justify-end animate-fade-in">
+                <button onclick="startDialogue('${nextStep}')" class="bg-white/10 hover:bg-white/20 border border-white/20 hover:border-amber-500 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold uppercase tracking-widest transition-all flex items-center gap-2 group shadow-lg">
+                    Continuar <i class="fas fa-chevron-right text-amber-500 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
         `;
-        // Clear options to focus user on result
         document.getElementById('dialogue-options').innerHTML = '';
+
     } else {
-        // Restore Options (so they can continue or leave)
-        renderOptions(data.options);
+        // End of branch: Offer choice to Close or Return
+        document.getElementById('dialogue-options').innerHTML = '';
+
+        resultContainer.innerHTML += `
+            <div class="flex flex-col gap-2 mt-4 animate-fade-in">
+                <button onclick="event.stopPropagation(); closeDialogue()" class="w-full py-3 bg-red-900/50 hover:bg-red-800 border-2 border-red-500 rounded text-center uppercase tracking-widest text-sm font-bold text-white shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all transform hover:scale-[1.02]">
+                    👋 Terminar Conversación
+                </button>
+                <button onclick="renderOptions(dialogueData['${currentNpcId}'].options); document.getElementById('dialogue-result').classList.add('hidden')" class="w-full py-2 text-gray-400 hover:text-white text-xs uppercase tracking-widest transition-colors">
+                    <i class="fas fa-undo mr-1"></i> Hacer otra pregunta
+                </button>
+            </div>
+        `;
     }
 
     resultContainer.classList.remove('hidden');
@@ -596,4 +760,46 @@ function triggerFight(opponentName) {
     }
 
     document.getElementById('fight-opponent').innerText = opponentName;
+}
+
+function handleReward(item) {
+    // Add to player inventory
+    // We import addItem from player.js
+    addItem(item);
+
+    // Visual Feedback (BG3 Style Modal)
+    const rewardModal = document.createElement('div');
+    rewardModal.className = "fixed inset-0 z-[100] flex items-center justify-center bg-black/80 animate-fade-in";
+    rewardModal.onclick = () => rewardModal.remove();
+
+    // Color based on rarity
+    let colorClass = "text-white";
+    if (item.rarity === 'legendary') colorClass = "text-amber-500";
+    if (item.rarity === 'rare') colorClass = "text-blue-400";
+    if (item.rarity === 'uncommon') colorClass = "text-green-400";
+
+    rewardModal.innerHTML = `
+        <div class="glass-panel p-8 rounded-xl border border-white/20 text-center transform scale-90 animate-fade-in-up max-w-sm mx-4 bg-black/90 shadow-[0_0_50px_rgba(255,165,0,0.2)]">
+            <h2 class="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6 border-b border-white/10 pb-2">Recompensa Obtenida</h2>
+            
+            <div class="relative w-24 h-24 mx-auto mb-6 group">
+                <div class="absolute inset-0 bg-${item.rarity === 'legendary' ? 'amber' : 'blue'}-500/20 rounded-full blur-xl animate-pulse"></div>
+                <div class="relative w-full h-full bg-black/50 rounded-full border-2 border-white/10 flex items-center justify-center shadow-2xl overflow-hidden">
+                     ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover">` : `<i class="fas fa-gift text-4xl ${colorClass}"></i>`}
+                </div>
+            </div>
+
+            <h3 class="font-cinzel text-2xl font-bold ${colorClass} mb-2 drop-shadow-md">${item.name}</h3>
+            
+            <div class="h-px w-16 bg-gradient-to-r from-transparent via-white/30 to-transparent mx-auto mb-4"></div>
+            
+            <p class="text-gray-300 italic text-sm leading-relaxed mb-6">"${item.desc}"</p>
+            
+            <div class="text-[10px] text-gray-500 uppercase tracking-widest animate-pulse flex items-center justify-center gap-2">
+                <i class="fas fa-mouse"></i> Click para continuar
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(rewardModal);
 }

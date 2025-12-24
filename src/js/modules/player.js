@@ -27,6 +27,7 @@ export const playerState = {
     gold: 1000,
     bloodCoins: 0, // NEW: Persistent Blood Currency
     missionStatus: {}, // NEW: Persist mission progress
+    npcStatus: {}, // { npcId: { trust: 50, encountered: true } }
     equipment: {
         // Armor (Pieces vs Full)
         head: null,
@@ -195,10 +196,8 @@ export async function saveGame() {
 }
 
 async function saveToCloud(username, state) {
-    if (window.location.hostname === 'localhost' && !localStorage.getItem('debug_cloud')) {
-        // Optional: Skip cloud on localhost unless forced, to save API calls? 
-        // Nah, let's enable it to test Neon.
-    }
+    // Force Cloud Save (Removed Localhost Check)
+    // if (window.location.hostname === 'localhost' && !localStorage.getItem('debug_cloud')) ...
 
     const known = knownUsers[username];
     if (!known) return; // Only save known users to cloud for now
@@ -248,23 +247,26 @@ export async function loadGame(specificUser = null) {
                     if (data.state) {
                         loadedState = data.state;
                         console.log('[CLOUD] Save Loaded!');
-                        safeToast("☁️ Partida Sincronizada (Nube)");
+                        safeToast("☁️ Partida Sincronizada (Neon DB)");
                     }
+                } else {
+                    console.warn('[CLOUD] Not Found or Error:', res.status);
                 }
             }
         } catch (e) {
             console.warn('[CLOUD] Load Failed/Offline:', e);
+            safeToast("⚠️ Error Conexión DB");
         }
 
         // 2. Fallback to LocalStorage if Cloud failed or empty
         if (!loadedState) {
-            const saved = localStorage.getItem(localKey);
-            if (saved) {
+            const storedRaw = localStorage.getItem(localKey);
+            if (storedRaw) {
                 try {
-                    loadedState = JSON.parse(saved);
-                    console.log('[LOCAL] Save Loaded');
-                    safeToast("💾 Partida Local (Cache)");
-                } catch (e) { console.error("Local Load Corrupt"); }
+                    loadedState = JSON.parse(storedRaw);
+                    console.log('[PLAYER] Loaded from Local Storage (Fallback)');
+                    safeToast("⚠️ MODO SIN CONEXIÓN (Cache Local)");
+                } catch (e) { console.error("Save Corrupt"); }
             }
         }
 

@@ -88,14 +88,10 @@ export const tavernsData = {
         ],
         // Pool for Daily Rotation (d12)
         npcPool: [
-            { id: 'pool_1', name: "Myla", role: "Brujo Loco", avatar: "/img/npcs/myla.png", desc: "Dibuja mapas de túneles antiguos en la mesa con cerveza.", dialogue: "¡Las ratas hablan! Dicen que el subsuelo arderá..." },
-            { id: 'pool_2', name: "Krug", role: "Portero Poeta", avatar: "/img/npcs/krug.png", desc: "Un ogro que recita versos mientras rompe jarras.", dialogue: "La sangre es roja, la espada es gris... págadme la ronda o os haré trizas. (Rima asonante)." },
             { id: 'pool_3', name: "Sasha", role: "Arquera Tuerta", avatar: "/img/npcs/sasha.png", desc: "Vende flechas mágicas de dudosa procedencia.", dialogue: "Tengo una flecha que persigue al que te debe dinero. ¿Interesa?" },
             { id: 'pool_4', name: "Viejo Rorn", role: "Minero", avatar: "/img/npcs/rorn.png", desc: "Jura haber encontrado una veta de plata en las alcantarillas.", dialogue: "¡Es verdad! ¡Brillaba! Pero las sombras se movían..." },
             { id: 'pool_5', name: "Trixie", role: "Hada en Tarro", avatar: "/img/npcs/trixie.png", desc: "Está atrapada en un tarro de cristal en la barra. Insulta a todos.", dialogue: "¡Sácame de aquí, gigante estúpido! ¡Te daré tres deseos! (Mentira)." },
             { id: 'pool_6', name: "Garra", role: "Tabaxi Yonqui", avatar: "/img/npcs/garra.png", desc: "Tiembla y se rasca. Vende secretos de la guardia.", dialogue: "Tengo... tengo info buena. Cambio de turno... puerta trasera... ¿tienes 'polvo de sueño'?" },
-            { id: 'pool_7', name: "Silas", role: "Falso Cura", avatar: "/img/npcs/silas.png", desc: "Vende reliquias falsas y perdona pecados por monedas.", dialogue: "Por 10 oros, los dioses perdonan ese robo. Por 20, perdonan el asesinato." },
-            { id: 'pool_8', name: "Brunhilda", role: "Campeona", avatar: "/img/npcs/brunhilda.png", desc: "La mujer más fuerte del foso. Reta a pulsos.", dialogue: "¿Crees que tienes brazo? Si me ganas, te doy mis guanteletes. Si pierdes, pagas la ronda." },
             { id: 'pool_9', name: "El Mudo", role: "Kenku Espía", avatar: "/img/npcs/elmudo.png", desc: "Imita sonidos de monstruos que ha visto recientemente.", dialogue: "*Sonido de una Hidra rugiendo y monedas cayendo*" },
             { id: 'pool_10', name: "Rey Riko", role: "Halfling", avatar: "/img/npcs/reyriko.png", desc: "Dice controlar a todas las ratas de la ciudad.", dialogue: "Mis pequeñas ojos lo ven todo. Cuidado donde pisas." },
             { id: 'pool_11', name: "Vex", role: "Brujo Dracónido", avatar: "/img/npcs/vex.png", desc: "Busca romper su pacto. Vende pergaminos oscuros.", dialogue: "No leas eso en voz alta. A menos que quieras invocar algo que no puedas matar." },

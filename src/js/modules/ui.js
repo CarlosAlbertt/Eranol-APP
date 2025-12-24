@@ -89,18 +89,27 @@ export function updateHUD() {
         // Filter active missions
         const active = [];
         if (playerState.missionStatus) {
-            for (const [id, status] of Object.entries(playerState.missionStatus)) {
-                if (status === 'accepted') active.push(id);
+            for (const [id, mission] of Object.entries(playerState.missionStatus)) {
+                if (mission.status === 'active') active.push({ id, ...mission });
             }
         }
 
         if (active.length === 0) {
             hudMissions.innerHTML = '<div class="text-center italic opacity-50 text-xs py-4">Sin contratos activos</div>';
         } else {
-            hudMissions.innerHTML = active.map(id => `
-                <div class="bg-black/40 p-2 rounded border border-white/5 flex justify-between items-center">
-                    <span class="text-xs font-bold text-yellow-500">Misión #${id}</span>
-                    <span class="text-[10px] text-gray-400 uppercase">En Progreso</span>
+            hudMissions.innerHTML = active.map(m => `
+                <div class="bg-gradient-to-r from-gray-900 to-gray-800 p-3 rounded border-l-2 border-amber-500 shadow-md mb-2 group hover:brightness-110 transition-all cursor-help" title="${m.desc || 'Misión Activa'}">
+                    <div class="flex justify-between items-start">
+                        <h4 class="text-xs font-bold text-amber-500 font-cinzel leading-tight">${m.title || m.id}</h4>
+                        ${m.type === 'main' ? '<i class="fas fa-crown text-[10px] text-yellow-600"></i>' : '<i class="fas fa-scroll text-[10px] text-gray-500"></i>'}
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1 line-clamp-2">${m.obj || 'Objetivo en curso...'}</p>
+                    
+                    <!-- DEBUG BUTTON -->
+                    <button onclick="event.stopPropagation(); if(window.completeMission && window.handleReward) window.handleReward(window.completeMission('${m.id}'));" 
+                            class="w-full mt-2 text-[9px] bg-green-900/30 hover:bg-green-800/80 text-green-400 border border-green-500/30 rounded py-1 uppercase tracking-widest transition-colors font-bold flex items-center justify-center gap-1 group-hover:opacity-100 opacity-60">
+                        <i class="fas fa-check-circle"></i> Completar
+                    </button>
                 </div>
             `).join('');
         }

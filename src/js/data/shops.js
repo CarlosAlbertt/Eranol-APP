@@ -403,11 +403,11 @@ export const allShops = [
             { name: 'Mono "Ladrón de Sombras"', price: 2500, type: 'Eranol', desc: 'Puede interactuar con objetos a 30 pies telequinéticamente. +5 a Juego de Manos.', rarity: 'Poco Común', image: 'img/items/vivarium_mundos/mono_ladron_sombras.png' },
             { name: 'Slime "Limpiador"', price: 800, type: 'Eranol', desc: 'Se come el óxido y repara armaduras dañadas durante el descanso largo (+1 AC temporal).', rarity: 'Común', image: 'img/items/vivarium_mundos/slime_limpiador.png' },
             { name: 'Bolsa de Trucos (Gris)', price: 2800, type: 'DMG', desc: 'Sacas bolas de pelo que se vuelven animales aleatorios.', rarity: 'Poco Común', image: 'img/items/vivarium_mundos/bolsa_trucos_gris.png' },
-            { name: 'Serpiente de Tinta', price: 1500, type: 'Eranol', desc: 'Puede volverse un tatuaje en tu piel y salir para atacar (Veneno 1d6).', rarity: 'Poco Común', image: 'img/EL VIVARIUM DE LOS MUNDOS/Serpiente de Tinta.png' },
-            { name: 'Búho de Cristal', price: 2200, type: 'Eranol', desc: 'Graba visualmente lo que ve y puede proyectarlo como un holograma.', rarity: 'Poco Común', image: 'img/EL VIVARIUM DE LOS MUNDOS/Búho de Cristal.png' },
-            { name: 'Tortuga Fortaleza', price: 3500, type: 'Eranol', desc: 'Crece hasta tamaño mediano y sirve de cobertura móvil (+2 CA) para quien se esconda tras ella.', rarity: 'Rara', image: 'img/EL VIVARIUM DE LOS MUNDOS/Tortuga Fortaleza.png' },
-            { name: 'Pequeño Elemental Tormenta', price: 4200, type: 'Eranol', desc: 'Una nube con ojos. Lanza Shocking Grasp a voluntad.', rarity: 'Rara', image: 'img/EL VIVARIUM DE LOS MUNDOS/Pequeño Elemental de Tormenta.png' },
-            { name: 'Escarabajo Resurrección', price: 5500, type: 'Eranol', desc: 'Un uso. Si el dueño muere, el escarabajo se sacrifica para lanzar Revivify automáticamente.', rarity: 'Muy Rara', image: 'img/EL VIVARIUM DE LOS MUNDOS/Escarabajo de la Resurrección.png' }
+            { name: 'Serpiente de Tinta', price: 1500, type: 'Eranol', desc: 'Puede volverse un tatuaje en tu piel y salir para atacar (Veneno 1d6).', rarity: 'Poco Común', image: 'img/el_vivarium_de_los_mundos/Serpiente de Tinta.png' },
+            { name: 'Búho de Cristal', price: 2200, type: 'Eranol', desc: 'Graba visualmente lo que ve y puede proyectarlo como un holograma.', rarity: 'Poco Común', image: 'img/el_vivarium_de_los_mundos/Búho de Cristal.png' },
+            { name: 'Tortuga Fortaleza', price: 3500, type: 'Eranol', desc: 'Crece hasta tamaño mediano y sirve de cobertura móvil (+2 CA) para quien se esconda tras ella.', rarity: 'Rara', image: 'img/el_vivarium_de_los_mundos/Tortuga Fortaleza.png' },
+            { name: 'Pequeño Elemental Tormenta', price: 4200, type: 'Eranol', desc: 'Una nube con ojos. Lanza Shocking Grasp a voluntad.', rarity: 'Rara', image: 'img/el_vivarium_de_los_mundos/Pequeño Elemental de Tormenta.png' },
+            { name: 'Escarabajo Resurrección', price: 5500, type: 'Eranol', desc: 'Un uso. Si el dueño muere, el escarabajo se sacrifica para lanzar Revivify automáticamente.', rarity: 'Muy Rara', image: 'img/el_vivarium_de_los_mundos/Escarabajo de la Resurrección.png' }
         ]
     },
     {
@@ -420,16 +420,16 @@ export const allShops = [
         image: 'img/tiendas/hilos_eter_1765927401749.png',
         description: "Elegancia silenciosa y telas que flotan solas. Ropa mágica para el aventurero distinguido.",
         items: [
-            { name: 'Capa de Desplazamiento', price: 5000, type: 'DMG', desc: 'Efecto visual de "blur", impone desventaja al atacar al portador.', rarity: 'Rara', image: 'img/SASTRERÍA HILOS DEL ÉTER/Capa de Desplazamiento.png' },
-            { name: 'Alas de Vuelo', price: 5500, type: 'DMG', desc: 'Capa que se transforma en alas de murciélago o águila.', rarity: 'Rara', image: 'img/SASTRERÍA HILOS DEL ÉTER/Alas de Volar.png' },
-            { name: 'Túnica de la Tormenta', price: 4500, type: 'Eranol', desc: 'Si te golpean, descargas 2d8 eléctricos al atacante. Flota un poco con el viento.', rarity: 'Rara', image: 'img/SASTRERÍA HILOS DEL ÉTER/Túnica de la Tormenta.png' },
-            { name: 'Guantes "Ladrón Hechizos"', price: 6000, type: 'Eranol', desc: 'Si eres blanco de un hechizo de nivel 1-2, puedes usar reacción para atraparlo y lanzarlo tú en el siguiente turno.', rarity: 'Legendaria', image: 'img/SASTRERÍA HILOS DEL ÉTER/Guantes del Ladrón de Hechizos.png' },
-            { name: 'Botas "Caminar Aire"', price: 3800, type: 'Eranol', desc: 'Dejas huellas de luz. Puedes caminar por el aire (45 grados) como si fuera suelo.', rarity: 'Rara', image: 'img/SASTRERÍA HILOS DEL ÉTER/Botas de Caminar sobre el Aire.png' },
-            { name: 'Capucha Verdugo Anónimo', price: 2500, type: 'Eranol', desc: 'Mientras la lleves puesta, nadie puede recordar tu cara ni tu voz 10 minutos después de verte.', rarity: 'Poco Común', image: 'img/SASTRERÍA HILOS DEL ÉTER/Capucha del Verdugo Anónimo.png' },
-            { name: 'Cinturón Gigante Colina', price: 5000, type: 'DMG', desc: 'Fuerza se vuelve 21.', rarity: 'Rara', image: 'img/SASTRERÍA HILOS DEL ÉTER/Cinturón de Fuerza de Gigante (Colina).png' },
-            { name: 'Traje "Presencia Real"', price: 3000, type: 'Eranol', desc: 'Los humanoides de CR bajo tienen desventaja para atacarte a menos que tú los ataques primero (Aura de Majestad).', rarity: 'Rara', image: 'img/SASTRERÍA HILOS DEL ÉTER/Vestido o Traje de la Presencia Real.png' },
-            { name: 'Bufanda Brazos Extra', price: 2200, type: 'Eranol', desc: 'Una bufanda larga que funciona como dos brazos extra (no atacan, pero pueden usar objetos, pociones o abrir puertas).', rarity: 'Poco Común', image: 'img/SASTRERÍA HILOS DEL ÉTER/Bufanda de Brazos Extra.png' },
-            { name: 'Máscara Mil Caras', price: 3500, type: 'Eranol', desc: 'Puedes lanzar Disguise Self a voluntad. La máscara se funde con tu piel.', rarity: 'Rara', image: 'img/SASTRERÍA HILOS DEL ÉTER/Máscara de las Mil Caras.png' }
+            { name: 'Capa de Desplazamiento', price: 5000, type: 'DMG', desc: 'Efecto visual de "blur", impone desventaja al atacar al portador.', rarity: 'Rara', image: 'img/sastreria_hilos_del_eter/Capa de Desplazamiento.png' },
+            { name: 'Alas de Vuelo', price: 5500, type: 'DMG', desc: 'Capa que se transforma en alas de murciélago o águila.', rarity: 'Rara', image: 'img/sastreria_hilos_del_eter/Alas de Volar.png' },
+            { name: 'Túnica de la Tormenta', price: 4500, type: 'Eranol', desc: 'Si te golpean, descargas 2d8 eléctricos al atacante. Flota un poco con el viento.', rarity: 'Rara', image: 'img/sastreria_hilos_del_eter/Túnica de la Tormenta.png' },
+            { name: 'Guantes "Ladrón Hechizos"', price: 6000, type: 'Eranol', desc: 'Si eres blanco de un hechizo de nivel 1-2, puedes usar reacción para atraparlo y lanzarlo tú en el siguiente turno.', rarity: 'Legendaria', image: 'img/sastreria_hilos_del_eter/Guantes del Ladrón de Hechizos.png' },
+            { name: 'Botas "Caminar Aire"', price: 3800, type: 'Eranol', desc: 'Dejas huellas de luz. Puedes caminar por el aire (45 grados) como si fuera suelo.', rarity: 'Rara', image: 'img/sastreria_hilos_del_eter/Botas de Caminar sobre el Aire.png' },
+            { name: 'Capucha Verdugo Anónimo', price: 2500, type: 'Eranol', desc: 'Mientras la lleves puesta, nadie puede recordar tu cara ni tu voz 10 minutos después de verte.', rarity: 'Poco Común', image: 'img/sastreria_hilos_del_eter/Capucha del Verdugo Anónimo.png' },
+            { name: 'Cinturón Gigante Colina', price: 5000, type: 'DMG', desc: 'Fuerza se vuelve 21.', rarity: 'Rara', image: 'img/sastreria_hilos_del_eter/Cinturón de Fuerza de Gigante (Colina).png' },
+            { name: 'Traje "Presencia Real"', price: 3000, type: 'Eranol', desc: 'Los humanoides de CR bajo tienen desventaja para atacarte a menos que tú los ataques primero (Aura de Majestad).', rarity: 'Rara', image: 'img/sastreria_hilos_del_eter/Vestido o Traje de la Presencia Real.png' },
+            { name: 'Bufanda Brazos Extra', price: 2200, type: 'Eranol', desc: 'Una bufanda larga que funciona como dos brazos extra (no atacan, pero pueden usar objetos, pociones o abrir puertas).', rarity: 'Poco Común', image: 'img/sastreria_hilos_del_eter/Bufanda de Brazos Extra.png' },
+            { name: 'Máscara Mil Caras', price: 3500, type: 'Eranol', desc: 'Puedes lanzar Disguise Self a voluntad. La máscara se funde con tu piel.', rarity: 'Rara', image: 'img/sastreria_hilos_del_eter/Máscara de las Mil Caras.png' }
         ]
     },
     {
@@ -442,7 +442,7 @@ export const allShops = [
         image: 'img/tiendas/fragua_astral_1765927429280.png',
         description: "Una plataforma de obsidiana flotando en el espacio profundo con un núcleo estelar.",
         items: [
-            { name: 'Gran Espada "Eclipse Solar"', price: 5500, type: 'Eranol', desc: '(+2). Hoja negra como el vacío. 1/día ciega enemigos en 10 pies al golpear (CON CD 15) excepto al portador.', rarity: 'Legendaria', image: 'img/items/fragua_astral/Espada del rey.jpg' },
+            { name: 'Gran Espada "Eclipse Solar"', price: 5500, type: 'Eranol', desc: '(+2). Hoja negra como el vacío. 1/día ciega enemigos en 10 pies al golpear (CON CD 15) excepto al portador.', rarity: 'Legendaria', image: 'img/items/fragua_astral/espada_del_rey.jpg' },
             { name: 'Arco "Susurro del Cometa"', price: 4200, type: 'Eranol', desc: '(+1). No usa flechas. Al tensar la cuerda, crea proyectiles de luz estelar. El daño es radiante y atraviesa enemigos en línea recta.', rarity: 'Rara', image: 'img/items/fragua_astral/arco.jpg' },
             { name: 'Espada Larga Lengua de Fuego', price: 5000, type: 'DMG', desc: '(+2d6 fuego). La hoja parece hecha de lava sólida que gotea pero no cae.', rarity: 'Rara', image: 'img/items/fragua_astral/espada.jpg' },
             { name: 'Dagas Gemelas "Fase Lunar"', price: 3800, type: 'Eranol', desc: '(+1). Si golpeas con ambas en el mismo turno, el objetivo se vuelve vulnerable al daño necrótico hasta el fin de su siguiente turno.', rarity: 'Rara', image: 'img/items/fragua_astral/daga.jpg' },
@@ -464,16 +464,16 @@ export const allShops = [
         image: 'img/tiendas/nido_dragon_1765927446552.png',
         description: "Construida dentro del esqueleto de un dragón gargantuesco.",
         items: [
-            { name: 'Placas "Escamas de Ashmir"', price: 5800, type: 'Eranol', desc: '(+1). Armadura blanca. Si te golpean cuerpo a cuerpo, el atacante recibe 1d6 de daño frío (Reacción).', rarity: 'Muy Rara', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Placas de Escamas de Ashmir.png' },
-            { name: 'Armadura de Adamantina', price: 4500, type: 'DMG', desc: 'Completa. Inmune a golpes críticos. Brilla con un tono verdoso oscuro.', rarity: 'Rara', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Armadura de Adamantina (Completa).png' },
-            { name: 'Escudo "Boca de Dragón"', price: 3200, type: 'Eranol', desc: 'Tiene una cara esculpida. Como acción adicional, puedes hacer que muerda el arma del enemigo (Desarme, Fue CD 15).', rarity: 'Rara', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Escudo Boca de Dragón.png' },
-            { name: 'Coraza de Magma Viviente', price: 4000, type: 'Eranol', desc: 'Otorga resistencia al fuego. Brilla en la oscuridad. Inspirada en Baran.', rarity: 'Rara', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Coraza de Magma Viviente.png' },
-            { name: 'Escudo Animado', price: 6000, type: 'DMG', desc: 'Flota a tu alrededor dejándote las manos libres.', rarity: 'Muy Rara', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Escudo Animado.png' },
-            { name: 'Cuero Tachonado Camaleón', price: 2800, type: 'Eranol', desc: 'Te vuelves invisible si permaneces inmóvil contra una superficie sólida por 1 asalto.', rarity: 'Poco Común', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Cuero Tachonado del Camaleón.png' },
-            { name: 'Casco "Mente de Hierro"', price: 3500, type: 'Eranol', desc: 'Inmunidad a daño psíquico y lectura de pensamientos.', rarity: 'Rara', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Casco de la Mente de Hierro.png' },
-            { name: 'Cota de Malla Élfica', price: 5000, type: 'DMG', desc: '(+1). Se considera armadura ligera.', rarity: 'Rara', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Cota de Malla Élfica.png' },
-            { name: 'Botas "Paso de Gigante"', price: 2500, type: 'Eranol', desc: 'Una vez al minuto, puedes pisotear el suelo y derribar a criaturas Pequeñas o Medianas a 5 pies (Fue CD 14).', rarity: 'Poco Común', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Botas de Paso de Gigante.png' },
-            { name: 'Guanteletes del Titán', price: 5500, type: 'Eranol', desc: 'Permiten empuñar armas de "Dos Manos" con una sola mano (con desventaja en el ataque).', rarity: 'Muy Rara', image: 'img/EL NIDO DEL DRAGÓN DE CRISTAL/Guanteletes del Titán.png' }
+            { name: 'Placas "Escamas de Ashmir"', price: 5800, type: 'Eranol', desc: '(+1). Armadura blanca. Si te golpean cuerpo a cuerpo, el atacante recibe 1d6 de daño frío (Reacción).', rarity: 'Muy Rara', image: 'img/el_nido_del_dragon_de_cristal/Placas de Escamas de Ashmir.png' },
+            { name: 'Armadura de Adamantina', price: 4500, type: 'DMG', desc: 'Completa. Inmune a golpes críticos. Brilla con un tono verdoso oscuro.', rarity: 'Rara', image: 'img/el_nido_del_dragon_de_cristal/Armadura de Adamantina (Completa).png' },
+            { name: 'Escudo "Boca de Dragón"', price: 3200, type: 'Eranol', desc: 'Tiene una cara esculpida. Como acción adicional, puedes hacer que muerda el arma del enemigo (Desarme, Fue CD 15).', rarity: 'Rara', image: 'img/el_nido_del_dragon_de_cristal/Escudo Boca de Dragón.png' },
+            { name: 'Coraza de Magma Viviente', price: 4000, type: 'Eranol', desc: 'Otorga resistencia al fuego. Brilla en la oscuridad. Inspirada en Baran.', rarity: 'Rara', image: 'img/el_nido_del_dragon_de_cristal/Coraza de Magma Viviente.png' },
+            { name: 'Escudo Animado', price: 6000, type: 'DMG', desc: 'Flota a tu alrededor dejándote las manos libres.', rarity: 'Muy Rara', image: 'img/el_nido_del_dragon_de_cristal/Escudo Animado.png' },
+            { name: 'Cuero Tachonado Camaleón', price: 2800, type: 'Eranol', desc: 'Te vuelves invisible si permaneces inmóvil contra una superficie sólida por 1 asalto.', rarity: 'Poco Común', image: 'img/el_nido_del_dragon_de_cristal/Cuero Tachonado del Camaleón.png' },
+            { name: 'Casco "Mente de Hierro"', price: 3500, type: 'Eranol', desc: 'Inmunidad a daño psíquico y lectura de pensamientos.', rarity: 'Rara', image: 'img/el_nido_del_dragon_de_cristal/Casco de la Mente de Hierro.png' },
+            { name: 'Cota de Malla Élfica', price: 5000, type: 'DMG', desc: '(+1). Se considera armadura ligera.', rarity: 'Rara', image: 'img/el_nido_del_dragon_de_cristal/Cota de Malla Élfica.png' },
+            { name: 'Botas "Paso de Gigante"', price: 2500, type: 'Eranol', desc: 'Una vez al minuto, puedes pisotear el suelo y derribar a criaturas Pequeñas o Medianas a 5 pies (Fue CD 14).', rarity: 'Poco Común', image: 'img/el_nido_del_dragon_de_cristal/Botas de Paso de Gigante.png' },
+            { name: 'Guanteletes del Titán', price: 5500, type: 'Eranol', desc: 'Permiten empuñar armas de "Dos Manos" con una sola mano (con desventaja en el ataque).', rarity: 'Muy Rara', image: 'img/el_nido_del_dragon_de_cristal/Guanteletes del Titán.png' }
         ]
     },
     {
@@ -486,16 +486,16 @@ export const allShops = [
         image: 'img/tiendas/bazar_cronometrista.png',
         description: "Relojes de arena donde la arena cae hacia arriba. El tendero envejece y rejuvenece en bucle.",
         items: [
-            { name: 'Reloj "Segundo Chance"', price: 6000, type: 'Eranol', desc: 'Una vez al día, puedes volver a tirar un turno completo (movimiento y acción) como si nunca hubiera pasado.', rarity: 'Legendaria', image: 'img/EL BAZAR DEL CRONOMETRISTA/Reloj de Bolsillo del Segundo Chance.png' },
-            { name: 'Cubo de Fuerza', price: 5500, type: 'DMG', desc: 'Crea barreras invisibles impenetrables.', rarity: 'Rara', image: 'img/EL BAZAR DEL CRONOMETRISTA/Cubo de Fuerza.png' },
-            { name: 'Moneda Suerte Absoluta', price: 2000, type: 'Eranol', desc: 'Al lanzarla al aire antes de una tirada: Cara = Crítico automático / Cruz = Pifia automática (1 del dado).', rarity: 'Poco Común', image: 'img/EL BAZAR DEL CRONOMETRISTA/Moneda de la Suerte Absoluta.png' },
-            { name: 'Gafas Pasado Inmediato', price: 3000, type: 'Eranol', desc: 'Permiten ver "fantasmas" de lo que ocurrió en la habitación hace 10 minutos.', rarity: 'Rara', image: 'img/EL BAZAR DEL CRONOMETRISTA/Gafas del Pasado Inmediato.png' },
-            { name: 'Gema Visión Verdadera', price: 1500, type: 'DMG', desc: 'Un uso. Ves lo invisible y la verdad durante 10 min.', rarity: 'Consumible', image: 'img/EL BAZAR DEL CRONOMETRISTA/Gema de Visión Verdadera (Un uso).png' },
-            { name: 'Caja de Schrödinger', price: 4000, type: 'Eranol', desc: 'Metes un objeto. Al abrirla 24h después, hay un 50% de que el objeto se haya duplicado o un 50% de que haya desaparecido.', rarity: 'Rara', image: 'img/EL BAZAR DEL CRONOMETRISTA/Caja de Schrödinger.png' },
-            { name: 'Llave Maestra Espectral', price: 2500, type: 'Eranol', desc: 'Abre cualquier puerta, incluso mágica, pero alerta a todos los enemigos en 100 metros.', rarity: 'Poco Común', image: 'img/EL BAZAR DEL CRONOMETRISTA/Llave Maestra Espectral.png' },
-            { name: 'Guantelete de la Pausa', price: 5000, type: 'Eranol', desc: '1 vez al día, lanza Hold Monster (Paralizar Monstruo) tocando al objetivo.', rarity: 'Muy Rara', image: 'img/EL BAZAR DEL CRONOMETRISTA/Guantelete de la Pausa.png' },
-            { name: 'Frasco de Juventud', price: 800, type: 'Eranol', desc: 'Falso pero efectivo. Te cambia la apariencia física para parecer 20 años más joven por 1 semana.', rarity: 'Común', image: 'img/EL BAZAR DEL CRONOMETRISTA/Frasco de Juventud (Falso pero efectivo).png' },
-            { name: 'Mapa del Futuro Posible', price: 3500, type: 'Eranol', desc: 'Muestra dónde estarán los enemigos en el siguiente turno (Ventaja en ataques 1 ronda).', rarity: 'Rara', image: 'img/EL BAZAR DEL CRONOMETRISTA/Mapa del Futuro Posible.png' }
+            { name: 'Reloj "Segundo Chance"', price: 6000, type: 'Eranol', desc: 'Una vez al día, puedes volver a tirar un turno completo (movimiento y acción) como si nunca hubiera pasado.', rarity: 'Legendaria', image: 'img/el_bazar_del_cronometrista/Reloj de Bolsillo del Segundo Chance.png' },
+            { name: 'Cubo de Fuerza', price: 5500, type: 'DMG', desc: 'Crea barreras invisibles impenetrables.', rarity: 'Rara', image: 'img/el_bazar_del_cronometrista/Cubo de Fuerza.png' },
+            { name: 'Moneda Suerte Absoluta', price: 2000, type: 'Eranol', desc: 'Al lanzarla al aire antes de una tirada: Cara = Crítico automático / Cruz = Pifia automática (1 del dado).', rarity: 'Poco Común', image: 'img/el_bazar_del_cronometrista/Moneda de la Suerte Absoluta.png' },
+            { name: 'Gafas Pasado Inmediato', price: 3000, type: 'Eranol', desc: 'Permiten ver "fantasmas" de lo que ocurrió en la habitación hace 10 minutos.', rarity: 'Rara', image: 'img/el_bazar_del_cronometrista/Gafas del Pasado Inmediato.png' },
+            { name: 'Gema Visión Verdadera', price: 1500, type: 'DMG', desc: 'Un uso. Ves lo invisible y la verdad durante 10 min.', rarity: 'Consumible', image: 'img/el_bazar_del_cronometrista/Gema de Visión Verdadera (Un uso).png' },
+            { name: 'Caja de Schrödinger', price: 4000, type: 'Eranol', desc: 'Metes un objeto. Al abrirla 24h después, hay un 50% de que el objeto se haya duplicado o un 50% de que haya desaparecido.', rarity: 'Rara', image: 'img/el_bazar_del_cronometrista/Caja de Schrödinger.png' },
+            { name: 'Llave Maestra Espectral', price: 2500, type: 'Eranol', desc: 'Abre cualquier puerta, incluso mágica, pero alerta a todos los enemigos en 100 metros.', rarity: 'Poco Común', image: 'img/el_bazar_del_cronometrista/Llave Maestra Espectral.png' },
+            { name: 'Guantelete de la Pausa', price: 5000, type: 'Eranol', desc: '1 vez al día, lanza Hold Monster (Paralizar Monstruo) tocando al objetivo.', rarity: 'Muy Rara', image: 'img/el_bazar_del_cronometrista/Guantelete de la Pausa.png' },
+            { name: 'Frasco de Juventud', price: 800, type: 'Eranol', desc: 'Falso pero efectivo. Te cambia la apariencia física para parecer 20 años más joven por 1 semana.', rarity: 'Común', image: 'img/el_bazar_del_cronometrista/Frasco de Juventud (Falso pero efectivo).png' },
+            { name: 'Mapa del Futuro Posible', price: 3500, type: 'Eranol', desc: 'Muestra dónde estarán los enemigos en el siguiente turno (Ventaja en ataques 1 ronda).', rarity: 'Rara', image: 'img/el_bazar_del_cronometrista/Mapa del Futuro Posible.png' }
         ]
     },
     {
@@ -508,16 +508,16 @@ export const allShops = [
         image: 'img/tiendas/nebulosa_liquida.png',
         description: "Esferas de líquido flotan en gravedad cero.",
         items: [
-            { name: 'Poción de Velocidad', price: 1200, type: 'DMG', desc: 'Efecto de Haste sin concentración.', rarity: 'Muy Rara', image: 'img/LA NEBULOSA LÍQUIDA/Poción de Velocidad.png' },
-            { name: 'Aceite de Etereidad', price: 2500, type: 'DMG', desc: 'Te vuelves etéreo durante 1 hora.', rarity: 'Rara', image: 'img/LA NEBULOSA LÍQUIDA/Aceite de Etereidad.png' },
-            { name: 'Sangre de Dragón Rojo', price: 800, type: 'Eranol', desc: 'Al beberla, ganas aliento de fuego (4d6) por 1 minuto. Te vuelve la piel roja.', rarity: 'Poco Común', image: 'img/LA NEBULOSA LÍQUIDA/Sangre de Dragón Rojo.png' },
-            { name: 'Tónico "Piel de Diamante"', price: 1500, type: 'Eranol', desc: 'Inmunidad al daño físico cortante/perforante/contundente durante 1 asalto.', rarity: 'Rara', image: 'img/LA NEBULOSA LÍQUIDA/Tónico de Piel de Diamante.png' },
-            { name: 'Vial "Silencio Líquido"', price: 600, type: 'Eranol', desc: 'Al romperlo, lanza Silencio en el área. El humo es negro y pesado.', rarity: 'Poco Común', image: 'img/LA NEBULOSA LÍQUIDA/Vial de Silencio Líquido.png' },
-            { name: 'Elixir Descanso Instantáneo', price: 3000, type: 'Eranol', desc: 'Obtienes los beneficios de un Descanso Largo en 10 minutos (1 vez por semana, tóxico si se abusa).', rarity: 'Muy Rara', image: 'img/LA NEBULOSA LÍQUIDA/Elixir del Descanso Instantáneo.png' },
-            { name: 'Poción Clarividencia', price: 900, type: 'DMG', desc: 'Ves y oyes un lugar lejano.', rarity: 'Rara', image: 'img/LA NEBULOSA LÍQUIDA/Poción de Clarividencia.png' },
-            { name: 'Perfume de Dominio', price: 500, type: 'Eranol', desc: 'Ventaja en Intimidación. Los animales huyen de ti.', rarity: 'Común', image: 'img/LA NEBULOSA LÍQUIDA/Perfume de Dominio.png' },
-            { name: 'Veneno "Sueño de Dioses"', price: 2000, type: 'Eranol', desc: 'Si se aplica al arma, CD 17 CON o el enemigo cae inconsciente 1 hora (o hasta recibir daño).', rarity: 'Rara', image: 'img/LA NEBULOSA LÍQUIDA/Veneno Sueño de los Dioses.png' },
-            { name: 'Bomba de Gravedad', price: 1800, type: 'Eranol', desc: 'Atrae a todos en 20 pies al centro y los aplasta (4d10 fuerza).', rarity: 'Rara', image: 'img/LA NEBULOSA LÍQUIDA/Bomba de Gravedad.png' }
+            { name: 'Poción de Velocidad', price: 1200, type: 'DMG', desc: 'Efecto de Haste sin concentración.', rarity: 'Muy Rara', image: 'img/la_nebulosa_liquida/Poción de Velocidad.png' },
+            { name: 'Aceite de Etereidad', price: 2500, type: 'DMG', desc: 'Te vuelves etéreo durante 1 hora.', rarity: 'Rara', image: 'img/la_nebulosa_liquida/Aceite de Etereidad.png' },
+            { name: 'Sangre de Dragón Rojo', price: 800, type: 'Eranol', desc: 'Al beberla, ganas aliento de fuego (4d6) por 1 minuto. Te vuelve la piel roja.', rarity: 'Poco Común', image: 'img/la_nebulosa_liquida/Sangre de Dragón Rojo.png' },
+            { name: 'Tónico "Piel de Diamante"', price: 1500, type: 'Eranol', desc: 'Inmunidad al daño físico cortante/perforante/contundente durante 1 asalto.', rarity: 'Rara', image: 'img/la_nebulosa_liquida/Tónico de Piel de Diamante.png' },
+            { name: 'Vial "Silencio Líquido"', price: 600, type: 'Eranol', desc: 'Al romperlo, lanza Silencio en el área. El humo es negro y pesado.', rarity: 'Poco Común', image: 'img/la_nebulosa_liquida/Vial de Silencio Líquido.png' },
+            { name: 'Elixir Descanso Instantáneo', price: 3000, type: 'Eranol', desc: 'Obtienes los beneficios de un Descanso Largo en 10 minutos (1 vez por semana, tóxico si se abusa).', rarity: 'Muy Rara', image: 'img/la_nebulosa_liquida/Elixir del Descanso Instantáneo.png' },
+            { name: 'Poción Clarividencia', price: 900, type: 'DMG', desc: 'Ves y oyes un lugar lejano.', rarity: 'Rara', image: 'img/la_nebulosa_liquida/Poción de Clarividencia.png' },
+            { name: 'Perfume de Dominio', price: 500, type: 'Eranol', desc: 'Ventaja en Intimidación. Los animales huyen de ti.', rarity: 'Común', image: 'img/la_nebulosa_liquida/Perfume de Dominio.png' },
+            { name: 'Veneno "Sueño de Dioses"', price: 2000, type: 'Eranol', desc: 'Si se aplica al arma, CD 17 CON o el enemigo cae inconsciente 1 hora (o hasta recibir daño).', rarity: 'Rara', image: 'img/la_nebulosa_liquida/Veneno Sueño de los Dioses.png' },
+            { name: 'Bomba de Gravedad', price: 1800, type: 'Eranol', desc: 'Atrae a todos en 20 pies al centro y los aplasta (4d10 fuerza).', rarity: 'Rara', image: 'img/la_nebulosa_liquida/Bomba de Gravedad.png' }
         ]
     },
     {
@@ -530,16 +530,16 @@ export const allShops = [
         image: 'img/tiendas/ojo_arcano.png',
         description: "Torreón espiral con libros voladores.",
         items: [
-            { name: 'Varita Bolas de Fuego', price: 5500, type: 'DMG', desc: 'Clásica y destructiva.', rarity: 'Rara', image: 'img/EL OJO DEL ARCANO/Varita de Bolas de Fuego.png' },
-            { name: 'Bastón de la Defensa', price: 2500, type: 'DMG', desc: 'Armadura de Mago + Escudo.', rarity: 'Rara', image: 'img/EL OJO DEL ARCANO/Bastón de la Defensa.png' },
-            { name: 'Cetro "Prisma de Hielo"', price: 4800, type: 'Eranol', desc: '3 cargas. Lanza Ice Storm. Si matas a alguien, se convierte en estatua de hielo.', rarity: 'Muy Rara', image: 'img/EL OJO DEL ARCANO/Cetro Prisma de Hielo.png' },
-            { name: 'Orbe "Mente Colmena"', price: 3000, type: 'Eranol', desc: 'Permite telepatía ilimitada entre los miembros del grupo que toquen el orbe al inicio del día.', rarity: 'Rara', image: 'img/EL OJO DEL ARCANO/Orbe de la Mente Colmena.png' },
-            { name: 'Varita "Titiritero"', price: 2200, type: 'Eranol', desc: 'Lanza Command (Orden Imperiosa) como acción adicional (5 cargas).', rarity: 'Poco Común', image: 'img/EL OJO DEL ARCANO/Varita del Titiritero.png' },
-            { name: 'Bastón "Raíces Profundas"', price: 3500, type: 'Eranol', desc: 'Puedes clavarlo en el suelo para crear un muro de espinas instantáneo.', rarity: 'Rara', image: 'img/EL OJO DEL ARCANO/Bastón de Raíces Profundas.png' },
-            { name: 'Perla de Poder', price: 4000, type: 'DMG', desc: 'Recuperas un espacio de conjuro de nivel 3.', rarity: 'Poco Común', image: 'img/EL OJO DEL ARCANO/Perla de Poder.png' },
-            { name: 'Guantelete Hechicero Guerra', price: 5000, type: 'Eranol', desc: 'Permite lanzar un truco como reacción si te atacan.', rarity: 'Rara', image: 'img/EL OJO DEL ARCANO/Guantelete del Hechicero de Guerra.png' },
-            { name: 'Pluma de Fénix', price: 4200, type: 'Eranol', desc: 'Varita. +1 al ataque de hechizos de fuego. Ignora resistencia al fuego.', rarity: 'Rara', image: 'img/EL OJO DEL ARCANO/Pluma de Fénix (Varita).png' },
-            { name: 'Foco "Doble Concentración"', price: 6000, type: 'Eranol', desc: 'Objeto maldito/Riesgo. Permite concentrarse en 2 hechizos, pero si fallas la tirada de CON, recibes daño psíquico y pierdes ambos.', rarity: 'Legendaria', image: 'img/EL OJO DEL ARCANO/Foco de Doble Concentración.png' }
+            { name: 'Varita Bolas de Fuego', price: 5500, type: 'DMG', desc: 'Clásica y destructiva.', rarity: 'Rara', image: 'img/el_ojo_del_arcano/Varita de Bolas de Fuego.png' },
+            { name: 'Bastón de la Defensa', price: 2500, type: 'DMG', desc: 'Armadura de Mago + Escudo.', rarity: 'Rara', image: 'img/el_ojo_del_arcano/Bastón de la Defensa.png' },
+            { name: 'Cetro "Prisma de Hielo"', price: 4800, type: 'Eranol', desc: '3 cargas. Lanza Ice Storm. Si matas a alguien, se convierte en estatua de hielo.', rarity: 'Muy Rara', image: 'img/el_ojo_del_arcano/Cetro Prisma de Hielo.png' },
+            { name: 'Orbe "Mente Colmena"', price: 3000, type: 'Eranol', desc: 'Permite telepatía ilimitada entre los miembros del grupo que toquen el orbe al inicio del día.', rarity: 'Rara', image: 'img/el_ojo_del_arcano/Orbe de la Mente Colmena.png' },
+            { name: 'Varita "Titiritero"', price: 2200, type: 'Eranol', desc: 'Lanza Command (Orden Imperiosa) como acción adicional (5 cargas).', rarity: 'Poco Común', image: 'img/el_ojo_del_arcano/Varita del Titiritero.png' },
+            { name: 'Bastón "Raíces Profundas"', price: 3500, type: 'Eranol', desc: 'Puedes clavarlo en el suelo para crear un muro de espinas instantáneo.', rarity: 'Rara', image: 'img/el_ojo_del_arcano/Bastón de Raíces Profundas.png' },
+            { name: 'Perla de Poder', price: 4000, type: 'DMG', desc: 'Recuperas un espacio de conjuro de nivel 3.', rarity: 'Poco Común', image: 'img/el_ojo_del_arcano/Perla de Poder.png' },
+            { name: 'Guantelete Hechicero Guerra', price: 5000, type: 'Eranol', desc: 'Permite lanzar un truco como reacción si te atacan.', rarity: 'Rara', image: 'img/el_ojo_del_arcano/Guantelete del Hechicero de Guerra.png' },
+            { name: 'Pluma de Fénix', price: 4200, type: 'Eranol', desc: 'Varita. +1 al ataque de hechizos de fuego. Ignora resistencia al fuego.', rarity: 'Rara', image: 'img/el_ojo_del_arcano/Pluma de Fénix (Varita).png' },
+            { name: 'Foco "Doble Concentración"', price: 6000, type: 'Eranol', desc: 'Objeto maldito/Riesgo. Permite concentrarse en 2 hechizos, pero si fallas la tirada de CON, recibes daño psíquico y pierdes ambos.', rarity: 'Legendaria', image: 'img/el_ojo_del_arcano/Foco de Doble Concentración.png' }
         ]
     },
     // ANILLO 3

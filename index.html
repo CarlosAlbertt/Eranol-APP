@@ -20,7 +20,8 @@
     <link rel="stylesheet" href="src/css/medieval-sheet.css?v=7.1">
 </head>
 
-<body class="bg-black text-white min-h-screen overflow-x-hidden font-sans selection:bg-red-900 selection:text-white">
+<body
+    class="bg-black text-white min-h-screen overflow-x-hidden font-sans selection:bg-red-900 selection:text-white select-none">
     <!-- Background Effects -->
     <div class="fixed inset-0 z-0 pointer-events-none"></div>
 
@@ -1085,6 +1086,8 @@
                                 <button class="inv-tab active" data-filter="all"><i class="fas fa-box"></i></button>
                                 <button class="inv-tab" data-filter="consumable"><i class="fas fa-flask"></i></button>
                                 <button class="inv-tab" data-filter="misc"><i class="fas fa-scroll"></i></button>
+                                <button class="inv-tab" data-filter="quest" title="Objetos de Misión"><i
+                                        class="fas fa-key"></i></button>
                             </div>
                         </div>
                         <div id="sheet-inventory" class="inventory-grid custom-scrollbar">
