@@ -102,21 +102,45 @@ export function initNavigation() {
 
 // NEW: Main Hub (City Index)
 export function enterCityIndex() {
+    console.log('[NAV] enterCityIndex called. currentRing:', state.currentRing);
+
+    // RESET: If coming from Ring 0 (Black Market), reset to Ring 1
+    if (state.currentRing === 0) {
+        state.currentRing = 1;
+        console.log('[NAV] Reset currentRing to 1');
+    }
+
     // Hide Login/Landing/App
     if (document.getElementById('login-screen')) document.getElementById('login-screen').classList.add('hidden');
+
+    // FORCE HIDE: Landing Screen (Ring Selection) with z-50 override
+    if (landingScreen) {
+        landingScreen.classList.add('hidden');
+        landingScreen.classList.remove('animate-fade-in');
+        landingScreen.style.display = 'none'; // FORCE
+        console.log('[NAV] landingScreen hidden');
+    }
+
+    // FORCE HIDE: Casino View if open
+    const casinoView = document.getElementById('casino-view');
+    if (casinoView) {
+        casinoView.classList.add('hidden');
+        casinoView.style.display = 'none';
+    }
 
     // Show City Index
     if (cityIndexView) {
         cityIndexView.classList.remove('hidden', 'animate-fade-out');
         cityIndexView.classList.add('animate-fade-in');
+        cityIndexView.style.display = ''; // Allow to show
+        console.log('[NAV] cityIndexView shown');
     }
 
-    // Hide others
-    if (landingScreen) landingScreen.classList.add('hidden');
-    // FIX: Do NOT hide appScreen as it contains the cityIndexView
+    // Show appScreen container
     if (appScreen) {
         appScreen.classList.remove('hidden', 'opacity-0', 'scale-95');
         appScreen.classList.add('animate-fade-in');
+        appScreen.style.display = ''; // Allow to show
     }
 
     // Hide App Specifics (Ring Sidebar, Inventory, etc.) to show clean Index
@@ -153,16 +177,25 @@ export function enterCityIndex() {
 
 // NEW: Market Hub (Ring Selection)
 export function enterLandingScreen() {
-    if (cityIndexView) cityIndexView.classList.add('hidden');
+    console.log('[NAV] enterLandingScreen called');
+
+    if (cityIndexView) {
+        cityIndexView.classList.add('hidden');
+        cityIndexView.style.display = 'none';
+    }
 
     if (appScreen) {
         appScreen.classList.add('hidden');
-        appScreen.classList.remove('flex'); // Hard remove display
+        appScreen.classList.remove('flex');
+        appScreen.style.display = 'none';
     }
 
     if (landingScreen) {
-        landingScreen.classList.remove('hidden', 'animate-fade-out');
+        landingScreen.classList.remove('hidden', 'animate-fade-out', 'opacity-0', 'scale-95');
         landingScreen.classList.add('animate-fade-in');
+        landingScreen.style.display = 'flex'; // FORCE SHOW - reset the style.display='none'
+        landingScreen.style.opacity = '1';
+        console.log('[NAV] landingScreen shown');
         // Reset App Theme just in case, though Landing Screen covers it usually
         if (appScreen) appScreen.className = "relative z-10 flex flex-col md:flex-row h-full transition-colors duration-500 theme-black-market hidden";
     }
@@ -177,6 +210,13 @@ import { playerState } from './player.js'; // Ensure we have access to player da
 
 export function enterMarket(ringLevel) {
     try {
+        // BLACK MARKET AUTHENTICATION CHECK
+        if (ringLevel === 0 && !state.blackMarketAuthenticated) {
+            console.log('[NAV] Ring 0 requires authentication. Showing login modal.');
+            openLoginModal();
+            return;
+        }
+
         // ULTIMATE PERMISSION CHECK (Fix for Sombra)
         const name = state.currentAdventurer || playerState.name || "";
         if (name.toLowerCase() === "sombra" || name.toLowerCase() === "asolador" || name.toLowerCase() === "admin") {
@@ -251,9 +291,15 @@ export function enterMarket(ringLevel) {
         if (ringLevel === 0) {
             if (patronageArea) patronageArea.classList.remove('hidden');
             if (document.getElementById('bank-area')) document.getElementById('bank-area').classList.remove('hidden');
+            // Show Cursed Wheel, Hide Normal Wheel
+            if (document.getElementById('roulette-area')) document.getElementById('roulette-area').classList.add('hidden');
+            if (document.getElementById('cursed-roulette-area')) document.getElementById('cursed-roulette-area').classList.remove('hidden');
         } else {
             if (patronageArea) patronageArea.classList.add('hidden');
             if (document.getElementById('bank-area')) document.getElementById('bank-area').classList.add('hidden');
+            // Show Normal Wheel, Hide Cursed Wheel
+            if (document.getElementById('roulette-area')) document.getElementById('roulette-area').classList.remove('hidden');
+            if (document.getElementById('cursed-roulette-area')) document.getElementById('cursed-roulette-area').classList.add('hidden');
         }
 
         // Force update of currency display (Gold -> Blood or vice versa)
@@ -269,11 +315,18 @@ export function enterMarket(ringLevel) {
         // Map Render Removed
         // renderMap(ringLevel);
 
-        if (landingScreen) landingScreen.classList.add('animate-fade-out');
+        if (landingScreen) {
+            landingScreen.classList.add('animate-fade-out');
+            landingScreen.style.display = 'none'; // Also hide with style
+        }
         setTimeout(() => {
-            if (landingScreen) landingScreen.classList.add('hidden');
+            if (landingScreen) {
+                landingScreen.classList.add('hidden');
+                landingScreen.style.display = 'none';
+            }
             if (appScreen) {
                 appScreen.classList.remove('hidden');
+                appScreen.style.display = 'flex'; // CRITICAL: Reset style.display
                 void appScreen.offsetWidth;
                 appScreen.classList.remove('opacity-0', 'scale-95');
                 appScreen.classList.add('animate-fade-in');
@@ -379,6 +432,12 @@ export function loadShop(index) {
         const shop = state.activeShops[index];
         if (!shop) return;
 
+        // Special Portal Redirection
+        if (shop.id === 'black-market-gate' || shop.id === 'black-market-gate-r1') {
+            enterMarket(0);
+            return;
+        }
+
         // Close Map Modal when loading a shop
         // Close Map Modal when loading a shop
         if (typeof closeMapModal === 'function') closeMapModal();
@@ -431,10 +490,29 @@ export function loadShop(index) {
         // CASINO LOGIC
         if (shop.specialType === 'casino') {
             // ... existing casino logic ...
-            if (inventoryGrid) inventoryGrid.classList.add('hidden');
-            if (districtView) districtView.classList.add('hidden');
-            // ...
-            if (document.getElementById('casino-view')) document.getElementById('casino-view').classList.remove('hidden');
+            if (inventoryGrid) {
+                inventoryGrid.classList.add('hidden');
+                inventoryGrid.style.display = 'none'; // CRITICAL FIX: Override previous 'grid' setting
+            }
+            if (districtView) {
+                districtView.classList.add('hidden');
+                districtView.style.display = 'none';
+            }
+
+            const casinoView = document.getElementById('casino-view');
+            const casinoMenu = document.getElementById('casino-menu');
+
+            if (casinoView) {
+                casinoView.classList.remove('hidden');
+                casinoView.style.display = 'block'; // Reset style.display
+                // FORCE MENU RESET
+                if (casinoMenu) casinoMenu.classList.remove('hidden');
+                // HIDE ACTIVE GAMES IF ANY
+                ['game-slots', 'game-blackjack', 'game-roulette'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+            }
             if (typeof drawRouletteWheel === 'function') drawRouletteWheel();
         }
         // NORMAL SHOP LOGIC
@@ -485,24 +563,38 @@ function closeModal() {
     setTimeout(() => itemModal.classList.add('hidden'), 300);
 }
 
+import { mapNodes } from '../data/locations.js';
+
+// ... (existing imports)
+
+// ...
+
 function renderDistrictCards() {
     const container = document.getElementById('district-cards-container');
     if (!container) return;
     container.innerHTML = '';
 
-    if (!state.activeShops || state.activeShops.length === 0) {
+    const currentRing = state.currentRing;
+
+    // Combine Shops and Map Nodes for this Ring
+    const shops = state.activeShops || [];
+    const nodes = mapNodes.filter(n => n.ring === currentRing && (n.type === 'shop' || n.type === 'portal' || n.type === 'poi')); // Allow POIs too if relevant
+
+    const allCards = [...shops.map(s => ({ ...s, _isShop: true })), ...nodes.map(n => ({ ...n, _isNode: true }))];
+
+    if (allCards.length === 0) {
         container.innerHTML = '<div class="col-span-full text-center text-gray-500 italic py-10">No hay servicios disponibles en este anillo.</div>';
         return;
     }
 
-    state.activeShops.forEach((shop, index) => {
+    allCards.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = "group relative h-64 rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-white/10 bg-gray-900";
 
-        // Background Image
+        // Image Handling
         const bg = document.createElement('div');
         bg.className = "absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-40";
-        if (shop.image) bg.style.backgroundImage = `url('${shop.image}')`;
+        if (item.image) bg.style.backgroundImage = `url('${item.image}')`;
 
         // Gradient Overlay
         const overlay = document.createElement('div');
@@ -512,17 +604,69 @@ function renderDistrictCards() {
         const content = document.createElement('div');
         content.className = "absolute inset-0 p-6 flex flex-col justify-end relative z-10";
 
+        // Icons & Subtitles
+        const iconClass = item.icon || item.fallbackIcon || 'fa-map-marker-alt';
+        const subtitle = item.subtitle || item.label || 'Ubicación';
+        const name = item.name || item.label;
+        const desc = item.description || item.text || "";
+
         content.innerHTML = `
             <div class="mb-2">
                 <span class="inline-block px-2 py-1 bg-white/10 backdrop-blur-md rounded text-[10px] uppercase font-bold tracking-widest text-white/80 border border-white/10 mb-2">
-                    <i class="fas ${shop.icon} mr-1"></i> ${shop.subtitle}
+                    <i class="fas ${iconClass} mr-1"></i> ${subtitle}
                 </span>
             </div>
-            <h3 class="text-2xl font-cinzel font-bold text-white mb-1 group-hover:text-yellow-400 transition-colors drop-shadow-md">${shop.name}</h3>
-            <p class="text-xs text-gray-400 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity delay-100 overflow-hidden h-0 group-hover:h-auto">${shop.description}</p>
+            <h3 class="text-2xl font-cinzel font-bold text-white mb-1 group-hover:text-yellow-400 transition-colors drop-shadow-md">${name}</h3>
+            <p class="text-xs text-gray-400 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity delay-100 overflow-hidden h-0 group-hover:h-auto">${desc}</p>
         `;
 
-        card.onclick = () => loadShop(index);
+        // Click Logic
+        card.onclick = () => {
+            if (item._isShop) {
+                // It's a shop, find its index in the ORIGINAL state.activeShops array
+                const shopIndex = state.activeShops.indexOf(item);
+                if (shopIndex > -1) loadShop(shopIndex);
+            } else if (item._isNode) {
+                // It's a Map Node
+                if (item.actionType === 'shop' && item.target) {
+                    // Special Case: Portal to Shop (like Casino)
+                    // We need to find the shop by ID in allShops and load it
+                    // But loadShop expects an index in state.activeShops.
+                    // If the target shop is NOT in activeShops (e.g. Ring 0 shop while in Ring 2), we might need a direct load strategy.
+
+                    // Hack: If target is 'casino-infernal', we Force Load it.
+                    if (item.target === 'casino-infernal') {
+                        // We need to find the casino shop in allShops
+                        // Import allShops is available at top.
+                        const casinoShop = allShops.find(s => s.id === 'casino-infernal');
+                        if (casinoShop) {
+                            // Determine if we need to switch context or just display it
+                            // For now, let's push it to activeShops if not present, or handle it specially.
+                            // Simpler: Just find it in allShops, set it as current, and call loadShop logic manually/mocked.
+                            // OR: Switch navigation to that shop's ring? 
+                            // Casino is Ring 0. If we are in Ring 2, technically we are "entering" the market.
+                            // Let's rely on enterMarket(0) if we want to go fully there, OR just load the shop.
+
+                            // Strategy: enterMarket(0) is the cleanest way to switch context to the Black Market.
+                            enterMarket(0);
+                        }
+                    } else if (item.target === 'bazar') {
+                        // Find shop index
+                        const idx = state.activeShops.findIndex(s => s.id === 'bazar');
+                        if (idx > -1) loadShop(idx);
+                        else console.warn("Shop not found in active ring");
+                    } else if (item.target === 'nebulosa') {
+                        const idx = state.activeShops.findIndex(s => s.id === 'nebulosa');
+                        if (idx > -1) loadShop(idx);
+                    }
+                } else if (item.actionType === 'modal') {
+                    if (item.target === 'mission-board') openMissionBoard();
+                } else if (item.actionType === 'dialog') {
+                    // Show a toast or small dialog
+                    showToast(item.text);
+                }
+            }
+        };
 
         card.appendChild(bg);
         card.appendChild(overlay);

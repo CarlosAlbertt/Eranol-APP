@@ -94,9 +94,37 @@ export function renderSheet() {
 
     // Stats
     for (const [key, els] of Object.entries(statEls)) {
+        if (!els.val) continue;
+
         const val = playerState.stats[key];
+        const mod = calculateMod(val);
+
+        // Update Text
         els.val.textContent = val;
-        els.mod.textContent = calculateMod(val);
+        els.mod.textContent = mod;
+
+        // Inject Controls if not present (Lazy Injection)
+        const parent = els.val.parentElement;
+        if (!parent.querySelector('.stat-btn')) {
+            // Apply relative positioning to parent for absolute buttons
+            parent.style.position = 'relative';
+
+            // Minus Button
+            const btnMinus = document.createElement('button');
+            btnMinus.className = "stat-btn minus absolute top-1/2 left-0 transform -translate-x-8 -translate-y-1/2 text-red-400 hover:text-white hover:scale-125 transition-all opacity-0 group-hover:opacity-100 z-50";
+            btnMinus.innerHTML = '<i class="fas fa-minus-circle text-xl shadow-black drop-shadow-md"></i>';
+            btnMinus.onclick = (e) => { e.stopPropagation(); updateStat(key, -1); };
+
+            // Plus Button
+            const btnPlus = document.createElement('button');
+            btnPlus.className = "stat-btn plus absolute top-1/2 right-0 transform translate-x-8 -translate-y-1/2 text-green-400 hover:text-white hover:scale-125 transition-all opacity-0 group-hover:opacity-100 z-50";
+            btnPlus.innerHTML = '<i class="fas fa-plus-circle text-xl shadow-black drop-shadow-md"></i>';
+            btnPlus.onclick = (e) => { e.stopPropagation(); updateStat(key, 1); };
+
+            parent.appendChild(btnMinus);
+            parent.appendChild(btnPlus);
+            parent.classList.add('group'); // Enable hover visibility
+        }
     }
 
     // Dynamic Equipment
@@ -106,189 +134,112 @@ export function renderSheet() {
     renderInventory();
 }
 
-function renderEquipment() {
-    // We'll target the container by class since we didn't ID it properly in previous HTML
-    // Best practice: Add ID in HTML, but for now we look for .equipment-row's parent or similar
-    // Actually, let's look for .col-inventory and find the equipment container area
-    // The previous XML showed .col-inventory -> .equipment-row
-    // The "Arcane Modern" CSS has .equipment-row used for minimal slots.
-    // We will Replace that HTML content entirely.
+function updateStat(statKey, change) {
+    if (!playerState.stats[statKey]) return;
 
+    // Bounds (e.g. 1 to 20 or 30)
+    const newVal = playerState.stats[statKey] + change;
+    if (newVal < 1 || newVal > 30) return;
+
+    playerState.stats[statKey] = newVal;
+    saveGame();
+    renderSheet(); // Re-render to update mods and values
+    // showToast(`${statKey.toUpperCase()} actualizado a ${newVal}`);
+}
+
+function renderEquipment() {
+    // DISABLED: Equipment slots are now static HTML in index.html
+    // The new equipment grid uses data-slot attributes for JS interaction
+    // This function was generating duplicate dynamic slots
+    return;
+
+    /* OLD DYNAMIC SLOTS CODE - DISABLED
     const colInventory = document.querySelector('.col-inventory');
     if (!colInventory) return;
 
-    // Check if we already have the complex grid container, if not create/reset it
     let equipContainer = document.getElementById('dynamic-equipment-grid');
 
     if (!equipContainer) {
-        // Remove old equipment row if exists
         const oldRow = colInventory.querySelector('.equipment-row');
         if (oldRow) oldRow.remove();
 
         equipContainer = document.createElement('div');
         equipContainer.id = 'dynamic-equipment-grid';
         equipContainer.className = 'equipment-layout';
-        // Insert at top of inventory col
         colInventory.insertBefore(equipContainer, colInventory.firstChild);
     }
 
-    if (equipContainer) equipContainer.innerHTML = ''; // Clear for draw
-
-    // Define Layout Config
-    // Slots: Head, Chest, Hands, Legs | FullBody
-    // Weapons: Main1, Main2, Off | Potion Slots (Limit)
-    // Jewelry: Amulet1-4, Ring1-6
-    // Extras: Belt, Boots, Cape
+    if (equipContainer) equipContainer.innerHTML = '<h3 class="font-bold border-b border-[#5d4037] mb-4 font-cinzel text-lg text-[#ffb74d] tracking-widest pl-2 drop-shadow-sm">EQUIPAMIENTO</h3>';
 
     const slotsConfig = [
-        { id: 'head', icon: 'fa-helmet-safety', label: 'Cabeza' },
-        { id: 'amulet1', icon: 'fa-gem', label: 'Amuleto 1' },
-        { id: 'amulet2', icon: 'fa-gem', label: 'Amuleto 2' },
-        { id: 'amulet3', icon: 'fa-gem', label: 'Amuleto 3' },
-        { id: 'amulet4', icon: 'fa-gem', label: 'Amuleto 4' },
-
-        { id: 'chest', icon: 'fa-shirt', label: 'Torso' },
-        { id: 'hands', icon: 'fa-hand-fist', label: 'Manos' },
-        { id: 'legs', icon: 'fa-person-walking', label: 'Piernas' }, // Better than socks
-
-        { id: 'mainHand1', icon: 'fa-khanda', label: 'Arma P.' },
-        { id: 'offHand', icon: 'fa-shield-halved', label: 'Secundaria' },
-        { id: 'mainHand2', icon: 'fa-khanda', label: 'Arma P. 2' },
-
-        { id: 'belt', icon: 'fa-minus', label: 'Cinturon' }, // simplified icon
-        { id: 'boots', icon: 'fa-shoe-prints', label: 'Botas' },
-        { id: 'cape', icon: 'fa-user-secret', label: 'Capa' },
+        { id: 'head', label: 'Cabeza' },
+        { id: 'chest', label: 'Torso' },
+        { id: 'hands', label: 'Manos' },
+        { id: 'legs', label: 'Piernas' },
+        { id: 'boots', label: 'Botas' },
+        { id: 'mainHand1', label: 'Arma Principal' },
+        { id: 'offHand', label: 'Mano Torpe' },
+        { id: 'amulet1', label: 'Cuello' },
+        { id: 'ring1', label: 'Anillo 1' },
+        { id: 'ring2', label: 'Anillo 2' }
     ];
 
-    // Helper to create slot
-    const createSlot = (config, type = 'standard') => {
-        const div = document.createElement('div');
-        div.className = `equip-slot-dynamic slot-${type} slot-${config.id}`;
-
-        // CHECK LEVEL UNLOCK
-        const level = playerState.level || 1;
-        let unlockLevel = 1;
-
-        // Unlocking Rules
-        switch (config.id) {
-            case 'mainHand2': unlockLevel = 3; break;
-            case 'offHand': unlockLevel = 3; break;
-
-            case 'amulet2': unlockLevel = 5; break;
-            case 'amulet3': unlockLevel = 15; break;
-            case 'amulet4': unlockLevel = 20; break;
-
-            case 'ring2': unlockLevel = 3; break;
-            case 'ring3': unlockLevel = 5; break;
-            case 'ring4': unlockLevel = 10; break;
-            case 'ring5': unlockLevel = 15; break;
-            case 'ring6': unlockLevel = 20; break;
-
-            case 'boots': unlockLevel = 5; break;
-            case 'belt': unlockLevel = 10; break;
-            case 'cape': unlockLevel = 15; break;
-
-            default: unlockLevel = 1;
-        }
-
-        if (level < unlockLevel) {
-            div.classList.add('locked');
-            div.title = `Bloqueado - Nivel ${unlockLevel}`;
-
-            // Visual Style for Locked
-            div.style.background = "rgba(0,0,0,0.5)";
-            div.style.border = "1px dashed #4a3b2a";
-            div.style.cursor = "not-allowed";
-
-            // Lock Icon
-            div.innerHTML = `<i class="fas fa-lock slot-icon-bg" style="font-size: 18px; color: #64748b; opacity: 0.8;"></i>`;
-
-            // Click Handler
-            div.addEventListener('click', () => {
-                showToast(`🔒 Bloqueado: Nivel ${unlockLevel} requerido`);
-            });
-
-            return div;
-        }
-
-        div.innerHTML = `<i class="fas ${config.icon} slot-icon-bg"></i>`;
-        div.title = config.label;
-
-        // If item equipped
+    // GRIMOIRE CARD style rendering
+    const createSlot = (config) => {
         const item = playerState.equipment[config.id];
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'equip-slot-dynamic group';
+
+        slotDiv.innerHTML = `
+            <div class="flex flex-col w-full">
+                <span class="font-bold text-[10px] text-[#a1887f] uppercase tracking-widest mb-1 font-serif">${config.label}</span>
+                <span class="${item ? 'text-[#ffcc80] font-bold font-cinzel text-base shadow-black drop-shadow-md' : 'text-[#5d4037] italic text-sm'} truncate">
+                    ${item ? item.name : 'Vacío'}
+                </span>
+            </div>
+            ${item ? '<div class="w-8 h-8 flex items-center justify-center rounded-full bg-[#3e2723] text-[#ef9a9a] opacity-0 group-hover:opacity-100 transition-all border border-[#5d4037] hover:bg-[#5d4037]"><i class="fas fa-times"></i></div>' : '<i class="fas fa-plus text-[#3e2723] opacity-50"></i>'}
+        `;
+
         if (item) {
-            div.classList.add('equipped');
-            // Add image or content
-            if (item.image) {
-                div.innerHTML = `<img src="${item.image}" class="w-full h-full object-cover rounded" alt="${item.name}">`;
-            } else {
-                div.innerHTML += `<div class="item-overlay"></div>`;
+            slotDiv.style.cursor = "pointer";
+            slotDiv.onclick = () => {
+                unequipItem(config.id);
+                showToast(`Desequipado: ${item.name}`);
             }
         }
-        return div;
+
+        return slotDiv;
     };
 
-    // --- RENDER LAYOUT GROUPS ---
-
-    // 1. Jewelry Row (Top)
-    const jewelryRow = document.createElement('div');
-    jewelryRow.className = 'equip-row jewelry-row';
-    ['amulet1', 'amulet2', 'amulet3', 'amulet4'].forEach(id => {
-        jewelryRow.appendChild(createSlot({ id, icon: 'fa-gem', label: 'Amuleto' }, 'jewelry'));
+    slotsConfig.forEach(config => {
+        equipContainer.appendChild(createSlot(config));
     });
-    equipContainer.appendChild(jewelryRow);
+    */
+}
 
-    // 2. Main Armor & Weapons (Middle Grid)
-    const mainGrid = document.createElement('div');
-    mainGrid.className = 'equip-main-grid';
 
-    // Left: Weapons 1
-    const leftWeapons = document.createElement('div');
-    leftWeapons.className = 'weapon-col';
-    leftWeapons.appendChild(createSlot({ id: 'mainHand1', icon: 'fa-khanda', label: 'Mano D.' }, 'weapon'));
-    leftWeapons.appendChild(createSlot({ id: 'mainHand2', icon: 'fa-khanda', label: 'Dual' }, 'weapon'));
+// HELPER: Get fallback image based on type
+function getTypeImage(type, rarity) {
+    const t = type.toLowerCase();
+    if (t.includes('poc') || t.includes('potion') || t.includes('cons')) return 'img/items/default_potion.png';
+    if (t.includes('arma') || t.includes('weapon') || t.includes('espada') || t.includes('hacha')) return 'img/items/default_weapon.png';
+    if (t.includes('pergamino') || t.includes('scroll') || t.includes('libro')) return 'img/items/default_scroll.png';
+    if (t.includes('armadura') || t.includes('armor') || t.includes('escudo') || t.includes('capa')) return 'img/items/default_armor.png';
+    if (t.includes('anillo') || t.includes('collar') || t.includes('amulet') || t.includes('joy')) return 'img/items/default_jewelry.png';
 
-    // Center: Body
-    const bodyCol = document.createElement('div');
-    bodyCol.className = 'body-col';
-    bodyCol.appendChild(createSlot({ id: 'head', icon: 'fa-helmet-safety', label: 'Cabeza' }, 'armor'));
-    bodyCol.appendChild(createSlot({ id: 'chest', icon: 'fa-shirt', label: 'Torso' }, 'armor'));
-    bodyCol.appendChild(createSlot({ id: 'legs', icon: 'fa-socks', label: 'Piernas' }, 'armor'));
-    bodyCol.appendChild(createSlot({ id: 'boots', icon: 'fa-shoe-prints', label: 'Botas' }, 'armor'));
-
-    // Right: Offhand & Gloves
-    const rightCol = document.createElement('div');
-    rightCol.className = 'right-col';
-    rightCol.appendChild(createSlot({ id: 'offHand', icon: 'fa-shield-halved', label: 'Escudo' }, 'weapon'));
-    rightCol.appendChild(createSlot({ id: 'hands', icon: 'fa-hand-fist', label: 'Guantes' }, 'armor'));
-    rightCol.appendChild(createSlot({ id: 'belt', icon: 'fa-grip-lines', label: 'Cinturon' }, 'armor'));
-    rightCol.appendChild(createSlot({ id: 'cape', icon: 'fa-user-secret', label: 'Capa' }, 'armor'));
-
-    mainGrid.appendChild(leftWeapons);
-    mainGrid.appendChild(bodyCol);
-    mainGrid.appendChild(rightCol);
-    equipContainer.appendChild(mainGrid);
-
-    // 3. Rings (Bottom Grid 6x)
-    const ringRow = document.createElement('div');
-    ringRow.className = 'equip-row ring-row';
-    for (let i = 1; i <= 6; i++) {
-        ringRow.appendChild(createSlot({ id: `ring${i}`, icon: 'fa-ring', label: `Anillo ${i}` }, 'ring'));
-    }
-    equipContainer.appendChild(ringRow);
+    return 'img/items/default_misc.png';
 }
 
 function renderInventory() {
-    // FORCE DEBUG ITEMS IF EMPTY (Emergency Fix)
-    if (!playerState.inventory || playerState.inventory.length === 0) {
-        playerState.inventory = [
-            { name: "Poción (Debug)", desc: "Fixing UI", image: "", type: "consumable", rarity: "common" },
-            { name: "Espada (Debug)", desc: "Fixing UI", image: "", type: "weapon", rarity: "common" },
-            { name: "Mapa (Debug)", desc: "Fixing UI", image: "", type: "misc", rarity: "rare" }
-        ];
+    // Get element directly to avoid initialization issues
+    const grid = document.getElementById('sheet-inventory');
+    if (!grid) {
+        console.error('[SHEET] sheet-inventory element not found!');
+        return;
     }
-    if (!inventoryGrid) return;
-    inventoryGrid.innerHTML = '';
+
+    grid.innerHTML = '';
+    grid.className = "inventory-grid";
 
     // Filter Items
     let displayItems = playerState.inventory;
@@ -296,38 +247,186 @@ function renderInventory() {
         displayItems = playerState.inventory.filter(item => item.type === currentFilter);
     }
 
+    // If no items, show empty slots
+    if (displayItems.length === 0) {
+        for (let i = 0; i < 6; i++) {
+            const emptySlot = document.createElement('div');
+            emptySlot.className = 'inv-row opacity-50';
+            emptySlot.innerHTML = `
+                <div class="flex items-center gap-3 w-full">
+                    <div class="w-10 h-10 rounded-md bg-[#1a0f0a] border border-[#3e2723] flex items-center justify-center">
+                        <i class="fas fa-box-open text-[#3e2723]"></i>
+                    </div>
+                    <span class="text-[#5d4037] italic text-sm">Slot vacío</span>
+                </div>
+            `;
+            grid.appendChild(emptySlot);
+        }
+        return;
+    }
+
     displayItems.forEach((item, index) => {
         const slot = document.createElement('div');
-        slot.className = `inv-slot rarity-${item.rarity || 'common'}`;
-        slot.title = item.name + '\n' + item.desc; // Simple tooltip
+        slot.className = 'inv-row group cursor-pointer';
 
-        // If item has image
-        if (item.image) {
-            const img = document.createElement('img');
-            img.src = item.image;
-            slot.appendChild(img);
-        } else {
-            // Text fallback
-            slot.textContent = item.name.substring(0, 2);
-        }
+        // Icon Logic
+        let iconClass = 'fa-box';
+        const t = (item.type || '').toLowerCase();
+        if (t.includes('weapon') || t.includes('arma')) iconClass = 'fa-sword';
+        if (t.includes('armor') || t.includes('armadura')) iconClass = 'fa-shield-alt';
+        if (t.includes('potion') || t.includes('consumable') || t.includes('poción')) iconClass = 'fa-flask';
+        if (t.includes('ring') || t.includes('anillo') || t.includes('accessory')) iconClass = 'fa-ring';
+        if (t.includes('scroll') || t.includes('pergamino')) iconClass = 'fa-scroll';
+        if (t.includes('key') || t.includes('llave')) iconClass = 'fa-key';
+        if (t.includes('misc')) iconClass = 'fa-gem';
+
+        const rarityColor = {
+            'common': '#bcaaa4',
+            'uncommon': '#66bb6a',
+            'rare': '#42a5f5',
+            'epic': '#ab47bc',
+            'legendary': '#ffa726',
+            'exotic': '#ef5350',
+            'prohibido': '#ab47bc'
+        }[item.rarity?.toLowerCase()] || '#bcaaa4';
+
+        slot.innerHTML = `
+            <div class="flex items-center gap-3 w-full overflow-hidden">
+                <div class="w-12 h-12 min-w-[48px] rounded-md bg-[#1a0f0a] border-2 border-[#5d4037] flex items-center justify-center shadow-inner group-hover:border-[#ffb74d] transition-colors relative">
+                    <i class="fas ${iconClass} text-xl relative z-10" style="color: ${rarityColor}"></i>
+                    <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.05)_0%,transparent_70%)]"></div>
+                </div>
+                <div class="flex flex-col overflow-hidden">
+                    <span class="inv-row-name group-hover:text-[#ffe0b2] transition-colors truncate font-cinzel text-[#d7ccc8] font-semibold">${item.name}</span>
+                    <span class="text-[10px] uppercase tracking-widest font-bold" style="color: ${rarityColor}">${item.rarity || 'común'}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0 ml-2">
+                <span class="inv-row-qty text-[#ffcc80] font-mono bg-[#1a0f0a] px-2 py-0.5 rounded border border-[#3e2723]">x${item.qty || 1}</span>
+            </div>
+        `;
 
         slot.addEventListener('click', () => {
-            console.log('Clicked item:', item);
-            // Future: Show detailed card
+            showItemDetailsModal(item);
         });
 
-        inventoryGrid.appendChild(slot);
+        grid.appendChild(slot);
     });
 
-    // Fill empty slots for grid look (optional, e.g. up to 30)
-    const totalSlots = 30;
-    const itemsToShow = displayItems.length;
-    const emptySlots = Math.max(0, totalSlots - itemsToShow);
+    // Fill remaining slots up to 30 total
+    const TOTAL_SLOTS = 30;
+    const emptySlots = TOTAL_SLOTS - displayItems.length;
     for (let i = 0; i < emptySlots; i++) {
-        const slot = document.createElement('div');
-        slot.className = 'inv-slot empty-slot'; // New class for empty slots if needed
-        // Removed inline opacity to let CSS handle it
-        inventoryGrid.appendChild(slot);
+        const emptySlot = document.createElement('div');
+        emptySlot.className = 'inv-row opacity-40 cursor-default';
+        emptySlot.innerHTML = `
+            <div class="flex items-center gap-3 w-full">
+                <div class="w-12 h-12 min-w-[48px] rounded-md bg-[#0f0a08] border-2 border-dashed border-[#3e2723] flex items-center justify-center">
+                    <i class="fas fa-plus text-[#3e2723] text-sm"></i>
+                </div>
+                <span class="text-[#5d4037] italic text-xs">Vacío</span>
+            </div>
+        `;
+        grid.appendChild(emptySlot);
     }
+
+    console.log(`[SHEET] Rendered ${displayItems.length} items + ${emptySlots} empty slots`);
 }
+
+// Item Details Modal
+function showItemDetailsModal(item) {
+    // Remove existing modal if any
+    const existing = document.getElementById('item-details-modal');
+    if (existing) existing.remove();
+
+    const rarityColors = {
+        'common': { bg: '#3e2723', border: '#5d4037', text: '#bcaaa4' },
+        'uncommon': { bg: '#1a3a1a', border: '#2e7d32', text: '#81c784' },
+        'rare': { bg: '#1a237e', border: '#3949ab', text: '#7986cb' },
+        'epic': { bg: '#4a148c', border: '#7b1fa2', text: '#ba68c8' },
+        'legendary': { bg: '#4a2c00', border: '#ff8f00', text: '#ffb74d' },
+        'exotic': { bg: '#4a0000', border: '#c62828', text: '#ef9a9a' }
+    };
+
+    const colors = rarityColors[item.rarity?.toLowerCase()] || rarityColors.common;
+
+    // Icon based on type
+    let iconClass = 'fa-box';
+    const t = (item.type || '').toLowerCase();
+    if (t.includes('weapon') || t.includes('arma')) iconClass = 'fa-sword';
+    if (t.includes('armor') || t.includes('armadura')) iconClass = 'fa-shield-alt';
+    if (t.includes('potion') || t.includes('consumable')) iconClass = 'fa-flask';
+    if (t.includes('ring') || t.includes('accessory')) iconClass = 'fa-ring';
+    if (t.includes('scroll') || t.includes('pergamino')) iconClass = 'fa-scroll';
+    if (t.includes('key') || t.includes('llave')) iconClass = 'fa-key';
+
+    const modal = document.createElement('div');
+    modal.id = 'item-details-modal';
+    modal.className = 'fixed inset-0 z-[10000] flex items-center justify-center';
+    modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="this.parentElement.remove()"></div>
+        <div class="relative max-w-md w-full mx-4 animate-fade-in" style="animation: fadeInUp 0.2s ease-out">
+            <div class="rounded-xl overflow-hidden shadow-2xl" style="background: ${colors.bg}; border: 2px solid ${colors.border}">
+                <!-- Header -->
+                <div class="p-6 border-b" style="border-color: ${colors.border}30">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-lg flex items-center justify-center" style="background: rgba(0,0,0,0.3); border: 2px solid ${colors.border}">
+                            <i class="fas ${iconClass} text-3xl" style="color: ${colors.text}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-cinzel text-xl font-bold" style="color: ${colors.text}">${item.name}</h3>
+                            <p class="text-xs uppercase tracking-widest opacity-70" style="color: ${colors.text}">${item.rarity || 'Común'} · ${item.type || 'Objeto'}</p>
+                        </div>
+                        <span class="text-lg font-mono font-bold px-3 py-1 rounded" style="background: rgba(0,0,0,0.3); color: ${colors.text}">x${item.qty || 1}</span>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="p-6">
+                    <p class="text-sm italic leading-relaxed opacity-90" style="color: ${colors.text}">"${item.desc || 'Sin descripción disponible.'}"</p>
+                </div>
+                
+                <!-- Actions -->
+                <div class="p-4 flex gap-3 border-t" style="border-color: ${colors.border}30; background: rgba(0,0,0,0.2)">
+                    ${item.type === 'consumable' || t.includes('potion') ? `
+                        <button onclick="useItem('${item.name}'); this.closest('#item-details-modal').remove();" 
+                            class="flex-1 py-3 rounded-lg font-bold uppercase tracking-widest text-sm transition-all hover:scale-[1.02]"
+                            style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: 1px solid #4caf50">
+                            <i class="fas fa-flask mr-2"></i>Usar
+                        </button>
+                    ` : ''}
+                    <button onclick="this.closest('#item-details-modal').remove();" 
+                        class="flex-1 py-3 rounded-lg font-bold uppercase tracking-widest text-sm transition-all hover:scale-[1.02]"
+                        style="background: rgba(255,255,255,0.1); color: ${colors.text}; border: 1px solid ${colors.border}50">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+// Use item function
+function useItem(itemName) {
+    const index = playerState.inventory.findIndex(i => i.name === itemName);
+    if (index === -1) return;
+
+    const item = playerState.inventory[index];
+
+    // Reduce quantity or remove
+    if (item.qty && item.qty > 1) {
+        item.qty--;
+    } else {
+        playerState.inventory.splice(index, 1);
+    }
+
+    saveGame();
+    renderInventory();
+    showToast(`Usaste: ${itemName}`);
+}
+
+// Global expose
+window.useItem = useItem;
 

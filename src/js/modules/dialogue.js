@@ -7,12 +7,13 @@ import { addItem, playerState } from './player.js';
 
 // --- STATE ---
 let currentNpcId = null;
+let failedOptions = {}; // Track failed skill checks per NPC: { npcId: [optionIndex1, optionIndex2] }
 
 // --- DATA: DIALOGUE TREES ---
 // Hardcoded here for now, could be moved to src/js/data/dialogues.js later
 const dialogueData = {
-    // 1. BORG (Tabernero)
-    'npc_borg': {
+    // 1. BORG (Tabernero) - ETAPA 1
+    'owner_g': {
         name: "Borg",
         role: "Dueño del Grifo",
         avatar: "/img/npcs/borg.png",
@@ -28,6 +29,7 @@ const dialogueData = {
                 check: { skill: "Persuasión", dc: 12 },
                 success: "Borg sonríe, mostrando dientes de oro. '¡JA! El mejor. Aplasté tres cabezas de ogro en una tarde. La clave es el equilibrio... y golpear primero. Toma, la primera invita la casa.' (Ganas una Cerveza)",
                 failure: "Borg gruñe. 'No me hagas la pelota. Cómprame algo o lárgate.'",
+                reward: { name: "Cerveza de la Casa", desc: "Una jarra de cerveza tibia. Recupera 1d4 PV.", type: "consumable", rarity: "common", image: "" },
                 successNext: 'borg_stage2_glory'
             },
             {
@@ -46,6 +48,133 @@ const dialogueData = {
                 onFailure: "fight",
                 successNext: 'borg_stage2_threat'
             }
+        ]
+    },
+
+    // BORG - ETAPA 2: Gloria (después de halagarle)
+    'borg_stage2_glory': {
+        name: "Borg",
+        role: "Ex-Campeón del Foso",
+        avatar: "/img/npcs/borg.png",
+        greeting: "Borg llena dos jarras y desliza una hacia ti. 'Siéntate. Hace mucho que nadie pregunta por los viejos tiempos. ¿Sabes por qué perdí el ojo?'",
+        options: [
+            {
+                label: "👂 Cuéntamelo.",
+                success: "Borg se toca el parche. 'Un trol. Tercer combate del Guantelete. Me arrancó el ojo de un mordisco, pero yo le arranqué las tripas. Gané igual. Esa fue mi última pelea.'",
+                successNext: 'borg_stage3_troll'
+            },
+            {
+                label: "💀 ¿Por qué dejaste de pelear?",
+                success: "'Porque ya no tenía nada que demostrar. Y porque la edad te hace más lento, pero no más inteligente. Los jóvenes mueren rápido ahí dentro.'",
+                successNext: 'borg_stage3_retirement'
+            },
+            {
+                label: "🏆 ¿Quién es el mejor luchador que has visto?",
+                success: "Borg mira a la nada por un momento. 'Brunhilda. Sin duda. Esa mujer... no es humana. Lleva 37 victorias. Yo tenía 15 cuando me retiré. Ni me acerqué.'",
+                successNext: 'borg_stage3_brunhilda'
+            },
+            { label: "👋 Gracias por la charla.", nextDialogue: null }
+        ]
+    },
+
+    // BORG - ETAPA 2: Zora (después de preguntar por ella)
+    'borg_stage2_zora': {
+        name: "Borg",
+        role: "Informante Reacio",
+        avatar: "/img/npcs/borg.png",
+        greeting: "Borg mira alrededor nervioso. 'Oye, no debería contarte esto, pero... Zora ha estado preguntando por los túneles bajo la ciudad. Dice que busca a alguien que desapareció hace años.'",
+        options: [
+            {
+                label: "🕵️ [Investigación CD 15] ¿Los túneles? ¿Qué hay ahí abajo?",
+                check: { skill: "Investigación", dc: 15 },
+                success: "'Nadie lo sabe con certeza. Catacumbas antiguas, alcantarillas, y... celdas. Algunas de antes de que existiera Eranol. He oído que hay cosas vivas ahí abajo que nunca han visto el sol.'",
+                failure: "'No sé nada de túneles. Y tú tampoco si sabes lo que te conviene.'",
+                successNext: 'borg_stage3_tunnels'
+            },
+            {
+                label: "💰 [Soborno] Toma 50 monedas de oro. ¿A quién busca Zora?",
+                success: "Borg coge las monedas rápidamente. 'Un tal Aldric Vorn. Era... algo así como un alquimista. Desapareció hace 5 años. Dicen que experimentaba con cosas prohibidas.'",
+                successNext: 'borg_stage3_aldric'
+            },
+            {
+                label: "☠️ ¿Zora es peligrosa para mí?",
+                success: "'Solo si te metes en su camino. O si tienes algo que ella quiere. De lo contrario, te ignorará. Pero cuidado: tiene ojos en todas partes.'",
+                successNext: null
+            },
+            { label: "👋 Mejor me voy.", nextDialogue: null }
+        ]
+    },
+
+    // BORG - ETAPA 2: Amenaza (después de intimidarlo con éxito)
+    'borg_stage2_threat': {
+        name: "Borg",
+        role: "Aliado Forzoso",
+        avatar: "/img/npcs/borg.png",
+        greeting: "Borg te mira con una mezcla de respeto y recelo. 'Tienes cojones, te lo concedo. Pero no tientes a la suerte. ¿Qué más quieres?'",
+        options: [
+            {
+                label: "🗡️ Información sobre trabajos peligrosos.",
+                success: "'Trabajos, ¿eh? Hay un tipo en la esquina, Dedos Vance. Siempre sabe de trabajos sucios. Dile que te mando yo.'",
+                successNext: null
+            },
+            {
+                label: "🔒 ¿Hay una habitación trasera aquí?",
+                check: { skill: "Intimidación", dc: 16 },
+                success: "Borg suspira. 'Sí. Para clientes VIP. Juegos privados, reuniones discretas. Pero necesitas invitación. O... podrías ganar en el Foso. Los campeones siempre tienen acceso.'",
+                failure: "'No sé de qué hablas. Y deja de amenazarme o te echo. Me da igual lo duro que parezcas.'",
+                successNext: 'borg_stage3_vip'
+            },
+            {
+                label: "🩸 ¿Puedo pelear en el Foso esta noche?",
+                success: "'El Foso siempre acepta carne fresca. Baja por el pasillo de la izquierda, busca a Krug. Él se encarga de las inscripciones. Pero cuidado... ahí abajo las apuestas son con sangre.'",
+                successNext: null
+            },
+            { label: "👋 Nos vemos, Borg.", nextDialogue: null }
+        ]
+    },
+
+    // BORG - ETAPA 3: Historia del Trol
+    'borg_stage3_troll': {
+        name: "Borg",
+        role: "Veterano Nostálgico",
+        avatar: "/img/npcs/borg.png",
+        greeting: "Borg se sirve un trago largo. 'Aquel trol... se llamaba Grunk. Tres metros de músculo y rabia. Todavía tengo su colmillo guardado. ¿Sabes qué? Te lo vendo por 200 monedas de oro.'",
+        options: [
+            {
+                label: "💰 [Comprar] Trato hecho. (200 MO)",
+                success: "Borg saca un enorme colmillo amarillento de debajo de la barra. 'Es tuyo. Dicen que trae suerte en combate.'",
+                reward: { name: "Colmillo de Trol", desc: "Amuleto de un trol derrotado. +1 a tiradas de daño crítico.", type: "accessory", rarity: "rare", image: "" }
+            },
+            {
+                label: "🤔 [Regatear] (Persuasión CD 14) 200 es mucho. ¿Qué tal 100?",
+                check: { skill: "Persuasión", dc: 14 },
+                success: "Borg gruñe pero asiente. 'Por los viejos tiempos. 100 monedas.'",
+                failure: "'No regateo. 200 o nada.'",
+                reward: { name: "Colmillo de Trol", desc: "Amuleto de un trol derrotado. +1 a tiradas de daño crítico.", type: "accessory", rarity: "rare", image: "" }
+            },
+            { label: "👋 Quizás otro día.", nextDialogue: null }
+        ]
+    },
+
+    // BORG - ETAPA 3: Brunhilda
+    'borg_stage3_brunhilda': {
+        name: "Borg",
+        role: "Admirador",
+        avatar: "/img/npcs/borg.png",
+        greeting: "Los ojos de Borg brillan al hablar de ella. 'Brunhilda... La vi pelear contra un minotauro. Tres golpes. Tres. El bicho ni la tocó. Si quieres un consejo: no la provoques. Jamás.'",
+        options: [
+            {
+                label: "⚔️ Quiero enfrentarme a ella.",
+                success: "'¿Estás loco? Bueno... si insistes. Primero tienes que ganar el Guantelete. Solo entonces Brunhilda te considerará digno de combatir. Buena suerte... la necesitarás.'",
+                mission: { id: 'challenge_brunhilda', name: 'Desafiar a Brunhilda', desc: 'Ganar el Guantelete para poder retar a la campeona.' }
+            },
+            {
+                label: "🏆 ¿Cuál es su debilidad?",
+                check: { skill: "Perspicacia", dc: 16 },
+                success: "Borg baja mucho la voz. 'Vi algo una vez. Su hombro izquierdo. Tiene una vieja herida que a veces le molesta. Nunca lo muestra, pero la vi tocárselo entre combates.'",
+                failure: "'¿Debilidad? No tiene ninguna. Es perfecta.'"
+            },
+            { label: "👋 Interesante. Me voy.", nextDialogue: null }
         ]
     },
 
@@ -122,40 +251,181 @@ const dialogueData = {
                 label: "🤮 [Pregunta] (Naturaleza CD 12) ¿Qué demonios es eso?",
                 check: { skill: "Naturaleza", dc: 12 },
                 success: "'Es... rata de alcantarilla fermentada con setas luminiscentes. ¡Da visión en la oscuridad! O diarrea. ¡Prueba!'",
-                failure: "'¡Es *Gourmet*! ¡Mousse de Otyugh! ¡Ignorante!'"
+                failure: "'¡Es *Gourmet*! ¡Mousse de Otyugh! ¡Ignorante!'",
+                successNext: 'grumm_stage2'
             },
             {
                 label: "🤝 [Amistoso] (Engaño CD 14) Huele... delicioso.",
                 check: { skill: "Engaño", dc: 14 },
                 success: "Grumm llora de alegría. '¡Alguien me entiende! ¡Toma! ¡La mejor parte!' Te da un cucharón de lodo verde. (Es tóxico, pero él está feliz).",
-                failure: "Te huele. 'Mientes. Tienes cara de asco. ¡Fuera de mi cocina!'"
+                failure: "Te huele. 'Mientes. Tienes cara de asco. ¡Fuera de mi cocina!'",
+                successNext: 'grumm_stage2',
+                reward: { name: "Lodo Verde de Grumm", desc: "Un cucharón de sustancia dudosa. ¿Comestible? Probablemente no. +5 HP o -5 HP (50/50).", type: "consumable", rarity: "uncommon" }
             },
             {
                 label: "🧪 [Comercio] ¿Vendes algo que no mate?",
                 type: "shop",
-                action: "openShop" // Could open specific food menu
+                action: "openShop"
             }
         ]
     },
-
-    // 5. SILAS "EL MUDO" (Dueño Mudo Reidor)
-    'owner_m': {
-        name: "Silas 'El Mudo'",
-        role: "Dueño Kenku",
-        avatar: "/img/npcs/silas.png",
-        greeting: "*Silas te mira con ojos de cuervo. Hace un gesto de beber y señala un cartel tosco que dice 'ORO = TRAGO'. Luego imita el sonido de una bolsa de monedas cayendo.*",
+    'grumm_stage2': {
+        name: "Grumm",
+        role: "Maestro de los Sabores Mortales",
+        avatar: "/img/npcs/grumm.png",
+        greeting: "'¡FINALMENTE! ¡Alguien que aprecia mi ARTE! Escucha... tengo una receta ancestral. Poción de Fuego Interno. ¡BOOM en el estómago! Pero me faltan... *ingredientes especiales*.'",
         options: [
             {
-                label: "🍺 [Comercio] Quiero ver qué vendes en este agujero.",
+                label: "🧪 [Misión] ¿Qué necesitas?",
+                check: { skill: "Supervivencia", dc: 10 },
+                success: "Misión Aceptada: Ingredientes Explosivos. 'Necesito: 3 Lenguas de Salamandra, 1 Corazón de Fuego Fátuo, y... ¡Un Diente de Dragón Joven! Tráemelos y te haré la MEJOR poción de Eranol.'",
+                mission: { id: 'ingredientes_explosivos', title: 'Ingredientes Explosivos', desc: 'Grumm necesita ingredientes raros para su poción secreta.', obj: 'Consigue los ingredientes de criaturas de fuego.', reward: { name: 'Poción de Fuego Interno', rarity: 'rare' } }
+            },
+            {
+                label: "💰 [Comercio] Primero muéstrame qué tienes.",
                 type: "shop",
-                action: "openShop",
-                shopId: "el-mudo-reidor" // Explicit ID for our helper logic
+                action: "openShop"
+            },
+            { label: "👋 Eso suena peligroso, paso.", nextDialogue: 'npc_grumm' }
+        ]
+    },
+
+    // 5. SILAS "EL MUDO" (Kenku Misterioso)
+    // 5. SILAS "EL MUDO" (Kenku Misterioso)
+    'npc_mudo': {
+        name: "El Mudo",
+        role: "Dueño Kenku",
+        avatar: "/img/npcs/elmudo.png",
+        greeting: "*El Kenku te mira con ojos de cuervo. Hace un gesto de beber y señala un cartel tosco que dice 'ORO = TRAGO'. Luego imita el sonido de una bolsa de monedas cayendo.*",
+        options: [
+            {
+                label: "📜 [Misión] Busco trabajo... del tipo silencioso.",
+                check: { skill: "Sigilo", dc: 14 },
+                success: "*El Mudo te pasa una nota arrugada por debajo de la mesa. Huele a sangre seca.* 'Objetivo: Capataz de la Mina. Vivo o muerto. Preferiblemente muerto.'",
+                failure: "*Te ignora y sigue limpiando un vaso con un trapo sucio. No pareces lo suficientemente discreto.*",
+                mission: { id: 'mision_mudo_1', title: 'Silencio en la Mina', desc: 'El Mudo quiere que el Capataz de la Mina "desaparezca".', reward: { name: 'Daga de Sombras', rarity: 'rare' } }
+            },
+            {
+                label: "🪙 [Moneda del Cuervo] *Muestras una moneda negra con un cuervo grabado*",
+                requiresItem: "Moneda del Cuervo", // Must have this item in inventory
+                success: "*Los ojos del Kenku se abren como platos. Reconoce la moneda. Con reverencia, te hace pasar a la trastienda.*",
+                reward: { name: "Llave de la Trastienda", desc: "Acceso a los productos prohibidos.", type: "key", rarity: "rare", image: "" },
+                successNext: 'silas_stage2_backroom'
             },
             {
                 label: "🧐 [Perspicacia] (Sabiduría CD 13) ¿Qué intentas decirme?",
                 check: { skill: "Perspicacia", dc: 13 },
-                success: "*Silas imita el sonido de una espada desenvainándose y señala a un rincón oscuro.* Te está advirtiendo de un peligro.",
-                failure: "*Silas te hace un corte de manga y grazna como un cuervo. Claramente piensa que eres idiota.*"
+                success: "*El Mudo imita el sonido de una espada desenvainándose y señala a un rincón oscuro.* Te está advirtiendo de un peligro.",
+                failure: "*El Mudo te hace un corte de manga y grazna como un cuervo. Claramente piensa que eres idiota.*",
+                successNext: 'silas_stage2_warning'
+            },
+            {
+                label: "🗣️ [Mímica] *Intentar imitar sus sonidos*",
+                check: { skill: "Actuación", dc: 14 },
+                success: "*Los ojos del Kenku se iluminan. Grazna con entusiasmo y te hace una reverencia. Has ganado su respeto.*",
+                failure: "*El Mudo te mira con desprecio. Tu imitación ha sido patética.*",
+                successNext: 'silas_stage2_friends'
+            },
+            { label: "👋 *Irte sin decir nada*", nextDialogue: null }
+        ]
+    },
+
+    // SILAS - ETAPA 2: Interesado
+    'silas_stage2_interested': {
+        name: "Silas 'El Mudo'",
+        role: "Comerciante Curioso",
+        avatar: "/img/npcs/silas.png",
+        greeting: "*Silas inclina la cabeza estudiándote. Emite un sonido que parece... ¿una pregunta? Saca varios frascos pequeños y los coloca sobre el mostrador.*",
+        options: [
+            {
+                label: "💰 ¿Qué más tienes escondido?",
+                success: "*Silas se ríe (o lo que pasa por risa en un Kenku). Saca un mapa viejo y arrugado, y lo señala con insistencia.*",
+                reward: { name: "Mapa de las Catacumbas", desc: "Un mapa parcial de los túneles bajo Eranol.", type: "quest", rarity: "rare", image: "" }
+            },
+            { label: "👋 *Asentir y marcharte*", nextDialogue: null }
+        ]
+    },
+
+    // SILAS - ETAPA 2: Advertencia
+    // SILAS - ETAPA 2: Advertencia
+    'silas_stage2_warning': {
+        name: "El Mudo",
+        role: "Vigía Silencioso",
+        avatar: "/img/npcs/elmudo.png",
+        greeting: "*El Kenku mira nerviosamente hacia las sombras. Imita el sonido de pasos, luego de monedas, y finalmente... un grito ahogado. Algo está pasando en este local.*",
+        options: [
+            {
+                label: "👀 [Percepción CD 15] Buscar lo que indica",
+                check: { skill: "Percepción", dc: 15 },
+                success: "En el rincón oscuro ves una figura encapuchada que observa a todos. Lleva una daga oculta en la manga. Es un espía o un asesino.",
+                failure: "No ves nada especial. Solo borrachos y sombras."
+            },
+            { label: "👋 Gracias por el aviso...", nextDialogue: null }
+        ]
+    },
+
+    // SILAS - ETAPA 2: Amigos
+    // SILAS - ETAPA 2: Amigos
+    'silas_stage2_friends': {
+        name: "El Mudo",
+        role: "Aliado Kenku",
+        avatar: "/img/npcs/elmudo.png",
+        greeting: "*El Mudo te trata como a un igual. Te ofrece sentarte detrás de la barra y comparte un trago contigo. ¡Ahora eres bienvenido aquí!*",
+        options: [
+            {
+                label: "🎁 ¿Tienes algo especial para mí?",
+                success: "*El Kenku te entrega una pluma de su propia cabeza. Es un gesto de gran confianza.*",
+                reward: { name: "Pluma del Cuervo", desc: "Una pluma de Kenku. Permite +5 a una tirada de sigilo (un uso).", type: "consumable", rarity: "rare", image: "" }
+            },
+            { label: "🍺 Solo quiero beber en paz.", nextDialogue: null }
+        ]
+    },
+
+    // SILAS - ETAPA ESPECIAL: Trastienda (requiere Moneda del Cuervo)
+    // SILAS - ETAPA ESPECIAL: Trastienda (requiere Moneda del Cuervo)
+    // SILAS - ETAPA ESPECIAL: Trastienda (requiere Moneda del Cuervo)
+    'silas_stage2_backroom': {
+        name: "El Mudo",
+        role: "Guardián de Secretos",
+        avatar: "/img/npcs/elmudo.png",
+        greeting: "*En la trastienda, El Mudo cambia de actitud. Ya no imita sonidos ridículos. Te mira con intensidad, saca un mapa antiguo de debajo de una tabla del suelo y lo extiende ante ti. Señala una 'X' marcada en sangre.*",
+        options: [
+            {
+                label: "🗺️ [Tomar Mapa] ¿Qué es esto?",
+                success: "*El Kenku grazna suavemente: 'El... Origen...'. Te entrega el mapa. Marca la entrada oculta a las Catacumbas Reales, debajo del Foso.*",
+                reward: { name: "Mapa de la Cripta Real", desc: "Revela la entrada secreta a las catacumbas bajo la Arena.", type: "quest", rarity: "epic", image: "" }
+            },
+            {
+                label: "🗝️ [Preguntar] ¿Quién eres realmente?",
+                success: "*Se baja la capucha un instante, revelando plumas grises marcadas con runas. Hace el gesto de 'silencio' y te da una llave negra. 'Vigilante'.*",
+                reward: { name: "Llave de Obsidiana", desc: "Una llave fría al tacto. Abre una puerta sellada en algún lugar.", type: "key", rarity: "legendary", image: "" }
+            },
+            { label: "👋 Guardaré el secreto.", nextDialogue: null }
+        ]
+    },
+
+
+    // SILAS (Falso Cura)
+    'npc_silas': {
+        name: "Silas",
+        role: "Falso Cura",
+        avatar: "/img/npcs/silas.png",
+        greeting: "El hombre sonríe con demasiados dientes. 'Hijo mío... veo pecado en tus ojos. Pecado y MONEDAS. Por una donación modesta, los dioses mirarán hacia otro lado.'",
+        options: [
+            {
+                label: "💰 [Donar 10 oro] Perdona mis pecados.",
+                success: "'Ego te absolvo... de ser rico.' Te hace una señal sagrada mal hecha y se guarda las monedas a la velocidad del rayo.",
+                reward: { name: "Bendición Dudosa", desc: "Te sientes... más ligero de bolsillo. (+1 Moral, -10 Oro mentalmente)", type: "consumable", rarity: "common", qty: 1 }
+            },
+            {
+                label: "🤨 [Perspicacia CD 12] ¿Eres un sacerdote de verdad?",
+                check: { skill: "Perspicacia", dc: 12 },
+                success: "'¡Por supuesto! Orden de la... Mano Dorada. ¿No ves mi túnica? (Es claramente una cortina vieja).' Se pone nervioso.",
+                failure: "'¡Blasfemia! ¡Hereje! ¡Que te parta un rayo! (Mira al techo esperando un rayo, nada pasa)'"
+            },
+            {
+                label: "👋 No necesito perdón.",
+                nextDialogue: null
             }
         ]
     },
@@ -338,7 +608,7 @@ const dialogueData = {
         avatar: "/img/npcs/zora.png",
         greeting: "'Sobrevives. Eso es raro aquí. ¿Buscas trabajo de verdad? El Gremio de Cazadores paga bien por trofeos de monstruos del Abismo.'",
         options: [
-            { label: "📜 ¿Dónde me apunto?", check: { skill: "Persuasión", dc: 12 }, success: "Te entrega una moneda negra. 'Enséñale esto al tablón de anuncios. Te darán las misiones difíciles.' (Desbloquea Contratos)", reward: { name: "Moneda de Sangre", desc: "Una moneda negra y pesada con el símbolo del Gremio. Abre puertas oscuras.", type: "quest", rarity: "rare", image: "" } },
+            { label: "📜 ¿Dónde me apunto?", check: { skill: "Persuasión", dc: 12 }, success: "Te entrega una moneda negra. 'Enséñale esto al tablón de anuncios. Te darán las misiones difíciles.' (Desbloquea Contratos)", reward: { name: "Moneda de Sangre", desc: "Una moneda negra y pesada con el símbolo del Gremio. Abre puertas oscuras.", type: "quest", rarity: "rare", image: "img/items/zora_coin.png" } },
             { label: "👋 Luego", nextDialogue: 'npc_zora' }
         ]
     },
@@ -373,6 +643,393 @@ const dialogueData = {
         options: [
             { label: "💰 Comprar Mapa (500 MO)", check: { skill: "Persuasión", dc: 15 }, success: "Vance te da un papel arrugado. 'No digas que te lo di yo.'", reward: { name: "Mapa de Contrabandista", desc: "Rutas seguras a través de las alcantarillas del Anillo 3.", type: "quest", rarity: "rare", image: "" }, failure: "'¿Sin oro? No hay mapa. El capitalismo es así.'" },
             { label: "👋 Volver", nextDialogue: 'npc_vance' }
+        ]
+    },
+
+    // --- NPCS DEL POOL (ROTACIÓN DIARIA) ---
+
+    // SASHA (Arquera Tuerta)
+    'pool_3': {
+        name: "Sasha",
+        role: "Arquera Tuerta",
+        avatar: "/img/npcs/sasha.png",
+        greeting: "Sasha afila una flecha con una piedra mientras te mira con su único ojo. 'No me mires así. Lo perdí apostando. ¿Buscas flechas especiales?'",
+        options: [
+            {
+                label: "🏹 [Comercio] ¿Qué tipo de flechas vendes?",
+                type: "shop",
+                action: "openShop"
+            },
+            {
+                label: "🎯 [Percepción] (CD 14) ¿Cómo apuntas con un solo ojo?",
+                check: { skill: "Percepción", dc: 14 },
+                success: "Se ríe. 'El ojo que me queda ve mejor que los dos tuyos. Mira.' Lanza una flecha que atraviesa una mosca al otro lado de la taberna. 'Puedo enseñarte... por un precio.'",
+                failure: "'No tan bien como antes. Pero lo suficiente para clavarte una flecha en la rodilla si sigues preguntando.'",
+                successNext: 'sasha_stage2'
+            },
+            {
+                label: "💀 [Historia] (CD 13) ¿La apuesta fue con dados?",
+                check: { skill: "Historia", dc: 13 },
+                success: "Su expresión se oscurece. 'Fue con un demonio en el Anillo 0. Me ofreció visión perfecta a cambio de un ojo. No especificó cuál me quitaría.' Te muestra una cuenca vacía que brilla púrpura. 'Ahora veo... otras cosas.'",
+                failure: "'Eso no te importa. Siguiente pregunta o siguiente cliente.'"
+            }
+        ]
+    },
+    'sasha_stage2': {
+        name: "Sasha",
+        role: "Instructora de Tiro",
+        avatar: "/img/npcs/sasha.png",
+        greeting: "'Si quieres aprender a disparar como yo, necesitarás práctica. Y paciencia. Mucha paciencia.'",
+        options: [
+            { label: "🏹 [Misión] Enséñame a disparar.", success: "Misión Aceptada: Ojo de Halcón. 'Tráeme 5 plumas de Cocatriz y empezamos.'", check: { skill: "Destreza", dc: 10 } },
+            { label: "👋 Volver", nextDialogue: 'pool_3' }
+        ]
+    },
+
+    // VIEJO RORN (Minero)
+    'pool_4': {
+        name: "Viejo Rorn",
+        role: "Minero Paranoico",
+        avatar: "/img/npcs/rorn.png",
+        greeting: "Rorn tiembla mientras agarra una jarra vacía. Sus ojos se mueven frenéticamente. '¡La encontré! ¡Plata pura! Pero... las sombras... SE MOVÍAN...' Estalla en sudor frío.",
+        options: [
+            {
+                label: "🧠 [Medicina] (CD 12) Pareces traumatizado. ¿Qué viste?",
+                check: { skill: "Medicina", dc: 12 },
+                success: "Le calmas. Respira hondo. 'Era... como las paredes respiraban. Ojos en la piedra. Y susurros. Nombres. MI nombre.' Te agarra del brazo. 'No vayas abajo. Nunca.'",
+                failure: "'¡NO ME TOQUES!' Tira la jarra y huye a un rincón oscuro.",
+                successNext: 'rorn_stage2'
+            },
+            {
+                label: "💰 [Persuasión] (CD 14) ¿Dónde está esa veta de plata?",
+                check: { skill: "Persuasión", dc: 14 },
+                success: "'Túnel 7-B. Bajo la Arena. Pero escucha... lleva sal. MUCHA sal. Las cosas de abajo odian la sal.' Te dibuja un mapa tembloroso en una servilleta.",
+                failure: "'¡NO! ¡Es mía! ¡La plata es MÍA!' Esconde la cabeza entre las manos.",
+                reward: { name: "Mapa de Rorn", desc: "Un mapa tembloroso hacia una supuesta veta de plata en las profundidades.", type: "quest", rarity: "uncommon" }
+            },
+            {
+                label: "🍺 Invitarle una cerveza.",
+                success: "Acepta la cerveza con manos temblorosas. 'Gracias... hacía tiempo que nadie era amable.' (+5 Confianza)"
+            }
+        ]
+    },
+    'rorn_stage2': {
+        name: "Viejo Rorn",
+        role: "Superviviente",
+        avatar: "/img/npcs/rorn.png",
+        greeting: "'Escucha... no soy el único que ha vuelto *cambiado*. Hay otros mineros. Los llaman los Huecoscuro. Se reúnen a medianoche en el Foso.'",
+        options: [
+            { label: "🕵️ [Investigación] (CD 15) ¿Reunión secreta?", check: { skill: "Investigación", dc: 15 }, success: "'Dicen que encontraron algo. Un templo antiguo. Y quieren volver.' Te da una contraseña: 'Sombra Hambrienta.'", failure: "'Ya he dicho demasiado. Olvídame.'" },
+            { label: "👋 Volver", nextDialogue: 'pool_4' }
+        ]
+    },
+
+    // TRIXIE (Hada en Tarro)
+    'pool_5': {
+        name: "Trixie",
+        role: "Hada Prisionera",
+        avatar: "/img/npcs/trixie.png",
+        greeting: "Una luz púrpura brilla dentro de un tarro sucio en la barra. Una vocecita chillona grita: '¡EH! ¡TÚ! ¡El de la cara fea! ¡Sácame de aquí! ¡Te daré TRES DESEOS!' *Obviamente miente.*",
+        options: [
+            {
+                label: "🧚 [Perspicacia] (CD 10) Eso suena a mentira...",
+                check: { skill: "Perspicacia", dc: 10 },
+                success: "'¡Vale, vale! Dos deseos. ¡Uno! ¡MEDIO! Ugh, está bien... NO tengo deseos. Pero puedo darte INFORMACIÓN. Sé cosas. Muchas cosas. Las hadas escuchamos TODO.'",
+                failure: "'¡Tres deseos! ¡Palabra de hada!' El brillo en sus ojos es claramente sospechoso."
+            },
+            {
+                label: "🔓 [Juego de Manos] (CD 14) Abrir el tarro discretamente.",
+                check: { skill: "Juego de Manos", dc: 14 },
+                success: "¡PLINK! El tarro se abre. Trixie sale volando y te da un beso en la nariz. '¡LIBRE! ¡Eres mi héroe! Toma, ten esto.' Te da un Polvo de Hada antes de desaparecer por una grieta.",
+                failure: "Borg te ve y gruñe. 'Ese bicho vale 50 oros. Tócalo otra vez y te arranco los dedos.'",
+                reward: { name: "Polvo de Hada", desc: "Espolvorea sobre un objeto para hacerlo brillar o sobre una herida para curar 1d4 HP.", type: "consumable", rarity: "uncommon" }
+            },
+            {
+                label: "😈 [Intimidación] (CD 8) Agitar el tarro.",
+                check: { skill: "Intimidación", dc: 8 },
+                success: "Agitas el tarro. Trixie rebota como una pelota gritando insultos en idioma Silvano. Muy satisfactorio.",
+                failure: "¡CRACK! El tarro explota en tu mano. Trixie te muerde la oreja y huye. -1 HP."
+            }
+        ]
+    },
+
+    // GARRA (Tabaxi)
+    'pool_6': {
+        name: "Garra",
+        role: "Tabaxi Informante",
+        avatar: "/img/npcs/garra.png",
+        greeting: "Un Tabaxi flaco se rasca compulsivamente. Sus pupilas están dilatadas. Tú pareces de confianza. Tengo información. Sobre la Guardia. Cambio de turno. Puerta trasera. Solo necesito un poco de Polvo de Sueño...",
+        options: [
+            {
+                label: "💊 [Medicina] (CD 12) Evaluar su adicción.",
+                check: { skill: "Medicina", dc: 12 },
+                success: "Síndrome de abstinencia severo. Polvo de Sueño, extracto de Seta del Abismo. Muy adictivo. 'Por favor... solo un poco. Te cuento todo.'",
+                failure: "'¡No me mires así! ¡Estoy bien! Solo... necesito... ayuda...'"
+            },
+            {
+                label: "🕵️ [Persuasión] (CD 14) Información primero, droga después.",
+                check: { skill: "Persuasión", dc: 14 },
+                success: "'V-vale... El cambio de guardia en la Puerta Norte es a medianoche. Hay un hueco de 3 minutos. Y el Capitán Volker acepta sobornos.' Te da un papel con horarios.",
+                failure: "'¿Crees que soy idiota? Primero el polvo. Luego hablamos.' Se aleja temblando.",
+                reward: { name: "Horarios de la Guardia", desc: "Documento con los cambios de turno y debilidades de la Guardia de Eranol.", type: "quest", rarity: "rare" }
+            },
+            {
+                label: "❌ [Rechazo] No trato con yonquis.",
+                success: "Garra te sisea. 'Algún día... tú también necesitarás algo. Y nadie te ayudará.' Se arrastra hacia las sombras."
+            }
+        ]
+    },
+
+    // EL MUDO (Kenku Espía)
+    'pool_9': {
+        name: "El Mudo",
+        role: "Kenku Espía",
+        avatar: "/img/npcs/elmudo.png",
+        greeting: "El Kenku te mira con ojos negros como el vacío. Abre el pico y emite un sonido perfecto: el rugido de una Hidra, seguido del tintineo de monedas cayendo. Luego, el grito de un hombre muriendo.",
+        options: [
+            {
+                label: "🎭 [Interpretación] (CD 13) Intentar comunicarse con sonidos.",
+                check: { skill: "Interpretación", dc: 13 },
+                success: "Imitas el sonido de aplausos. El Mudo ladea la cabeza, impresionado. Responde con el sonido de una puerta abriéndose y pasos alejándose. ¿Una invitación?",
+                failure: "Haces un ruido. El Mudo te mira decepcionado y grazna como un cuervo enfadado.",
+                successNext: 'elmudo_stage2'
+            },
+            {
+                label: "💰 [Oro] Mostrar monedas.",
+                success: "Los ojos del Kenku brillan. Imita el sonido de una bolsa abriéndose y luego un susurro: 'Recompensa... por... el Rata...' Reproduce una risa conocida del Anillo 0."
+            },
+            {
+                label: "👀 [Percepción] (CD 15) Observar qué ha visto recientemente.",
+                check: { skill: "Percepción", dc: 15 },
+                success: "Notas manchas de sangre seca en sus plumas. Y un olor a azufre. Ha estado en el Anillo 0. Hace poco.",
+                failure: "Solo ves un pájaro raro. Probablemente inofensivo."
+            }
+        ]
+    },
+    'elmudo_stage2': {
+        name: "El Mudo",
+        role: "Guía Silencioso",
+        avatar: "/img/npcs/elmudo.png",
+        greeting: "El Kenku reproduce el sonido de tus propios pasos, luego los de alguien siguiéndote. Un gruñido. Y tu grito de dolor. ¿Una advertencia? ¿O una predicción?",
+        options: [
+            { label: "¿Quién me sigue?", success: "El Mudo imita el sonido de una capa ondeando y el clic de una ballesta amartillándose. 'Sombra... Cazador...'" },
+            { label: "👋 Retirarse", nextDialogue: 'pool_9' }
+        ]
+    },
+
+    // REY RIKO (Halfling Rey de las Ratas)
+    'pool_10': {
+        name: "Rey Riko",
+        role: "Señor de las Ratas",
+        avatar: "/img/npcs/reyriko.png",
+        greeting: "Un Halfling sucio está rodeado de ratas que parecen obedecerle. Una de ellas está sentada en su hombro royendo queso. 'Mis pequeños ojos lo ven TODO. Cada migaja, cada secreto, cada traición. ¿Qué quieres saber?'",
+        options: [
+            {
+                label: "🐀 [Trato con Animales] (CD 12) Ganarse la confianza de las ratas.",
+                check: { skill: "Trato con Animales", dc: 12 },
+                success: "Extiendes la mano. Una rata la olfatea y chilla. Riko sonríe. 'Le gustas. Eso es raro. Mis niñas no confían fácilmente.'",
+                failure: "Una rata te muerde el dedo. '-1 HP'. Riko se ríe. 'A mis niñas no les gustas. Mala señal.'",
+                successNext: 'riko_stage2'
+            },
+            {
+                label: "🕵️ [Investigación] (CD 14) ¿Qué han visto tus ratas últimamente?",
+                check: { skill: "Investigación", dc: 14 },
+                success: "'Mis espías encontraron un túnel nuevo bajo la Arena. Va a algún lugar antiguo. Las ratas viejas tienen miedo de bajar.' Te describe la ubicación.",
+                failure: "'Esa información cuesta. 50 oros por susurro.'"
+            },
+            {
+                label: "👑 [Historia] (CD 10) ¿Por qué te llaman 'Rey'?",
+                check: { skill: "Historia", dc: 10 },
+                success: "'Porque MANDO. Cada rata de Eranol responde a mí. Son mis ojos, mis oídos, mis asesinas silenciosas.' Chasquea los dedos y cien ojos rojos brillan desde las sombras.",
+                failure: "'Porque soy el mejor. Siguiente pregunta.'"
+            }
+        ]
+    },
+    'riko_stage2': {
+        name: "Rey Riko",
+        role: "Aliado Roedor",
+        avatar: "/img/npcs/reyriko.png",
+        greeting: "'Escucha, me caes bien. Puedo prestarte una de mis exploradoras. Te guiará por los túneles. Pero me debes un favor. Un día lo cobraré.'",
+        options: [
+            { label: "🤝 Aceptar el trato.", success: "Una rata gorda sube a tu hombro. 'Se llama Princesa. Trátala bien.' (Ganas Compañero Temporal)", reward: { name: "Princesa la Rata", desc: "Una rata entrenada que conoce los túneles de Eranol.", type: "companion", rarity: "uncommon" } },
+            { label: "👋 Declinar", nextDialogue: 'pool_10' }
+        ]
+    },
+
+    // VEX (Brujo Dracónido)
+    'pool_11': {
+        name: "Vex",
+        role: "Brujo Desesperado",
+        avatar: "/img/npcs/vex.png",
+        greeting: "Un Dracónido de escamas negras bebe nerviosamente. Tiene ojeras y las garras le tiemblan. 'Necesito... romper mi pacto. Es demasiado. Me pide... cosas. ¿Conoces a alguien que pueda ayudar?'",
+        options: [
+            {
+                label: "📜 [Arcano] (CD 15) ¿Qué tipo de pacto es?",
+                check: { skill: "Arcano", dc: 15 },
+                success: "'Un pacto de sangre con un Archidiablo. Nivel 6. Casi imposible de romper sin... sacrificio.' Notas marcas de quemaduras en sus escamas formando runas.",
+                failure: "'No lo entenderías. Es... complicado.' Se frota los ojos cansado.",
+                successNext: 'vex_stage2'
+            },
+            {
+                label: "💀 [Intimidación] (CD 16) ¿Qué te ha pedido hacer?",
+                check: { skill: "Intimidación", dc: 16 },
+                success: "Palidece (para ser un dracónido). 'Almas. Jóvenes. Tengo hasta la luna nueva o... seré yo el sacrificio.' Te muestra una cuenta regresiva tatuada en su muñeca.",
+                failure: "'¡Eso es entre mi Patrón y yo!' Escamas de humo brotan de su cuello, señal de que está asustado."
+            },
+            {
+                label: "📜 [Comercio] ¿Pergaminos oscuros?",
+                type: "shop",
+                action: "openShop"
+            }
+        ]
+    },
+    'vex_stage2': {
+        name: "Vex",
+        role: "Brujo en Deuda",
+        avatar: "/img/npcs/vex.png",
+        greeting: "'Hay una forma de engañar al contrato. Necesito el Cálamo del Primer Escriba. Está en las Ruinas del Ateneo. ¿Me ayudas a buscarlo?'",
+        options: [
+            { label: "📜 [Misión] Buscar el Cálamo.", success: "Misión Aceptada: Contrato Roto. 'Si lo logras, te enseñaré un conjuro prohibido.'", check: { skill: "Arcano", dc: 12 }, mission: { id: 'contrato_roto', title: 'Contrato Roto', desc: 'Vex necesita el Cálamo del Primer Escriba para romper su pacto.', obj: 'Encuentra el Cálamo en las Ruinas del Ateneo.', reward: { name: 'Hechizo: Llamas Abisales', rarity: 'legendary' } } },
+            { label: "👋 Paso de problemas demoniacos", nextDialogue: 'pool_11' }
+        ]
+    },
+
+    // LA ENCAPUCHADA (Drow)
+    'pool_12': {
+        name: "La Encapuchada",
+        role: "Asesina Drow",
+        avatar: "/img/npcs/encapuchada.png",
+        greeting: "Una figura en las sombras. Solo ves sus ojos: rojos como rubíes. Una voz fría susurra: 'Una gota basta para parar un corazón de ogro. 200 oros. Sin preguntas.'",
+        options: [
+            {
+                label: "💀 [Comercio] Quiero veneno.",
+                type: "shop",
+                action: "openShop"
+            },
+            {
+                label: "🕵️ [Sigilo] (CD 16) Intentar ver su cara.",
+                check: { skill: "Sigilo", dc: 16 },
+                success: "Por un instante, la luz de una vela ilumina rasgos élficos perfectos, cicatrizados por un símbolo grabado a fuego en la mejilla: el emblema de una Casa Drow caída.",
+                failure: "Sientes un frío en el cuello. Un cuchillo. 'No. Mires. Otra vez.' El cuchillo desaparece y ella sigue en la sombra.",
+                successNext: 'encapuchada_stage2'
+            },
+            {
+                label: "🤝 [Persuasión] (CD 18) ¿Por qué te escondes?",
+                check: { skill: "Persuasión", dc: 18 },
+                success: "Silencio largo. 'Porque si me encuentran, moriremos todos. Hay cosas peores que demonios en la Infraoscuridad.' Una carta cae a tus pies. 'Si ves este símbolo, corre.'",
+                failure: "'Lo que escondo no te concierne, superficial.' La sombra se desvanece.",
+                reward: { name: "Carta de Advertencia", desc: "Un símbolo extraño y una nota: 'Los Ojos del Vacío observan.'", type: "quest", rarity: "rare" }
+            }
+        ]
+    },
+    'encapuchada_stage2': {
+        name: "La Encapuchada",
+        role: "Exiliada",
+        avatar: "/img/npcs/encapuchada.png",
+        greeting: "'Casa Zau'Ith. Mi antigua familia. Me marcaron como traidora por no participar en un sacrificio. Ahora cazo a los que me cazaban. Y tú... acabas de convertirte en testigo.'",
+        options: [
+            { label: "🤐 Tu secreto está a salvo.", success: "Asiente casi imperceptiblemente. 'Bien. Si necesitas que alguien... desaparezca, sabes dónde encontrarme.' (+15 Confianza)" },
+            { label: "👋 Me voy.", nextDialogue: 'pool_12' }
+        ]
+    },
+
+    // --- NPCS DEL MUDO REIDOR ---
+
+    // SUSURROS (Informante)
+    'npc_whisper': {
+        name: "Susurros",
+        role: "Mercader de Secretos",
+        avatar: "/img/npcs/encapuchada.png",
+        greeting: "Apenas distingues una silueta en el rincón más oscuro. Una voz sin género susurra: 'Tengo algo que te interesa. Siempre lo tengo. La pregunta es... ¿qué tienes tú para mí?'",
+        options: [
+            {
+                label: "💰 [Persuasión] (CD 14) Dinero. ¿Cuánto por un buen rumor?",
+                check: { skill: "Persuasión", dc: 14 },
+                success: "'50 oros por un susurro. 100 por un grito.' Te inclinas y escuchas: 'El Gremio de Ladrones planea un golpe al Banco Gnomo. Esta semana.'",
+                failure: "'Tu bolsa suena vacía. Vuelve cuando tengas algo real.'",
+                reward: { name: "Rumor: Golpe al Banco", desc: "El Gremio planea robar el Banco Gnomo esta semana.", type: "quest", rarity: "uncommon" }
+            },
+            {
+                label: "🔄 [Engaño] (CD 16) Ofrezco información por información.",
+                check: { skill: "Engaño", dc: 16 },
+                success: "'Interesante. Cuéntame algo primero.' Le inventas una historia sobre un noble. Susurros asiente. 'Bien jugado. Toma tu premio: El Comandante de la Guardia tiene una amante secreta. En el Anillo 0.'",
+                failure: "'Eso es mentira. Y mal contada.' Sientes un pinchazo en la espalda. '-2 HP'. 'La próxima vez, no me hagas perder el tiempo.'"
+            },
+            {
+                label: "🔍 [Investigación] (CD 13) ¿Qué sabes del Mercado Negro?",
+                check: { skill: "Investigación", dc: 13 },
+                success: "'La entrada está en el callejón detrás del Grifo Tuerto. Busca el Ojo Azul pintado en la pared. Di 'Sombra Hambrienta' al guardián.'",
+                failure: "'Esa información cuesta más de lo que puedes pagar. Busca en otra parte.'"
+            }
+        ]
+    },
+
+    // --- NPCS DEL CÁLIZ DE MANÁ ---
+
+    // LADY ELARA (Dueña)
+    'owner_c': {
+        name: "Lady Elara",
+        role: "Propietaria del Cáliz",
+        avatar: "/img/npcs/sasha.png",
+        greeting: "Una elfa de cabello plateado te evalúa con ojos antiguos. Camareros invisibles flotan a su alrededor. 'Bienvenido al Cáliz de Maná. Este es un establecimiento *selecto*. Espero que tu comportamiento esté a la altura.'",
+        options: [
+            {
+                label: "🍷 [Comercio] Ver la carta de lujo.",
+                type: "shop",
+                action: "openShop",
+                shopId: "caliz-mana"
+            },
+            {
+                label: "🎭 [Etiqueta] (CD 12) Hacer una reverencia apropiada.",
+                check: { skill: "Interpretación", dc: 12 },
+                success: "Elara sonríe levemente. 'Vaya, alguien con modales. Refrescante. Quizás puedas sentarte en la mesa de los Nobles. Si tu bolsa lo permite.'",
+                failure: "'Tu gesto es... adecuado. Para un herrero.' Una sombra de desprecio cruza su rostro.",
+                successNext: 'elara_stage2'
+            },
+            {
+                label: "🧐 [Arcano] (CD 14) Esos camareros invisibles son sirvientes conjurados...",
+                check: { skill: "Arcano", dc: 14 },
+                success: "'Observador. Sí, son ecos de mi magia. Más fiables que los vivos. No roban, no mienten, no... fallan.' Su voz tiene un dejo de amargura.",
+                failure: "'La magia de este lugar no es asunto de curiosos.' Los ojos de los invisibles parecen mirarte."
+            }
+        ]
+    },
+    'elara_stage2': {
+        name: "Lady Elara",
+        role: "Anfitriona Secreta",
+        avatar: "/img/npcs/sasha.png",
+        greeting: "'Veo potencial en ti. Hay una reunión esta noche. Nobles, mercaderes, y... otros. Si quieres ascender en Eranol, necesitas contactos. ¿Te interesa una invitación?'",
+        options: [
+            { label: "👔 [Misión] Acepto la invitación.", success: "Misión Aceptada: La Cena de Cristal. 'Viste apropiadamente. Y no hables de más.'", check: { skill: "Persuasión", dc: 10 }, mission: { id: 'cena_cristal', title: 'La Cena de Cristal', desc: 'Lady Elara te ha invitado a una reunión secreta de élites.', obj: 'Asiste a la cena y consigue un contacto valioso.', reward: { name: 'Invitación VIP', rarity: 'epic' } } },
+            { label: "👋 No es mi ambiente.", nextDialogue: 'owner_c' }
+        ]
+    },
+
+    // VIZCONDE POMPOUS (Noble)
+    'npc_3': {
+        name: "Vizconde Pompous",
+        role: "Noble Arrogante",
+        avatar: "/img/npcs/borg.png",
+        greeting: "Un humano gordo te mira a través de un monóculo de oro. '¡Tú! El de la ropa... *pasable*. Pareces alguien que hace trabajos sucios. He perdido mi broche familiar en las alcantarillas. Un Devorador lo robó. Quiero *MI BROCHE*.'",
+        options: [
+            {
+                label: "💰 [Persuasión] (CD 14) ¿Cuánto paga por el trabajo?",
+                check: { skill: "Persuasión", dc: 14 },
+                success: "'¡Hmph! Mercenarios. 500 oros de oro puro cuando me lo devuelvas. Y 200 de anticipo.' Te lanza una bolsa con desprecio.",
+                failure: "'¿Negociar? ¿CONMIGO? Deberías estar agradecido de trabajar para un Vizconde. 300 oros. Tómalo o déjalo.'",
+                reward: { name: "Anticipo del Vizconde", desc: "200 monedas de oro del Vizconde Pompous.", type: "gold", rarity: "common" }
+            },
+            {
+                label: "🕵️ [Perspicacia] (CD 12) ¿Qué hace un broche noble en las alcantarillas?",
+                check: { skill: "Perspicacia", dc: 12 },
+                success: "El Vizconde se pone rojo. 'Eso... eso no te incumbe.' Notas que evita mirarte. Claramente hay más en esta historia.",
+                failure: "'¡Impertinente! ¡El broche estaba en mi carruaje cuando fui asaltado! ¡Nada más!'"
+            },
+            {
+                label: "❌ [Rechazo] No trabajo para presumidos.",
+                success: "'¡¿Cómo te ATREVES?!' Se atraganta con el vino. Los nobles cercanos murmuran. Has hecho un enemigo (-20 Reputación Noble).",
+                failure: "El Vizconde hace un gesto y dos guardias aparecen. 'Fuera de MI vista.'"
+            }
         ]
     }
 };
@@ -433,7 +1090,8 @@ export function initDialogueSystem() {
     window.closeDialogue = closeDialogue;
     window.handleDialogueOption = handleDialogueOption;
     window.resolveManualRoll = resolveManualRoll;
-    window.handleReward = handleReward; // Expose for Mission Debug
+    window.handleReward = handleReward;
+    window.retryDialogue = retryDialogue; // For "Intentar otra cosa" button
 }
 
 export function startDialogue(npcId, fallbackData = null) {
@@ -527,6 +1185,17 @@ export function closeDialogue() {
     currentNpcId = null;
 }
 
+// Retry dialogue - go back to options
+function retryDialogue() {
+    if (!currentNpcId) return;
+
+    const data = dialogueData[currentNpcId];
+    if (data && data.options) {
+        document.getElementById('dialogue-result').classList.add('hidden');
+        renderOptions(data.options);
+    }
+}
+
 function renderOptions(options) {
     const container = document.getElementById('dialogue-options');
     container.innerHTML = '';
@@ -535,20 +1204,53 @@ function renderOptions(options) {
 
     options.forEach((opt, index) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left p-4 rounded bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-500/50 transition-all group flex items-center justify-between";
+
+        // Check if this option was failed before (skill check failed)
+        const wasFailed = failedOptions[currentNpcId]?.includes(index);
+
+        // Check if this option requires a special item
+        let hasRequiredItem = true;
+        if (opt.requiresItem) {
+            hasRequiredItem = playerState.inventory?.some(item => item.name === opt.requiresItem);
+        }
+
+        if (wasFailed) {
+            // Disabled style for failed options
+            btn.className = "w-full text-left p-4 rounded bg-red-950/20 border border-red-900/30 cursor-not-allowed opacity-50 flex items-center justify-between";
+            btn.disabled = true;
+        } else if (!hasRequiredItem && opt.requiresItem) {
+            // Disabled style for options that require an item you don't have
+            btn.className = "w-full text-left p-4 rounded bg-purple-950/20 border border-purple-900/30 cursor-not-allowed opacity-60 flex items-center justify-between";
+            btn.disabled = true;
+        } else {
+            btn.className = "w-full text-left p-4 rounded bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-500/50 transition-all group flex items-center justify-between";
+        }
 
         let icon = "fa-comment";
         if (opt.label.includes("Combate")) icon = "fa-swords";
         if (opt.label.includes("Comercio")) icon = "fa-coins";
         if (opt.label.includes("Investig")) icon = "fa-search";
         if (opt.label.includes("Amenaza")) icon = "fa-fist-raised";
+        if (opt.requiresItem) icon = "fa-key";
 
-        btn.innerHTML = `
-            <span class="text-sm md:text-base text-gray-300 group-hover:text-white font-medium">${opt.label}</span>
-            <i class="fas ${icon} text-gray-600 group-hover:text-amber-500 opacity-50 group-hover:opacity-100 transition-opacity"></i>
-        `;
+        if (wasFailed) {
+            btn.innerHTML = `
+                <span class="text-sm md:text-base text-red-400/50 line-through font-medium">${opt.label}</span>
+                <span class="text-xs text-red-500"><i class="fas fa-ban mr-1"></i>Fallado</span>
+            `;
+        } else if (!hasRequiredItem && opt.requiresItem) {
+            btn.innerHTML = `
+                <span class="text-sm md:text-base text-purple-400/50 font-medium">${opt.label}</span>
+                <span class="text-xs text-purple-400"><i class="fas fa-lock mr-1"></i>Requiere: ${opt.requiresItem}</span>
+            `;
+        } else {
+            btn.innerHTML = `
+                <span class="text-sm md:text-base text-gray-300 group-hover:text-white font-medium">${opt.label}</span>
+                <i class="fas ${icon} text-gray-600 group-hover:text-amber-500 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+            `;
+            btn.onclick = () => handleDialogueOption(index);
+        }
 
-        btn.onclick = () => handleDialogueOption(index);
         container.appendChild(btn);
     });
 }
@@ -560,19 +1262,19 @@ export function handleDialogueOption(optionIndex) {
     const opt = data.options[optionIndex];
     if (!opt) return;
 
-    // Reward Handling
-    if (opt.reward) {
-        handleReward(opt.reward);
+    // Mission/Reward Trigger:
+    // If there is a CHECK, we wait for resolveManualRoll.
+    // If there is NO CHECK, we grant immediately.
+
+    // Is it a skill check?
+    if (opt.check) {
+        renderManualRollInput(optionIndex, opt);
+        return;
     }
 
-    // Mission Trigger
-    if (opt.mission) {
-        if (window.addMission) {
-            window.addMission(opt.mission);
-        } else {
-            console.warn("addMission not found globally");
-        }
-    }
+    // If no check, grant immediately
+    if (opt.reward) handleReward(opt.reward);
+    if (opt.mission && window.addMission) window.addMission(opt.mission);
 
     // Is it a shop action?
     if (opt.type === 'shop') {
@@ -645,12 +1347,32 @@ function resolveManualRoll(optionIndex) {
     const isSuccess = val >= opt.check.dc;
     const nextStep = isSuccess ? opt.successNext : opt.failureNext;
 
+    // Track failed options so they can't be retried
+    if (!isSuccess && opt.check) {
+        if (!failedOptions[currentNpcId]) {
+            failedOptions[currentNpcId] = [];
+        }
+        if (!failedOptions[currentNpcId].includes(optionIndex)) {
+            failedOptions[currentNpcId].push(optionIndex);
+        }
+    }
+
     // UPDATE TRUST
     if (playerState.npcStatus && playerState.npcStatus[currentNpcId]) {
         const change = isSuccess ? 10 : -5;
         let newTrust = playerState.npcStatus[currentNpcId].trust + change;
         newTrust = Math.max(0, Math.min(100, newTrust)); // Clamp 0-100
         playerState.npcStatus[currentNpcId].trust = newTrust;
+
+        // Grant Rewards/Missions ON SUCCESS
+        if (isSuccess) {
+            if (opt.reward) handleReward(opt.reward);
+            // We use a small timeout to let the result render first, or just call it.
+            // Missions usually have a visual feedback too.
+            if (opt.mission && window.addMission) {
+                window.addMission(opt.mission);
+            }
+        }
 
         // Refresh Trust Bar visually immediate
         const trustBarInner = document.querySelector('#dialogue-trust-bar div');
@@ -727,7 +1449,7 @@ function resolveManualRoll(optionIndex) {
                         👋 Terminar Conversación
                     </button>
                     ${!opt.onFailure ? `
-                    <button onclick="renderOptions(dialogueData['${currentNpcId}'].options); document.getElementById('dialogue-result').classList.add('hidden')" class="w-full py-2 text-gray-400 hover:text-white text-xs uppercase tracking-widest transition-colors">
+                    <button onclick="retryDialogue()" class="w-full py-2 text-gray-400 hover:text-white text-xs uppercase tracking-widest transition-colors">
                         <i class="fas fa-undo mr-1"></i> Intentar otra cosa
                     </button>` : ''}
                 </div>
@@ -798,7 +1520,7 @@ function handleReward(item) {
             <div class="relative w-24 h-24 mx-auto mb-6 group">
                 <div class="absolute inset-0 bg-${item.rarity === 'legendary' ? 'amber' : 'blue'}-500/20 rounded-full blur-xl animate-pulse"></div>
                 <div class="relative w-full h-full bg-black/50 rounded-full border-2 border-white/10 flex items-center justify-center shadow-2xl overflow-hidden">
-                     ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover">` : `<i class="fas fa-gift text-4xl ${colorClass}"></i>`}
+                     ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover" style="mix-blend-mode: multiply;">` : `<i class="fas fa-gift text-4xl ${colorClass}"></i>`}
                 </div>
             </div>
 

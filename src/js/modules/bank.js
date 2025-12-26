@@ -1,4 +1,5 @@
 import { state } from '../../state.js';
+import { playerState, saveGame } from './player.js';
 import { showToast, updateGoldDisplay } from './ui.js';
 
 let bankModal;
@@ -23,43 +24,38 @@ export function initBank() {
 }
 
 export function openBankModal() {
+    if (!bankModal) return;
     bankModal.classList.remove('hidden');
     // Force layout reflow
     void bankModal.offsetWidth;
     bankModal.classList.remove('opacity-0');
 
-    // Update balances in modal
+    // Update balances in modal - USE PLAYERSTATE!
     const goldBal = document.getElementById('bank-gold-balance');
     const bloodBal = document.getElementById('bank-blood-balance');
-    if (goldBal) goldBal.innerText = state.userGold.toLocaleString();
-    if (bloodBal) bloodBal.innerText = state.userBloodCoins.toLocaleString();
+    if (goldBal) goldBal.innerText = (playerState.gold || 0).toLocaleString();
+    if (bloodBal) bloodBal.innerText = (playerState.bloodCoins || 0).toLocaleString();
 
     updateBankEstimate();
 }
 
 export function closeBankModal() {
+    if (!bankModal) return;
     bankModal.classList.add('opacity-0');
     setTimeout(() => bankModal.classList.add('hidden'), 300);
 }
 
 function updateBankEstimate() {
+    if (!bankInput || !bankEstimateEl) return;
     const amount = parseInt(bankInput.value) || 0;
     const blood = amount * 10;
     bankEstimateEl.innerText = blood.toLocaleString();
 }
 
 export function bankExchangeMax() {
-    bankInput.value = state.userGold;
+    if (!bankInput) return;
+    bankInput.value = playerState.gold || 0;
     updateBankEstimate();
-}
-
-/**
- * Updates the bank UI with current balances (since we might hide it in main UI)
- */
-function updateBankBalances() {
-    // Ideally we update the text in the modal if we add spans for balances
-    // For now, the input placeholder or a dedicated span could show it.
-    // Let's assume the user knows their gold or checks the max button.
 }
 
 export function bankExchange() {
@@ -70,24 +66,26 @@ export function bankExchange() {
         return;
     }
 
-    if (state.userGold < amount) {
+    if ((playerState.gold || 0) < amount) {
         showToast("No tienes suficiente oro.");
         return;
     }
 
-    state.userGold -= amount;
-    state.userBloodCoins += (amount * 10);
+    // Deduct gold, add blood coins
+    playerState.gold = (playerState.gold || 0) - amount;
+    playerState.bloodCoins = (playerState.bloodCoins || 0) + (amount * 10);
+    saveGame(); // PERSIST!
 
     // Update displays
     updateGoldDisplay();
 
     // Also update UI inside the modal for immediate feedback
-    document.getElementById('bank-gold-balance').innerText = state.userGold.toLocaleString();
-    document.getElementById('bank-blood-balance').innerText = state.userBloodCoins.toLocaleString();
-    // We should also implement logic to update the blood coin display if we had a separate one
-    // For now we might repurpose the gold display or add a new one, but let's stick to state updates first.
+    const goldBal = document.getElementById('bank-gold-balance');
+    const bloodBal = document.getElementById('bank-blood-balance');
+    if (goldBal) goldBal.innerText = (playerState.gold || 0).toLocaleString();
+    if (bloodBal) bloodBal.innerText = (playerState.bloodCoins || 0).toLocaleString();
 
     showToast(`Cambio realizado: +${(amount * 10).toLocaleString()} Monedas de Sangre`);
     closeBankModal();
-    bankInput.value = '';
+    if (bankInput) bankInput.value = '';
 }

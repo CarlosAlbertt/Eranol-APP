@@ -18,16 +18,45 @@ export const playerState = {
         cha: 11
     },
     inventory: [
-        { name: "Poción Curativa", desc: "Restaura 50 HP", image: "", type: "consumable", rarity: "common" },
-        { name: "Pergamino Antiguo", desc: "Contiene hechizos olvidados", image: "", type: "misc", rarity: "rare" },
-        { name: "Daga Oxidada", desc: "Mejor que nada", image: "", type: "weapon", rarity: "common" },
-        { name: "Cristal de Maná", desc: "Brilla con luz tenue", image: "", type: "resource", rarity: "rare" },
-        { name: "Amuleto de Suerte", desc: "+1 a Salvaciones", image: "", type: "accessory", rarity: "legendary" }
+        // Consumibles
+        { name: "Poción de Curación", desc: "Restaura 2d4+2 puntos de golpe.", type: "consumable", rarity: "common", qty: 5 },
+        { name: "Poción de Curación Mayor", desc: "Restaura 4d4+4 puntos de golpe.", type: "consumable", rarity: "uncommon", qty: 2 },
+        { name: "Poción de Fuerza de Gigante", desc: "Tu Fuerza es 21 durante 1 hora.", type: "consumable", rarity: "rare", qty: 1 },
+        { name: "Antídoto", desc: "Neutraliza un veneno en tu sistema.", type: "consumable", rarity: "common", qty: 3 },
+
+        // Items de Misión / Llaves
+        { name: "Moneda del Cuervo", desc: "Una moneda negra con un cuervo grabado. Silas la reconocerá.", type: "key", rarity: "rare", qty: 1 },
+        { name: "Llave Oxidada", desc: "Abre algo... en algún lugar.", type: "key", rarity: "common", qty: 1 },
+
+        // Miscelanea
+        { name: "Pergamino Antiguo", desc: "Contiene hechizos olvidados de una era pasada.", type: "misc", rarity: "rare", qty: 1 },
+        { name: "Cristal de Maná", desc: "Brilla con luz arcana tenue. Útil para rituales.", type: "resource", rarity: "rare", qty: 3 },
+        { name: "Gema de Sangre", desc: "Una gema roja que pulsa como un corazón.", type: "resource", rarity: "epic", qty: 1 },
+
+        // Equipo
+        { name: "Daga Oxidada", desc: "Mejor que nada. +1 al daño.", type: "weapon", rarity: "common", qty: 1 },
+        { name: "Amuleto de Suerte", desc: "+1 a tiradas de salvación.", type: "accessory", rarity: "legendary", qty: 1 },
+        { name: "Anillo de Protección", desc: "+1 a CA y tiradas de salvación.", type: "accessory", rarity: "rare", qty: 1 }
     ], // Array of item objects
     gold: 1000,
     bloodCoins: 0, // NEW: Persistent Blood Currency
+    lastWheelSpinTime: null, // NEW: Timestamp of last daily wheel spin
     missionStatus: {}, // NEW: Persist mission progress
     npcStatus: {}, // { npcId: { trust: 50, encountered: true } }
+    arenaStats: {
+        wins: 50,
+        losses: 5,
+        draws: 2,
+        totalFights: 57,
+        currentStreak: 10,
+        bestStreak: 15,
+        honor: 100,           // Máximo honor
+        respect: 2500,        // Máximo respeto para ver todos los oponentes
+        rank: 'Matadioses',   // Rango máximo
+        totalEarnings: 50000,
+        kills: 30,
+        knockouts: 20
+    },
     equipment: {
         // Armor (Pieces vs Full)
         head: null,
@@ -106,7 +135,24 @@ export function resetPlayerState() {
     playerState.name = "Viajero";
     playerState.level = 1;
     playerState.xp = 0;
-    playerState.inventory = [];
+    playerState.inventory = [
+        // Consumibles de inicio
+        { name: "Poción de Curación", desc: "Restaura 2d4+2 puntos de golpe.", type: "consumable", rarity: "common", qty: 5 },
+        { name: "Poción de Curación Mayor", desc: "Restaura 4d4+4 puntos de golpe.", type: "consumable", rarity: "uncommon", qty: 2 },
+        { name: "Poción de Fuerza de Gigante", desc: "Tu Fuerza es 21 durante 1 hora.", type: "consumable", rarity: "rare", qty: 1 },
+        { name: "Antídoto", desc: "Neutraliza un veneno en tu sistema.", type: "consumable", rarity: "common", qty: 3 },
+        // Items de Misión
+        { name: "Moneda del Cuervo", desc: "Una moneda negra con un cuervo grabado. Silas la reconocerá.", type: "key", rarity: "rare", qty: 1 },
+        { name: "Llave Oxidada", desc: "Abre algo... en algún lugar.", type: "key", rarity: "common", qty: 1 },
+        // Miscelánea
+        { name: "Pergamino Antiguo", desc: "Contiene hechizos olvidados de una era pasada.", type: "misc", rarity: "rare", qty: 1 },
+        { name: "Cristal de Maná", desc: "Brilla con luz arcana tenue. Útil para rituales.", type: "resource", rarity: "rare", qty: 3 },
+        { name: "Gema de Sangre", desc: "Una gema roja que pulsa como un corazón.", type: "resource", rarity: "epic", qty: 1 },
+        // Equipo
+        { name: "Daga Oxidada", desc: "Mejor que nada. +1 al daño.", type: "weapon", rarity: "common", qty: 1 },
+        { name: "Amuleto de Suerte", desc: "+1 a tiradas de salvación.", type: "accessory", rarity: "legendary", qty: 1 },
+        { name: "Anillo de Protección", desc: "+1 a CA y tiradas de salvación.", type: "accessory", rarity: "rare", qty: 1 }
+    ];
     playerState.gold = 1000;
     playerState.bloodCoins = 0;
     playerState.missionStatus = {};

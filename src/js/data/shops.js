@@ -22,13 +22,13 @@ export const allShops = [
         image: 'img/tiendas/fragua_matadioses_1765927064019.png',
         description: "Armas prohibidas capaces de herir lo divino forjadas en lava negra.",
         items: [
-            { name: 'La Cercenadora de Conjuros', price: 1500000, type: 'Arma', desc: 'Espada +5. Reacción infinita: Corta cualquier hechizo (incluso Deseo) si superas la CD.', rarity: 'Prohibido' },
-            { name: 'Guadaña del Fin (Antares)', price: 2200000, type: 'Arma', desc: 'Guadaña +5. Ignora resistencias/inmunidades. Si mata, borra el alma (sin resurrección).', rarity: 'Prohibido' },
-            { name: 'Arco del Horizonte Infinito', price: 1800000, type: 'Arma', desc: 'Arco +5. Alcance visual infinito. Atraviesa muros. Ataca vs CA 10 + Des (ignora armadura).', rarity: 'Prohibido' },
-            { name: 'Dagas del Tiempo Robado', price: 2500000, type: 'Arma', desc: 'Dagas +5. Si aciertas 2 ataques, el enemigo pierde su turno y tú ganas uno extra.', rarity: 'Prohibido' },
-            { name: 'Martillo de Gravedad (Legia)', price: 1600000, type: 'Arma', desc: 'Martillo +5. Empuja 1km o crea zona de no-vuelo al golpear.', rarity: 'Prohibido' },
-            { name: 'Lanza Perforacielos', price: 1700000, type: 'Arma', desc: 'Lanza +5. Golpea voladores: caen aturdidos (sin salvación) y pierden vuelo 1 hora.', rarity: 'Prohibido' },
-            { name: 'Látigo de la Plaga (Querehsha)', price: 1900000, type: 'Arma', desc: 'Látigo +5. Veneno ignora inmunidad. Crítico: Parálisis permanente.', rarity: 'Prohibido' }
+            { name: 'La Cercenadora de Conjuros', price: 1500000, type: 'Arma', desc: 'Espada +5. Reacción infinita: Corta cualquier hechizo (incluso Deseo) si superas la CD.', rarity: 'Prohibido', image: 'img/items/fragua_matadioses/cercenadora_conjuros.png' },
+            { name: 'Guadaña del Fin (Antares)', price: 2200000, type: 'Arma', desc: 'Guadaña +5. Ignora resistencias/inmunidades. Si mata, borra el alma (sin resurrección).', rarity: 'Prohibido', image: 'img/items/fragua_matadioses/guadana_antares.png' },
+            { name: 'Arco del Horizonte Infinito', price: 1800000, type: 'Arma', desc: 'Arco +5. Alcance visual infinito. Atraviesa muros. Ataca vs CA 10 + Des (ignora armadura).', rarity: 'Prohibido', image: 'img/items/fragua_matadioses/arco_horizonte.png' },
+            { name: 'Dagas del Tiempo Robado', price: 2500000, type: 'Arma', desc: 'Dagas +5. Si aciertas 2 ataques, el enemigo pierde su turno y tú ganas uno extra.', rarity: 'Prohibido', image: 'img/items/fragua_matadioses/dagas_tiempo.png' },
+            { name: 'Martillo de Gravedad (Legia)', price: 1600000, type: 'Arma', desc: 'Martillo +5. Empuja 1km o crea zona de no-vuelo al golpear.', rarity: 'Prohibido', image: 'img/items/fragua_matadioses/martillo_legia.png' },
+            { name: 'Lanza Perforacielos', price: 1700000, type: 'Arma', desc: 'Lanza +5. Golpea voladores: caen aturdidos (sin salvación) y pierden vuelo 1 hora.', rarity: 'Prohibido', image: 'img/items/fragua_matadioses/lanza_perforacielos.png' },
+            { name: 'Látigo de la Plaga (Querehsha)', price: 1900000, type: 'Arma', desc: 'Látigo +5. Veneno ignora inmunidad. Crítico: Parálisis permanente.', rarity: 'Prohibido', image: 'img/items/fragua_matadioses/latigo_plaga.png' }
         ]
     },
     {
@@ -41,7 +41,7 @@ export const allShops = [
         image: 'img/tiendas/bunker_eterno_1765927079607.png',
         description: "Defensas absolutas para sobrevivir al apocalipsis hechas de placas negras.",
         items: [
-            { name: 'Placas del Reflejo Total', price: 2500000, type: 'Armadura', desc: 'Armadura +5 (CA 23). Inmune magia Nvl 1-5. Nvl 6+ 50% rebote.', rarity: 'Prohibido' },
+            { name: 'Placas del Reflejo Total', price: 2500000, type: 'Armadura', desc: 'Armadura +5 (CA 23). Inmune magia Nvl 1-5. Nvl 6+ 50% rebote.', rarity: 'Prohibido', image: 'img/items/bunker_eterno/placas_reflejo.png' },
             { name: 'Túnica de Intangibilidad', price: 1900000, type: 'Ropa', desc: 'Resistencia a todo daño físico. Atraviesa paredes.', rarity: 'Prohibido' },
             { name: 'Escudo Muro de Legia', price: 1750000, type: 'Escudo', desc: 'Escudo +5. Inmune a ser movido. Cobertura Total detrás de ti.', rarity: 'Prohibido' },
             { name: 'Yelmo de la Omnisciencia', price: 2000000, type: 'Casco', desc: 'Visión Verdadera 1km. Inmune Sorpresa/Ceguera. Ves stats enemigos.', rarity: 'Prohibido' },
@@ -676,5 +676,31 @@ export const allShops = [
             { name: 'Anillo "Fuerza de Toro"', price: 20000, type: 'Anillo', desc: 'Fuerza +2 (máx 22).', rarity: 'Legendaria' },
             { name: 'Tiara "Intelecto Despierto"', price: 20000, type: 'Casco', desc: 'Inteligencia +2 (máx 22).', rarity: 'Legendaria' }
         ]
+    },
+    {
+        id: 'black-market-gate-r1',
+        ring: 1,
+        name: 'Entrada al Mercado Negro (R1)',
+        subtitle: 'Callejón Oscuro',
+        themeClass: 'theme-black-market',
+        icon: 'fa-dungeon',
+        bgIcon: 'fa-skull',
+        image: 'img/map/icon_casino.png',
+        description: "Un susurro te guía hacia las sombras...",
+        specialType: 'portal',
+        items: []
+    },
+    {
+        id: 'black-market-gate',
+        ring: 2,
+        name: 'Entrada al Mercado Negro',
+        subtitle: 'Zona Prohibida',
+        themeClass: 'theme-black-market',
+        icon: 'fa-dungeon',
+        bgIcon: 'fa-skull',
+        image: 'img/map/icon_casino.png',
+        description: "¿Buscas algo más fuerte? Sigue al conejo blanco...",
+        specialType: 'portal',
+        items: []
     }
 ];

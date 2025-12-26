@@ -77,6 +77,15 @@ export const tavernsData = {
                 dialogue: "Por 10 oros los dioses perdonan ese robo. Por 20, perdonan... cosas peores."
             },
             {
+                id: 'npc_mudo',
+                name: "El Mudo",
+                role: "Kenku Misterioso",
+                avatar: "/img/npcs/elmudo.png", // Asegurarse que existe o usar placeholder
+                desc: "Un kenku encapuchado en un rincón. Se comunica con mímica y sonidos extraños.",
+                type: "info",
+                dialogue: "*Sonido de monedas de oro chocando entre sí*"
+            },
+            {
                 id: 'npc_brunhilda',
                 name: "Brunhilda",
                 role: "Campeona",
@@ -498,8 +507,7 @@ window.closeTavern = closeTavern;
 // Zone Logic
 function handleZoneInteraction(zone, tavernId) {
     if (zone.action === 'fight') {
-        // Initialize Arena if not done (lazy check or rely on main init)
-        if (typeof window.startArenaMode === 'undefined') initArena();
+        // Initialize Arena if not done
         if (typeof window.startArenaMode === 'undefined') initArena();
         enterArena();
     } else if (zone.action === 'dice_game') {

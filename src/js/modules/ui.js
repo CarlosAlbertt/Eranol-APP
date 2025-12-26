@@ -49,6 +49,10 @@ export function updateGoldDisplay() {
         }
     }
 
+    // Casino Header Blood Coins Display
+    const bloodCoinsEl = document.getElementById('blood-coins-display');
+    if (bloodCoinsEl) bloodCoinsEl.innerText = (playerState.bloodCoins || 0).toLocaleString();
+
     // Sidebar HUD Display (New)
     updateHUD();
 }
@@ -69,16 +73,19 @@ export function updateHUD() {
 
         // KAISER BUTTON INJECTION
         const parent = hudGold.parentElement;
-        // Only add if not exists
-        if (!parent.querySelector('.kaiser-btn') && playerState.name && playerState.name.toLowerCase() === 'kaiser') {
+        const isKaiser = (playerState.name && playerState.name.toLowerCase() === 'kaiser') ||
+            (state.currentAdventurer && state.currentAdventurer.toLowerCase() === 'kaiser');
+
+        // Only add if not exists and user is Kaiser
+        if (!parent.querySelector('.kaiser-btn') && isKaiser) {
             const btn = document.createElement('button');
-            btn.className = 'kaiser-btn ml-2 text-[10px] bg-yellow-900/50 hover:bg-yellow-700 text-yellow-200 px-1 rounded border border-yellow-500/50';
-            btn.innerHTML = '<i class="fas fa-sync"></i>';
+            btn.className = 'kaiser-btn ml-2 text-[10px] bg-yellow-900/50 hover:bg-yellow-700 text-yellow-200 px-2 py-1 rounded border border-yellow-500/50';
+            btn.innerHTML = '<i class="fas fa-coins"></i> +1M';
             btn.onclick = (e) => {
                 e.stopPropagation();
-                window.forceGold(10000000);
+                window.forceGold(1000000);
             };
-            btn.title = "Restaurar Fortuna";
+            btn.title = "Añadir 1.000.000 de oro";
             parent.appendChild(btn);
         }
     }

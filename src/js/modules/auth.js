@@ -169,16 +169,21 @@ export function attemptLogin() {
     const user = loginUser.value.trim();
     const pass = loginPass.value.trim();
 
-    // Check credentials for Admin/Special users
-    if ((user === "Sombra" && pass === "1234") || (user === "Asolador" && pass === "Asolador")) {
+    // Check credentials for Admin/Special users (Black Market Access)
+    const isAdmin = (user === "Sombra" && pass === "1234") ||
+        (user === "Asolador" && pass === "Asolador") ||
+        (user.toLowerCase() === "kaiser" && pass === "ashmir");
+
+    if (isAdmin) {
         closeLoginModal();
 
-        // CRITICAL FIX: Load the profile for Sombra/Asolador so persistence works
+        // CRITICAL FIX: Load the profile for admin users so persistence works
         loadGame(user);
 
         // Force Admin Permissions Synchronously
         state.currentUserMaxRing = 4;
         state.currentAdventurer = user;
+        state.blackMarketAuthenticated = true; // NEW: Mark as authenticated for Black Market
 
         // Visuals
         if (displayUsername) displayUsername.innerText = user;

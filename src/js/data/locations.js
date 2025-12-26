@@ -67,7 +67,7 @@ export const mapNodes = [
         fallbackIcon: 'fa-mask',
         color: 'text-indigo-400',
         actionType: 'shop',
-        target: 'casino',
+        target: 'casino-infernal',
         ring: 0,
         description: 'Zona laberíntica. Un espejo no refleja tu cara, sino la entrada a lo prohibido.'
     },
@@ -80,7 +80,7 @@ export const mapNodes = [
         fallbackIcon: 'fa-dice-d20',
         color: 'text-purple-600',
         actionType: 'shop',
-        target: 'casino',
+        target: 'casino-infernal',
         ring: 2,
         description: '¿Buscas algo más fuerte? Sigue al conejo blanco...'
     },

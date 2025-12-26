@@ -8,7 +8,7 @@ export const state = {
     activeDiscount: 0,
     hasSpunWheel: false,
     loginAttempts: 0,
-    loginAttempts: 0,
+    blackMarketAuthenticated: false, // NEW: Track if user has logged into Black Market this session
     // userGold: Removed in favor of playerState.gold (Persistent)
     // userBloodCoins: Removed in favor of playerState.bloodCoins (Persistent)
     currentRing: 1 // Default to 1
