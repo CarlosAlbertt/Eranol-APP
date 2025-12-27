@@ -598,18 +598,34 @@
 }
 
 .inv-row {
-    background: #231711;
-    border: 1px solid #3e2723;
-    border-radius: 3px;
-    padding: 12px;
+    position: relative;
+    /* Aspect Ratio Square */
+    aspect-ratio: 1 / 1;
+    background: #1a0f0a;
+    border: 2px solid #3e2723;
+    border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    overflow: hidden;
     transition: all 0.2s;
-    position: relative;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    min-height: 60px;
+    user-select: none;
+    /* Fix: Prevent text cursor */
+    cursor: pointer;
+    /* Fix: Ensure pointer cursor */
 }
+
+/* Global Interactive Fix */
+button,
+.dialogue-option,
+.equip-slot,
+.stat-hex,
+.close-sheet {
+    user-select: none !important;
+    cursor: pointer !important;
+}
+
+
 
 .inv-row:hover {
     background: #2c1e14;
