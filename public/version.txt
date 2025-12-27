@@ -1,5 +1,4 @@
-Version: Build 27-Dec 15:05
-- Inventory Grid Layout Recode
-- Fixed: Icon Clipping in 70px slots
-- Optimized for compact view (Icons centered, Qty badge)
-If you see this, icons should fit perfectly inside the squares.
+Version: Build 27-Dec 15:10
+- Removed "Modo Sin Conexión" Toast
+- Inventory Grid Fixed (70px + Compact HTML)
+If you see this, the annoying warning message should be gone.

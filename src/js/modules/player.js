@@ -311,7 +311,7 @@ export async function loadGame(specificUser = null) {
                 try {
                     loadedState = JSON.parse(storedRaw);
                     console.log('[PLAYER] Loaded from Local Storage (Fallback)');
-                    safeToast("⚠️ MODO SIN CONEXIÓN (Cache Local)");
+                    // safeToast("⚠️ MODO SIN CONEXIÓN (Cache Local)");
                 } catch (e) { console.error("Save Corrupt"); }
             }
         }
