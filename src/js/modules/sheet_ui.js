@@ -253,11 +253,8 @@ function renderInventory() {
             const emptySlot = document.createElement('div');
             emptySlot.className = 'inv-row opacity-50';
             emptySlot.innerHTML = `
-                <div class="flex items-center gap-3 w-full">
-                    <div class="w-10 h-10 rounded-md bg-[#1a0f0a] border border-[#3e2723] flex items-center justify-center">
-                        <i class="fas fa-box-open text-[#3e2723]"></i>
-                    </div>
-                    <span class="text-[#5d4037] italic text-sm">Slot vacío</span>
+                <div class="flex items-center justify-center w-full h-full opacity-30">
+                    <i class="fas fa-box-open text-[#3e2723] text-xl"></i>
                 </div>
             `;
             grid.appendChild(emptySlot);
@@ -290,19 +287,19 @@ function renderInventory() {
             'prohibido': '#ab47bc'
         }[item.rarity?.toLowerCase()] || '#bcaaa4';
 
+        // Compact Grid Layout (70px)
+        slot.title = `${item.name} (${item.rarity || 'común'})`; // Native tooltip
         slot.innerHTML = `
-            <div class="flex items-center gap-3 w-full overflow-hidden">
-                <div class="w-12 h-12 min-w-[48px] rounded-md bg-[#1a0f0a] border-2 border-[#5d4037] flex items-center justify-center shadow-inner group-hover:border-[#ffb74d] transition-colors relative">
-                    <i class="fas ${iconClass} text-xl relative z-10" style="color: ${rarityColor}"></i>
-                    <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.05)_0%,transparent_70%)]"></div>
-                </div>
-                <div class="flex flex-col overflow-hidden">
-                    <span class="inv-row-name group-hover:text-[#ffe0b2] transition-colors truncate font-cinzel text-[#d7ccc8] font-semibold">${item.name}</span>
-                    <span class="text-[10px] uppercase tracking-widest font-bold" style="color: ${rarityColor}">${item.rarity || 'común'}</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 shrink-0 ml-2">
-                <span class="inv-row-qty text-[#ffcc80] font-mono bg-[#1a0f0a] px-2 py-0.5 rounded border border-[#3e2723]">x${item.qty || 1}</span>
+            <div class="relative w-full h-full flex items-center justify-center p-1 group-hover:bg-[#2c1e14] transition-colors">
+                <i class="fas ${iconClass} text-2xl drop-shadow-md transition-transform group-hover:scale-110" style="color: ${rarityColor}"></i>
+                
+                <!-- Qty Badge -->
+                <span class="absolute bottom-1 right-1 text-[9px] bg-black/80 text-[#ffcc80] px-1 rounded font-mono leading-none border border-[#3e2723ec] shadow-sm">
+                    ${item.qty || 1}
+                </span>
+
+                <!-- Rarity Indicator (Border glow handled by CSS, but maybe a dot?) -->
+                <div class="absolute top-1 left-1 w-1.5 h-1.5 rounded-full" style="background-color: ${rarityColor}; box-shadow: 0 0 4px ${rarityColor}"></div>
             </div>
         `;
 
@@ -320,11 +317,8 @@ function renderInventory() {
         const emptySlot = document.createElement('div');
         emptySlot.className = 'inv-row opacity-40 cursor-default';
         emptySlot.innerHTML = `
-            <div class="flex items-center gap-3 w-full">
-                <div class="w-12 h-12 min-w-[48px] rounded-md bg-[#0f0a08] border-2 border-dashed border-[#3e2723] flex items-center justify-center">
-                    <i class="fas fa-plus text-[#3e2723] text-sm"></i>
-                </div>
-                <span class="text-[#5d4037] italic text-xs">Vacío</span>
+            <div class="flex items-center justify-center w-full h-full">
+                <i class="fas fa-plus text-[#3e2723] text-lg opacity-50 group-hover:opacity-100 transition-opacity"></i>
             </div>
         `;
         grid.appendChild(emptySlot);

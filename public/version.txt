@@ -1,4 +1,5 @@
-Version: Build 27-Dec 14:50
-- Inventory Grid Size Fix (70px)
-- NPC Images & Cursor Fix confirmed
-If you see this, the layout should be dense (many small squares).
+Version: Build 27-Dec 15:05
+- Inventory Grid Layout Recode
+- Fixed: Icon Clipping in 70px slots
+- Optimized for compact view (Icons centered, Qty badge)
+If you see this, icons should fit perfectly inside the squares.
