@@ -1,5 +1,4 @@
-Version: Build 27-Dec 11:35
-Fixes:
-- NPC Image Conflict (removed duplicate img/npcs)
-- CSS Cursor Fix (user-select: none globally)
-If you see this, the deployment is UPDATED.
+Version: Build 27-Dec 14:50
+- Inventory Grid Size Fix (70px)
+- NPC Images & Cursor Fix confirmed
+If you see this, the layout should be dense (many small squares).
