@@ -19,6 +19,8 @@
     opacity: 1;
     pointer-events: auto;
     /* ENABLE CLICKS WHEN ACTIVE */
+    user-select: none;
+    /* Fix: Global prevent text selection in modal */
 }
 
 #character-sheet-modal.active .sheet-container {
