@@ -24,7 +24,7 @@ export const knownUsers = {
         title: "El Rugido",
         password: "voli",
         race: "Ursa",
-        class: "Berserker",
+        class: "Bárbaro",
         level: 6,
         stats: {
             str: 20,
@@ -33,7 +33,11 @@ export const knownUsers = {
             int: 12,
             wis: 14,
             cha: 8
-        }
+        },
+        gold: 1500,
+        inventory: [
+            { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
+        ]
     },
     "ulume": {
         rank: "D",
@@ -51,7 +55,11 @@ export const knownUsers = {
             int: 18,
             wis: 10,
             cha: 10
-        }
+        },
+        gold: 1500,
+        inventory: [
+            { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
+        ]
     },
     "m": {
         rank: "D",
@@ -69,7 +77,11 @@ export const knownUsers = {
             int: 11,
             wis: 17,
             cha: 10
-        }
+        },
+        gold: 1500,
+        inventory: [
+            { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
+        ]
     },
     "janus": {
         rank: "D",
@@ -87,7 +99,11 @@ export const knownUsers = {
             int: 12,
             wis: 17,
             cha: 8
-        }
+        },
+        gold: 1500,
+        inventory: [
+            { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
+        ]
     },
     "khan": {
         rank: "D",
@@ -105,6 +121,10 @@ export const knownUsers = {
             int: 12,
             wis: 14,
             cha: 16
-        }
+        },
+        gold: 1500,
+        inventory: [
+            { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
+        ]
     }
 };

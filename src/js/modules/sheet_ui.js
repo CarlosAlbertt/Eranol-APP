@@ -418,7 +418,27 @@ function useItem(itemName) {
 
     saveGame();
     renderInventory();
-    showToast(`Usaste: ${itemName}`);
+    // CHEST LOGIC
+    if (itemName === "Cofre Misterioso" || itemName === "Cofre Aleatorio") {
+        if (window.openLootChest) {
+            window.openLootChest();
+            showToast(`¡Abriendo cofre!`);
+        } else {
+            console.error("Loot chest system not found!");
+            showToast("Error: No se puede abrir el cofre.");
+            // Refund item if error
+            if (item.qty !== undefined) item.qty++;
+            else playerState.inventory.splice(index, 0, item);
+            saveGame();
+            renderInventory();
+            return;
+        }
+    } else {
+        showToast(`Usaste: ${itemName}`);
+    }
+
+    saveGame();
+    renderInventory();
 }
 
 // Global expose
