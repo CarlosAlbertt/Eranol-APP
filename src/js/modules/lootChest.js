@@ -184,14 +184,26 @@ export function openLootChest(chestItem = null) {
     if (chestItem && chestItem.name) {
         // Map Item Name to Tier directly
         const n = chestItem.name.toLowerCase();
-        if (n.includes('maldito')) finalTier = 'cursed';
+
+        // Mystery/Random -> Random Roll
+        if (n.includes('misterioso') || n.includes('aleatorio') || n.includes('?')) {
+            finalTier = rollFinalTier();
+            console.log(`[CHEST] Is Mystery Chest -> Rolling... Result: ${finalTier}`);
+        }
+        // Specific Tiers
+        else if (n.includes('maldito')) finalTier = 'cursed';
         else if (n.includes('legendario')) finalTier = 'legendary';
         else if (n.includes('épico')) finalTier = 'epic';
         else if (n.includes('especial')) finalTier = 'special';
-        else if (n.includes('raro') || n.includes('misterioso')) finalTier = 'rare'; // Mystery defaults to Rare/Blue usually
-        else finalTier = 'common';
+        else if (n.includes('raro')) finalTier = 'rare';
+        else if (n.includes('común')) finalTier = 'common';
+        else {
+            // Default to random if name doesn't match a tier but isn't explicitly "mystery" 
+            // (Safety fallback, though 'Misterioso' covers Didy's case)
+            finalTier = rollFinalTier();
+        }
 
-        console.log(`[CHEST] Forced Tier from Item (${chestItem.name}): ${finalTier}`);
+        console.log(`[CHEST] Tier Decision: ${finalTier} (Source: ${chestItem.name})`);
     } else {
         // Fallback to random roll if no specific item passed (e.g. debug or generic call)
         finalTier = rollFinalTier();
