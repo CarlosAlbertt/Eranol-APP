@@ -24,7 +24,7 @@ export const knownUsers = {
         title: "El Rugido",
         password: "voli",
         race: "Ursa",
-        class: "Bárbaro",
+        class: "Berserker",
         level: 6,
         stats: {
             str: 20,
@@ -42,7 +42,7 @@ export const knownUsers = {
         title: "Daga Silenciosa",
         password: "ulu",
         race: "Elfo",
-        class: "Pícaro",
+        class: "Mago",
         level: 6,
         stats: {
             str: 8,
@@ -59,8 +59,8 @@ export const knownUsers = {
         maxRing: 2,
         title: "Mente Maestra",
         password: "eme",
-        race: "Humano",
-        class: "Estratega",
+        race: "Slime",
+        class: "Guerrero",
         level: 6,
         stats: {
             str: 10,
@@ -78,7 +78,7 @@ export const knownUsers = {
         title: "El Observador",
         password: "jan",
         race: "Cambiante",
-        class: "Monje",
+        class: "Explorador",
         level: 6,
         stats: {
             str: 11,
@@ -96,7 +96,7 @@ export const knownUsers = {
         title: "Señor de las Bestias",
         password: "khan",
         race: "Leonin",
-        class: "Guerrero",
+        class: "Pícaro",
         level: 6,
         stats: {
             str: 11,
