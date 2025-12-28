@@ -126,5 +126,27 @@ export const knownUsers = {
         inventory: [
             { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
         ]
+    },
+    "didy": {
+        rank: "D",
+        guild: "Voz de Seda",
+        maxRing: 2,
+        title: "La Melodía",
+        password: "did",
+        race: "Humano",
+        class: "Brujo",
+        level: 6,
+        stats: {
+            str: 6,
+            dex: 14,
+            con: 16,
+            int: 12,
+            wis: 11,
+            cha: 20
+        },
+        gold: 1500,
+        inventory: [
+            { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 6 }
+        ]
     }
 };

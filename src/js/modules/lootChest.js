@@ -401,8 +401,7 @@ function generateLoot() {
     generatedLoot = { gold, items };
 }
 
-// Import the specific Spanish database
-import { magicItemsES } from '../data/magicItemsES.js';
+// Import removed (duplicate)
 
 /**
  * Generate a specific magic item based on chest tier using the translated DB

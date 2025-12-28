@@ -1,5 +1,5 @@
 import { state } from '../../state.js';
-import { playerState } from './player.js'; // Import playerState
+import { playerState, addBloodCoins } from './player.js'; // Import playerState and actions
 
 export function showToast(msg) {
     const overlay = document.getElementById('status-overlay');
@@ -166,7 +166,7 @@ export function closeLoanConfirm() {
     setTimeout(() => loanModal.classList.add('hidden'), 300);
 }
 
-import { addBloodCoins } from './player.js';
+// Consolidated to top
 
 export function confirmLoan() {
     addBloodCoins(pendingLoanAmount);
