@@ -405,45 +405,45 @@ function generateLoot() {
  * Generate a mundane item based on chest tier
  */
 function generateMundaneItem(chestData) {
-    // Define loot pools by tier/theme
+    // ALL items must be MAGICAL, even common ones.
     const LOOT_POOLS = {
         common: [
-            { name: 'Poción de Curación', desc: 'Recupera 2d4+2 HP', type: 'Poción', rarity: 'Común' },
-            { name: 'Antorcha', desc: 'Ilumina la oscuridad.', type: 'Equipo', rarity: 'Común' },
-            { name: 'Raciones de Viaje', desc: 'Suficiente para un día.', type: 'Comida', rarity: 'Común' },
-            { name: 'Daga de Hierro', desc: 'Simple pero efectiva.', type: 'Arma', rarity: 'Común' },
-            { name: 'Venda Sucia', desc: 'Detiene sangrados menores.', type: 'Consumible', rarity: 'Común' },
-            { name: 'Moneda de Cobre Antigua', desc: 'Tiene valor para coleccionistas.', type: 'Tesoro', rarity: 'Común' }
+            { name: 'Poción de Curación Menor', desc: 'Brilla con una luz tenue. (2d4+2 HP)', type: 'Poción', rarity: 'Común' },
+            { name: 'Capa de la Brisa', desc: 'Se agita dramáticamente a tu voluntad.', type: 'Accesorio', rarity: 'Común' },
+            { name: 'Orbe de Luz Eterna', desc: 'Flota y emite luz a voluntad.', type: 'Objeto Maravilloso', rarity: 'Común' },
+            { name: 'Daga de Advertencia', desc: 'Vibra cuando hay enemigos cerca.', type: 'Arma', rarity: 'Común' },
+            { name: 'Botas de Huellas Falsas', desc: 'Dejan huellas de otra criatura.', type: 'Calzado', rarity: 'Común' },
+            { name: 'Cristal de Susurros', desc: 'Graba y reproduce 10 segundos de audio.', type: 'Objeto', rarity: 'Común' }
         ],
         rare: [
-            { name: 'Poción de Curación Mayor', desc: 'Recupera 4d4+4 HP', type: 'Poción', rarity: 'Poco Común' },
-            { name: 'Flechas de Plata (x5)', desc: 'Efectivas contra bestias.', type: 'Munición', rarity: 'Poco Común' },
-            { name: 'Pergamino de Identificación', desc: 'Revela propiedades mágicas.', type: 'Pergamino', rarity: 'Poco Común' },
-            { name: 'Aceite de Afilado', desc: '+1 al daño por 1 hora.', type: 'Consumible', rarity: 'Poco Común' },
-            { name: 'Gema de Ámbar', desc: 'Brilla con luz cálida.', type: 'Tesoro', rarity: 'Poco Común' }
+            { name: 'Espada Larga +1', desc: 'Forjada con técnicas olvidadas. +1 Ataque/Daño.', type: 'Arma', rarity: 'Raro' },
+            { name: 'Anillo de Protección Mental', desc: 'Impide que lean tus pensamientos.', type: 'Anillo', rarity: 'Raro' },
+            { name: 'Bolsa de Contención', desc: 'Espacio extradimensional para carga.', type: 'Objeto Maravilloso', rarity: 'Raro' },
+            { name: 'Varita de Detectar Magia', desc: '3 cargas diarias. Vibra ante la magia.', type: 'Varita', rarity: 'Raro' },
+            { name: 'Botas Élficas', desc: 'Tus pasos no hacen ningún sonido.', type: 'Calzado', rarity: 'Raro' }
         ],
-        special: [ // Similar to Rare/Epic bridge
-            { name: 'Elixir de Salud', desc: 'Cura enfermedades comunes.', type: 'Poción', rarity: 'Raro' },
-            { name: 'Polvo de Desaparición', desc: 'Invisibilidad por 1 minuto.', type: 'Consumible', rarity: 'Raro' },
-            { name: 'Pergamino de Bola de Fuego', desc: 'Un clásico explosivo.', type: 'Pergamino', rarity: 'Raro' },
-            { name: 'Bolsa de Contención (Menor)', desc: 'Reduce el peso de lo que lleva.', type: 'Objeto Maravilloso', rarity: 'Raro' }
+        special: [ // Special Chests get cool unique utility
+            { name: 'Piedra de la Buena Suerte', desc: '+1 a pruebas de habilidad.', type: 'Objeto Maravilloso', rarity: 'Raro' },
+            { name: 'Guantes de Robo', desc: '+5 a Juego de Manos.', type: 'Guantes', rarity: 'Raro' },
+            { name: 'Gafas de Visión Nocturna', desc: 'Permiten ver en la oscuridad total.', type: 'Cabeza', rarity: 'Raro' },
+            { name: 'Cuerda de Escalada', desc: 'Se mueve sola hacia arriba 18m.', type: 'Objeto', rarity: 'Raro' }
         ],
         epic: [
-            { name: 'Poción de Curación Superior', desc: 'Recupera 8d4+8 HP', type: 'Poción', rarity: 'Raro' },
-            { name: 'Piedra Elemental', desc: 'Crepita con energía pura.', type: 'Material', rarity: 'Muy Raro' },
-            { name: 'Ungüento de Keoghtom', desc: 'Cura y neutraliza venenos.', type: 'Consumible', rarity: 'Muy Raro' },
-            { name: 'Tomo de Conocimiento', desc: '+1 a una habilidad aleatoria.', type: 'Consumible', rarity: 'Muy Raro' }
+            { name: 'Armadura de Placas +2', desc: 'Impenetrable para armas comunes.', type: 'Armadura', rarity: 'Muy Raro' },
+            { name: 'Escudo Centinela', desc: 'Ventaja en Iniciativa y Percepción.', type: 'Escudo', rarity: 'Muy Raro' },
+            { name: 'Capa de Desplazamiento', desc: 'Los enemigos tienen desventaja al atacarte.', type: 'Capa', rarity: 'Muy Raro' },
+            { name: 'Anillo de Regeneración', desc: 'Recuperas 1d6 HP cada 10 minutos.', type: 'Anillo', rarity: 'Muy Raro' }
         ],
         legendary: [
-            { name: 'Poción de Curación Suprema', desc: 'Recupera 10d4+20 HP', type: 'Poción', rarity: 'Muy Raro' },
-            { name: 'Diamante Astral', desc: 'Material de ascensión.', type: 'Tesoro', rarity: 'Legendario' },
-            { name: 'Pergamino de Deseo (Fragmento)', desc: 'Poder inestable de un solo uso.', type: 'Pergamino', rarity: 'Legendario' },
-            { name: 'Sangre de Dragón', desc: 'Otorga resistencia temporal.', type: 'Consumible', rarity: 'Legendario' }
+            { name: 'Vorpal Sword', desc: 'Corta cabezas con un crítico.', type: 'Arma', rarity: 'Legendario' },
+            { name: 'Bastón de los Magos', desc: 'Poder arcano infinito.', type: 'Bastón', rarity: 'Legendario' },
+            { name: 'Manto de Invisibilidad', desc: 'Invisibilidad total permanente.', type: 'Capa', rarity: 'Legendario' },
+            { name: 'Anillo de los Tres Deseos', desc: 'Cuidado con lo que pides.', type: 'Anillo', rarity: 'Legendario' }
         ],
         cursed: [
-            { name: 'Cenizas de Vampiro', desc: 'Maldito. Atrae no-muertos.', type: 'Restos', rarity: 'Maldito' },
-            { name: 'Moneda de la Traición', desc: 'Siempre vuelve a su dueño.', type: 'Tesoro', rarity: 'Maldito' },
-            { name: 'Poción de Veneno', desc: 'Parece curación, pero es letal.', type: 'Poción', rarity: 'Maldito' }
+            { name: 'Espada de la Venganza', desc: 'Maldita. No puedes soltarla.', type: 'Arma', rarity: 'Maldito' },
+            { name: 'Amuleto de Atracción de Flechas', desc: 'Los proyectiles se curvan hacia ti.', type: 'Accesorio', rarity: 'Maldito' },
+            { name: 'Poción de Veneno Disfrazada', desc: 'Huele a curación.', type: 'Poción', rarity: 'Maldito' }
         ]
     };
 
