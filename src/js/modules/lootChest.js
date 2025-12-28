@@ -437,8 +437,30 @@ function generateMundaneItem(chestData) {
         pool = magicItemsES.filter(i => i.rarity === "Común");
     }
 
-    // Pick random
-    const dbItem = pool[Math.floor(Math.random() * pool.length)];
+    // Pick random item with duplicate protection
+    let dbItem = null;
+    let attempts = 0;
+    const MAX_ATTEMPTS = 10;
+
+    while (attempts < MAX_ATTEMPTS) {
+        const candidate = pool[Math.floor(Math.random() * pool.length)];
+
+        // Check if player already has this item
+        const hasItem = playerState.inventory && playerState.inventory.some(i => i.name === candidate.name);
+
+        if (!hasItem) {
+            dbItem = candidate;
+            break;
+        }
+
+        attempts++;
+    }
+
+    // If we failed to find a unique item after MAX_ATTEMPTS, just use the last candidate
+    if (!dbItem) {
+        console.warn("[LOOT] Could not find unique item, giving duplicate.");
+        dbItem = pool[Math.floor(Math.random() * pool.length)];
+    }
 
     // Convert to game item format
     return {
