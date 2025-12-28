@@ -146,7 +146,8 @@ export const knownUsers = {
         },
         gold: 1500,
         inventory: [
-            { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 6 }
+            { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 6 },
+            { name: "Cofre Especial", type: "Consumible", desc: "Un cofre brillante de calidad superior. Contenido asegurado.", rarity: "Especial", qty: 3 }
         ]
     }
 };
