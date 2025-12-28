@@ -19,8 +19,8 @@ const CHEST_TIERS = {
         colorClass: 'text-gray-400',
         borderClass: 'border-gray-500',
         glowColor: 'rgba(156, 163, 175, 0.6)',
-        goldRange: [50, 200],
-        itemCount: [1, 2],
+        goldRange: [50, 51],
+        itemCount: [1, 1],
         magicItemChance: 0.1,
         emoji: '📦',
         particles: ['⚪', '💨', '✧'],
@@ -32,8 +32,8 @@ const CHEST_TIERS = {
         colorClass: 'text-blue-400',
         borderClass: 'border-blue-500',
         glowColor: 'rgba(59, 130, 246, 0.7)',
-        goldRange: [200, 600],
-        itemCount: [1, 3],
+        goldRange: [200, 201],
+        itemCount: [1, 1],
         magicItemChance: 0.25,
         emoji: '💎',
         particles: ['💙', '✨', '🔷'],
@@ -45,8 +45,8 @@ const CHEST_TIERS = {
         colorClass: 'text-emerald-400',
         borderClass: 'border-emerald-500',
         glowColor: 'rgba(16, 185, 129, 0.7)',
-        goldRange: [500, 1200],
-        itemCount: [2, 3],
+        goldRange: [100, 101],
+        itemCount: [1, 1],
         magicItemChance: 0.4,
         emoji: '🌟',
         particles: ['💚', '⭐', '🍀', '✨'],
@@ -58,8 +58,8 @@ const CHEST_TIERS = {
         colorClass: 'text-purple-400',
         borderClass: 'border-purple-500',
         glowColor: 'rgba(168, 85, 247, 0.8)',
-        goldRange: [1000, 3000],
-        itemCount: [2, 4],
+        goldRange: [300, 301],
+        itemCount: [1, 1],
         magicItemChance: 0.6,
         emoji: '👑',
         particles: ['💜', '⭐', '🔮', '✨', '💎'],
@@ -71,8 +71,8 @@ const CHEST_TIERS = {
         colorClass: 'text-yellow-400',
         borderClass: 'border-yellow-500',
         glowColor: 'rgba(245, 158, 11, 0.9)',
-        goldRange: [3000, 10000],
-        itemCount: [3, 5],
+        goldRange: [500, 501],
+        itemCount: [1, 1],
         magicItemChance: 0.85,
         emoji: '🏆',
         particles: ['💛', '🌟', '👑', '💫', '✨', '⚡'],
@@ -84,8 +84,8 @@ const CHEST_TIERS = {
         colorClass: 'text-red-500',
         borderClass: 'border-red-600',
         glowColor: 'rgba(220, 38, 38, 0.85)',
-        goldRange: [2000, 8000],
-        itemCount: [2, 4],
+        goldRange: [1000, 1001],
+        itemCount: [1, 1],
         magicItemChance: 0.7,
         emoji: '💀',
         particles: ['🔥', '💀', '👁️', '⛧', '🩸'],
@@ -385,7 +385,8 @@ function generateLoot() {
             };
 
             // Cursed chests have a chance to curse items
-            if (isCursed && Math.random() < 0.3) {
+            // Cursed chests ALWAYS curse items
+            if (isCursed) {
                 item.isCursed = true;
                 item.name = `${item.name} (Maldito)`;
             }
