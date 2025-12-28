@@ -339,14 +339,24 @@ function syncPermissions() {
             // Overwrite stats only if we want to enforce canonical stats from users.js every load
             // The user implies they want to see "their" stats, but if they just edited users.js, they expect to see that.
             // Let's force sync for now as per requirements to "see" the new values.
-            if (k.stats) playerState.stats = { ...k.stats };
+            // FIXED: Only overwrite stats/level if they are MISSING in playerState (i.e. new save)
+            // or if we explicitly want to enforce them (which we don't for an RPG where you level up)
 
-            // Sync immutable traits
+            // Stats - Only set if missing or empty object (initialization)
+            if (k.stats && (!playerState.stats || Object.keys(playerState.stats).length === 0)) {
+                playerState.stats = { ...k.stats };
+            }
+
+            // Sync immutable traits (Race/Class) -> usually strictly from DB
             if (k.race) playerState.race = k.race;
             if (k.class) playerState.class = k.class;
-            if (k.level) playerState.level = k.level;
-            if (k.rank) playerState.rank = k.rank;
-            if (k.guild) playerState.guild = k.guild;
+
+            // Level/Rank - Only set if missing (Start at defined level, then grow)
+            if (k.level && !playerState.level) playerState.level = k.level;
+            if (k.rank && !playerState.rank) playerState.rank = k.rank;
+
+            // Guild/Title - Sync always? Or allow change? Let's allow change, so sync only if missing.
+            if (k.guild && !playerState.guild) playerState.guild = k.guild;
 
             // NEW: Fix for "Missing Chests"
             // If the user's inventory is empty (which happens after our recent wipe of default items),
@@ -355,7 +365,8 @@ function syncPermissions() {
                 console.log("[PLAYER] Hydrating missing inventory from definitions...");
                 playerState.inventory = [...k.inventory];
             }
-            if (k.gold !== undefined && playerState.gold === 1000) { // If default gold
+            // For Gold: Only apply default if player has exactly 1000 (default) AND the DB has a different value
+            if (k.gold !== undefined && playerState.gold === 1000) {
                 playerState.gold = k.gold;
             }
         }
