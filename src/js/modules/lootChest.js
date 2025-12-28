@@ -401,72 +401,53 @@ function generateLoot() {
     generatedLoot = { gold, items };
 }
 
+// Import the specific Spanish database
+import { magicItemsES } from '../data/magicItemsES.js';
+
 /**
- * Generate a mundane item based on chest tier
+ * Generate a specific magic item based on chest tier using the translated DB
  */
 function generateMundaneItem(chestData) {
-    // ALL items must be MAGICAL, even common ones.
-    const LOOT_POOLS = {
-        common: [
-            { name: 'Poción de Curación Menor', desc: 'Brilla con una luz tenue. (2d4+2 HP)', type: 'Poción', rarity: 'Común' },
-            { name: 'Capa de la Brisa', desc: 'Se agita dramáticamente a tu voluntad.', type: 'Accesorio', rarity: 'Común' },
-            { name: 'Orbe de Luz Eterna', desc: 'Flota y emite luz a voluntad.', type: 'Objeto Maravilloso', rarity: 'Común' },
-            { name: 'Daga de Advertencia', desc: 'Vibra cuando hay enemigos cerca.', type: 'Arma', rarity: 'Común' },
-            { name: 'Botas de Huellas Falsas', desc: 'Dejan huellas de otra criatura.', type: 'Calzado', rarity: 'Común' },
-            { name: 'Cristal de Susurros', desc: 'Graba y reproduce 10 segundos de audio.', type: 'Objeto', rarity: 'Común' }
-        ],
-        rare: [
-            { name: 'Espada Larga +1', desc: 'Forjada con técnicas olvidadas. +1 Ataque/Daño.', type: 'Arma', rarity: 'Raro' },
-            { name: 'Anillo de Protección Mental', desc: 'Impide que lean tus pensamientos.', type: 'Anillo', rarity: 'Raro' },
-            { name: 'Bolsa de Contención', desc: 'Espacio extradimensional para carga.', type: 'Objeto Maravilloso', rarity: 'Raro' },
-            { name: 'Varita de Detectar Magia', desc: '3 cargas diarias. Vibra ante la magia.', type: 'Varita', rarity: 'Raro' },
-            { name: 'Botas Élficas', desc: 'Tus pasos no hacen ningún sonido.', type: 'Calzado', rarity: 'Raro' }
-        ],
-        special: [ // Special Chests get cool unique utility
-            { name: 'Piedra de la Buena Suerte', desc: '+1 a pruebas de habilidad.', type: 'Objeto Maravilloso', rarity: 'Raro' },
-            { name: 'Guantes de Robo', desc: '+5 a Juego de Manos.', type: 'Guantes', rarity: 'Raro' },
-            { name: 'Gafas de Visión Nocturna', desc: 'Permiten ver en la oscuridad total.', type: 'Cabeza', rarity: 'Raro' },
-            { name: 'Cuerda de Escalada', desc: 'Se mueve sola hacia arriba 18m.', type: 'Objeto', rarity: 'Raro' }
-        ],
-        epic: [
-            { name: 'Armadura de Placas +2', desc: 'Impenetrable para armas comunes.', type: 'Armadura', rarity: 'Muy Raro' },
-            { name: 'Escudo Centinela', desc: 'Ventaja en Iniciativa y Percepción.', type: 'Escudo', rarity: 'Muy Raro' },
-            { name: 'Capa de Desplazamiento', desc: 'Los enemigos tienen desventaja al atacarte.', type: 'Capa', rarity: 'Muy Raro' },
-            { name: 'Anillo de Regeneración', desc: 'Recuperas 1d6 HP cada 10 minutos.', type: 'Anillo', rarity: 'Muy Raro' }
-        ],
-        legendary: [
-            { name: 'Vorpal Sword', desc: 'Corta cabezas con un crítico.', type: 'Arma', rarity: 'Legendario' },
-            { name: 'Bastón de los Magos', desc: 'Poder arcano infinito.', type: 'Bastón', rarity: 'Legendario' },
-            { name: 'Manto de Invisibilidad', desc: 'Invisibilidad total permanente.', type: 'Capa', rarity: 'Legendario' },
-            { name: 'Anillo de los Tres Deseos', desc: 'Cuidado con lo que pides.', type: 'Anillo', rarity: 'Legendario' }
-        ],
-        cursed: [
-            { name: 'Espada de la Venganza', desc: 'Maldita. No puedes soltarla.', type: 'Arma', rarity: 'Maldito' },
-            { name: 'Amuleto de Atracción de Flechas', desc: 'Los proyectiles se curvan hacia ti.', type: 'Accesorio', rarity: 'Maldito' },
-            { name: 'Poción de Veneno Disfrazada', desc: 'Huele a curación.', type: 'Poción', rarity: 'Maldito' }
-        ]
-    };
+    let rarityFilter = "Común";
 
-    // Determine which pool to use based on chest name or internal key check
-    // Since we don't pass the key explicitly, we infer from name or pass the key in generateLoot if needed.
-    // Simplifying: map chest name/color to pool keys.
+    // Map Chest Tier to D&D Rarity
+    // Common Chest -> Común
+    // Rare Chest -> Poco Común
+    // Special Chest -> Raro
+    // Epic Chest -> Muy Raro
+    // Legendary Chest -> Legendario
+    // Cursed Chest -> Raro (but becomes cursed)
 
-    let poolKey = 'common';
     if (chestData) {
         const n = chestData.name.toLowerCase();
-        if (n.includes('común')) poolKey = 'common';
-        else if (n.includes('raro')) poolKey = 'rare';
-        else if (n.includes('especial')) poolKey = 'special';
-        else if (n.includes('épico')) poolKey = 'epic';
-        else if (n.includes('legendario')) poolKey = 'legendary';
-        else if (n.includes('maldito')) poolKey = 'cursed';
+        if (n.includes('común')) rarityFilter = "Común";
+        else if (n.includes('raro')) rarityFilter = "Poco Común";
+        else if (n.includes('especial')) rarityFilter = "Raro";
+        else if (n.includes('épico')) rarityFilter = "Muy Raro";
+        else if (n.includes('legendario')) rarityFilter = "Legendario";
+        else if (n.includes('maldito')) rarityFilter = "Raro"; // Cursed gets good base items
     }
 
-    const pool = LOOT_POOLS[poolKey] || LOOT_POOLS['common'];
-    const item = pool[Math.floor(Math.random() * pool.length)];
+    // Filter DB
+    let pool = magicItemsES.filter(i => i.rarity === rarityFilter);
 
-    // Clone to avoid reference issues
-    return { ...item };
+    // Fallback if empty (shouldn't happen with full DB but safety first)
+    if (pool.length === 0) {
+        console.warn(`[LOOT] No items found for rarity ${rarityFilter}, falling back to Común`);
+        pool = magicItemsES.filter(i => i.rarity === "Común");
+    }
+
+    // Pick random
+    const dbItem = pool[Math.floor(Math.random() * pool.length)];
+
+    // Convert to game item format
+    return {
+        name: dbItem.name,
+        desc: dbItem.desc,
+        type: dbItem.type,
+        rarity: dbItem.rarity,
+        qty: 1
+    };
 }
 
 /**
