@@ -382,7 +382,7 @@ function showItemDetailsModal(item) {
                 
                 <!-- Actions -->
                 <div class="p-4 flex gap-3 border-t" style="border-color: ${colors.border}30; background: rgba(0,0,0,0.2)">
-                    ${item.type === 'consumable' || t.includes('potion') ? `
+                    ${t.includes('consumable') || t.includes('consumible') || t.includes('potion') ? `
                         <button onclick="useItem('${item.name}'); this.closest('#item-details-modal').remove();" 
                             class="flex-1 py-3 rounded-lg font-bold uppercase tracking-widest text-sm transition-all hover:scale-[1.02]"
                             style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: 1px solid #4caf50">

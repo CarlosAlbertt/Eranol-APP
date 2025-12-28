@@ -17,27 +17,7 @@ export const playerState = {
         wis: 12,
         cha: 11
     },
-    inventory: [
-        // Consumibles
-        { name: "Poción de Curación", desc: "Restaura 2d4+2 puntos de golpe.", type: "consumable", rarity: "common", qty: 5 },
-        { name: "Poción de Curación Mayor", desc: "Restaura 4d4+4 puntos de golpe.", type: "consumable", rarity: "uncommon", qty: 2 },
-        { name: "Poción de Fuerza de Gigante", desc: "Tu Fuerza es 21 durante 1 hora.", type: "consumable", rarity: "rare", qty: 1 },
-        { name: "Antídoto", desc: "Neutraliza un veneno en tu sistema.", type: "consumable", rarity: "common", qty: 3 },
-
-        // Items de Misión / Llaves
-        { name: "Moneda del Cuervo", desc: "Una moneda negra con un cuervo grabado. Silas la reconocerá.", type: "key", rarity: "rare", qty: 1 },
-        { name: "Llave Oxidada", desc: "Abre algo... en algún lugar.", type: "key", rarity: "common", qty: 1 },
-
-        // Miscelanea
-        { name: "Pergamino Antiguo", desc: "Contiene hechizos olvidados de una era pasada.", type: "misc", rarity: "rare", qty: 1 },
-        { name: "Cristal de Maná", desc: "Brilla con luz arcana tenue. Útil para rituales.", type: "resource", rarity: "rare", qty: 3 },
-        { name: "Gema de Sangre", desc: "Una gema roja que pulsa como un corazón.", type: "resource", rarity: "epic", qty: 1 },
-
-        // Equipo
-        { name: "Daga Oxidada", desc: "Mejor que nada. +1 al daño.", type: "weapon", rarity: "common", qty: 1 },
-        { name: "Amuleto de Suerte", desc: "+1 a tiradas de salvación.", type: "accessory", rarity: "legendary", qty: 1 },
-        { name: "Anillo de Protección", desc: "+1 a CA y tiradas de salvación.", type: "accessory", rarity: "rare", qty: 1 }
-    ], // Array of item objects
+    inventory: [], // Array of item objects
     gold: 1000,
     bloodCoins: 0, // NEW: Persistent Blood Currency
     lastWheelSpinTime: null, // NEW: Timestamp of last daily wheel spin
@@ -135,24 +115,7 @@ export function resetPlayerState() {
     playerState.name = "Viajero";
     playerState.level = 1;
     playerState.xp = 0;
-    playerState.inventory = [
-        // Consumibles de inicio
-        { name: "Poción de Curación", desc: "Restaura 2d4+2 puntos de golpe.", type: "consumable", rarity: "common", qty: 5 },
-        { name: "Poción de Curación Mayor", desc: "Restaura 4d4+4 puntos de golpe.", type: "consumable", rarity: "uncommon", qty: 2 },
-        { name: "Poción de Fuerza de Gigante", desc: "Tu Fuerza es 21 durante 1 hora.", type: "consumable", rarity: "rare", qty: 1 },
-        { name: "Antídoto", desc: "Neutraliza un veneno en tu sistema.", type: "consumable", rarity: "common", qty: 3 },
-        // Items de Misión
-        { name: "Moneda del Cuervo", desc: "Una moneda negra con un cuervo grabado. Silas la reconocerá.", type: "key", rarity: "rare", qty: 1 },
-        { name: "Llave Oxidada", desc: "Abre algo... en algún lugar.", type: "key", rarity: "common", qty: 1 },
-        // Miscelánea
-        { name: "Pergamino Antiguo", desc: "Contiene hechizos olvidados de una era pasada.", type: "misc", rarity: "rare", qty: 1 },
-        { name: "Cristal de Maná", desc: "Brilla con luz arcana tenue. Útil para rituales.", type: "resource", rarity: "rare", qty: 3 },
-        { name: "Gema de Sangre", desc: "Una gema roja que pulsa como un corazón.", type: "resource", rarity: "epic", qty: 1 },
-        // Equipo
-        { name: "Daga Oxidada", desc: "Mejor que nada. +1 al daño.", type: "weapon", rarity: "common", qty: 1 },
-        { name: "Amuleto de Suerte", desc: "+1 a tiradas de salvación.", type: "accessory", rarity: "legendary", qty: 1 },
-        { name: "Anillo de Protección", desc: "+1 a CA y tiradas de salvación.", type: "accessory", rarity: "rare", qty: 1 }
-    ];
+    playerState.inventory = [];
     playerState.gold = 1000;
     playerState.bloodCoins = 0;
     playerState.missionStatus = {};
@@ -338,10 +301,18 @@ export async function loadGame(specificUser = null) {
                 resetPlayerState();
                 playerState.name = specificUser;
 
-                // Apply Starter Config
+                // Apply Starter Config (HYDRATION)
                 const lower = specificUser.toLowerCase();
-                if (knownUsers[lower] && knownUsers[lower].startingGold) {
-                    playerState.gold = knownUsers[lower].startingGold;
+                if (knownUsers[lower]) {
+                    const k = knownUsers[lower];
+                    if (k.gold !== undefined) playerState.gold = k.gold;
+                    if (k.inventory) playerState.inventory = [...k.inventory]; // Copy array
+                    if (k.stats) playerState.stats = { ...k.stats };
+                    if (k.race) playerState.race = k.race;
+                    if (k.class) playerState.class = k.class;
+                    if (k.level) playerState.level = k.level;
+                    if (k.rank) playerState.rank = k.rank;
+                    if (k.guild) playerState.guild = k.guild;
                 }
                 saveGame();
             }
@@ -357,15 +328,36 @@ function syncPermissions() {
     if (playerState.name) {
         const lowerName = playerState.name.toLowerCase();
 
-        // Fixed Data Sync
+        // Fixed Data Sync (ONLY if not already valid in playerState, OR for immutable traits like Race/Class if desired)
+        // Ideally, we load from disk and TRUST disk. We only force knownUsers values on NEW creation.
+        // But for development iterating, we might want to force sync stats.
+
+        // Fix: Only apply if stats are default (12/14/etc) or empty
         if (knownUsers[lowerName]) {
             const k = knownUsers[lowerName];
+
+            // Overwrite stats only if we want to enforce canonical stats from users.js every load
+            // The user implies they want to see "their" stats, but if they just edited users.js, they expect to see that.
+            // Let's force sync for now as per requirements to "see" the new values.
             if (k.stats) playerState.stats = { ...k.stats };
+
+            // Sync immutable traits
             if (k.race) playerState.race = k.race;
             if (k.class) playerState.class = k.class;
             if (k.level) playerState.level = k.level;
             if (k.rank) playerState.rank = k.rank;
             if (k.guild) playerState.guild = k.guild;
+
+            // NEW: Fix for "Missing Chests"
+            // If the user's inventory is empty (which happens after our recent wipe of default items),
+            // but users.js says they should have items, we force copy them.
+            if (k.inventory && (!playerState.inventory || playerState.inventory.length === 0)) {
+                console.log("[PLAYER] Hydrating missing inventory from definitions...");
+                playerState.inventory = [...k.inventory];
+            }
+            if (k.gold !== undefined && playerState.gold === 1000) { // If default gold
+                playerState.gold = k.gold;
+            }
         }
 
         // Admin/God Mode
