@@ -391,3 +391,50 @@ window.forceGold = function (amount) {
     alert(`💰 FORCE GOLD: ${playerState.gold}\nRecargando...`);
     location.reload();
 };
+
+export function resetToKaiser() {
+    console.log("🔥 INITIATING KAISER PROTOCOL: WIPING ALL DATA 🔥");
+    localStorage.clear();
+
+    // Force Override State
+    const kaiserState = {
+        name: "Kaiser",
+        level: 100,
+        xp: 999999,
+        nextLevelXp: 1000000,
+        rank: "S+",
+        guild: "Líder Supremo",
+        class: "Dios de la Guerra",
+        race: "Primordial",
+        stats: { str: 20, dex: 20, con: 20, int: 20, wis: 20, cha: 20 },
+        inventory: [
+            { name: "Moneda del Cuervo", desc: "Símbolo de poder.", type: "key", rarity: "epic", qty: 10 },
+            { name: "Llave Maestra", desc: "Abre todo.", type: "key", rarity: "legendary", qty: 1 }
+        ],
+        gold: 9999999,
+        bloodCoins: 50000,
+        blackMarketIdentity: "Kaiser", // Auto-auth
+        arenaStats: {
+            wins: 999,
+            losses: 0,
+            rank: 'Leyenda Viviente'
+        }
+    };
+
+    localStorage.setItem('eranol_player_state_v1', JSON.stringify(kaiserState));
+    location.reload(); // Reload to apply fresh state
+}
+
+
+window.resetToKaiser = resetToKaiser;
+
+// HELPER: Reset specifically the Black Market Identity
+window.resetBlackMarketID = function () {
+    console.log("🕵️‍♂️ Clearing Black Market Identity...");
+    playerState.blackMarketIdentity = null;
+    playerState.blackMarketUser = null;
+    playerState.blackMarketPass = null;
+    saveGame();
+    alert("✅ Identidad del Mercado Negro BORRADA.\nAhora puedes volver a intentar el proceso con El Mudo.");
+    location.reload();
+};

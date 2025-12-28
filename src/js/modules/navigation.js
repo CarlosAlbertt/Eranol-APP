@@ -5,6 +5,7 @@ import { addToCart, initCart } from './cart.js';
 import { drawRouletteWheel } from './games.js';
 import { loadGame, addGold, addItem } from './player.js';
 import { enterTavern, closeTavern } from './taverns.js';
+import { playerState } from './player.js';
 
 // Expose tavern functions globally
 window.enterTavern = enterTavern;
@@ -12,6 +13,7 @@ window.closeTavern = closeTavern;
 
 // import { renderMap } from './map.js';
 import { initSheetUI } from './sheet_ui.js';
+import { playScene } from './cinematic.js';
 
 let appRingTitle;
 let appRingSubtitle;
@@ -48,8 +50,11 @@ const rarityColors = {
 // --- NAVIGATION SYSTEM ---
 let cityIndexView;
 
-export function initNavigation() {
-    loadGame(); // START: Load saved state
+// Make initNavigation async to wait for loadGame
+export async function initNavigation() {
+    console.log('[NAV] Initializing Navigation...');
+    await loadGame(); // WAIT for save data
+    console.log('[NAV] Game Loaded. Identity:', playerState.blackMarketIdentity);
 
     appRingTitle = document.getElementById('app-ring-title');
     appRingSubtitle = document.getElementById('app-ring-subtitle');
@@ -87,6 +92,15 @@ export function initNavigation() {
     window.loadShop = loadShop;
     window.closeModal = closeModal;
 
+    // Dialog Router
+    window.openTavernMenu = (shopId) => {
+        if (shopId === 'mercado-negro') {
+            enterMarket(0);
+        } else {
+            enterTavern(shopId);
+        }
+    };
+
     // Initialize Sub-Modules
     initCart();
     initPatronage();
@@ -98,6 +112,36 @@ export function initNavigation() {
     // Hide sidebars initially
     if (document.getElementById('hub-sidebar')) document.getElementById('hub-sidebar').classList.add('hidden');
     if (document.getElementById('ring-sidebar')) document.getElementById('ring-sidebar').classList.add('hidden');
+
+    updateMarketAccessUI();
+}
+
+function updateMarketAccessUI() {
+    // Find the button for Ring 0
+    const blackMarketBtn = document.querySelector('button[onclick="enterMarket(0)"]');
+    const ringsGrid = document.getElementById('market-rings-grid');
+
+    if (blackMarketBtn) {
+        if (!playerState.blackMarketIdentity) {
+            // HIDE
+            blackMarketBtn.classList.add('hidden');
+            blackMarketBtn.style.display = 'none';
+            // Adjust Grid: 3 Cols
+            if (ringsGrid) {
+                ringsGrid.classList.remove('md:grid-cols-4');
+                ringsGrid.classList.add('md:grid-cols-3');
+            }
+        } else {
+            // SHOW
+            blackMarketBtn.classList.remove('hidden');
+            blackMarketBtn.style.display = 'block';
+            // Adjust Grid: 4 Cols
+            if (ringsGrid) {
+                ringsGrid.classList.remove('md:grid-cols-3');
+                ringsGrid.classList.add('md:grid-cols-4');
+            }
+        }
+    }
 }
 
 // NEW: Main Hub (City Index)
@@ -175,6 +219,109 @@ export function enterCityIndex() {
     if (appScreen) appScreen.className = "relative z-10 flex flex-col md:flex-row h-full transition-colors duration-500 theme-black-market"; // Default theme
 }
 
+// --- BLACK MARKET LOGIN SYSTEM ---
+function openBlackMarketLogin() {
+    const modal = document.getElementById('login-modal');
+    if (!modal) return;
+
+    // Reset fields
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-msg').innerText = '';
+
+    // Hijack the "Acceder" button logic
+    const btn = modal.querySelector('button[onclick="attemptLogin()"]');
+    if (btn) btn.onclick = attemptBlackMarketLogin;
+
+    modal.classList.remove('hidden');
+}
+
+function attemptBlackMarketLogin() {
+    const userInput = document.getElementById('login-user').value || "";
+    const passInput = document.getElementById('login-pass').value || "";
+
+    // Clean Inputs
+    const userClean = userInput.trim().toLowerCase();
+    const passClean = passInput.trim().toLowerCase();
+
+    // Stored Credentials
+    const storedUser = (playerState.blackMarketUser || "").trim().toLowerCase();
+    const storedPass = (playerState.blackMarketPass || "").trim().toLowerCase();
+
+    // For legacy/Kaiser compat: if Identity exists but no User/Pass, use Identity as User and check if Pass matches (or bypass)
+    // Actually, let's keep it strict. 
+
+    console.log(`[AUTH] Checking: User="${userClean}"/${storedUser} | Pass="***"`);
+
+    if (userClean && userClean === storedUser && passClean === storedPass) {
+        // SUCCESS
+        document.getElementById('login-msg').innerText = "Acceso Autorizado.";
+        document.getElementById('login-msg').className = "h-6 mt-4 text-xs text-center text-green-500 font-mono animate-pulse";
+
+        // TRANSITION EFFECT
+        const overlay = document.getElementById('penalty-overlay');
+        if (overlay) {
+            overlay.classList.remove('hidden', 'bg-red-600', 'mix-blend-overlay');
+            overlay.className = "absolute inset-0 bg-black z-[80] animate-fade-in duration-1000"; // Full Blackout
+            overlay.style.opacity = "0";
+            requestAnimationFrame(() => overlay.style.opacity = "1");
+        }
+
+        setTimeout(() => {
+            document.getElementById('login-modal').classList.add('hidden');
+            // Restore Overlay (hidden state)
+            if (overlay) overlay.className = "absolute inset-0 bg-red-600 mix-blend-overlay hidden z-[70] pointer-events-none";
+
+            // Trigger Cinematic Transition instead of direct entry
+            playScene({
+                id: 'black_market_entry',
+                music: 'black_market_theme', // More thematic
+                steps: [
+                    {
+                        text: "El callejón sin salida parece vacío, tal como prometieron los rumores. La niebla se aferra a tus botas, y sientes el peso de ojos invisibles observando desde las sombras.",
+                        bg: "/img/cinematics/blackmarket_alley.png",
+                        sfx: "whispers",
+                        duration: 6000 // Longer for reading
+                    },
+                    {
+                        text: "Susurras la contraseña. La piedra antigua vibra y runas carmesí despiertan de su letargo. Un mecanismo arcano gime, revelando un pasadizo donde antes solo había roca sólida.",
+                        bg: "/img/cinematics/blackmarket_door.png",
+                        sfx: "metal_door",
+                        duration: 6000
+                    },
+                    {
+                        text: "El aire viciado del subsuelo te golpea la cara. Antorchas de llama eterna marcan el descenso hacia las profundidades. Ya no hay vuelta atrás.",
+                        bg: "/img/cinematics/blackmarket_corridor.png",
+                        sfx: "wind_howl",
+                        duration: 5000
+                    },
+                    {
+                        text: "Lo prohibido se despliega ante ti. Mercancías de mil mundos, secretos robados y tratos forjados en sangre. Bienvenido al Mercado Negro.",
+                        bg: "/img/rings/ring0.png",
+                        duration: 5000
+                    }
+                ],
+                onComplete: () => {
+                    forceEnterBlackMarket();
+                }
+            });
+
+        }, 1500);
+
+    } else {
+        // FAIL
+        console.warn(`[AUTH] Failed.`);
+        document.getElementById('login-msg').innerText = "Credenciales Inválidas.";
+        document.getElementById('login-msg').className = "h-6 mt-4 text-xs text-center text-red-500 font-mono";
+    }
+}
+
+function forceEnterBlackMarket() {
+    state.tempAuthBypass = true;
+    enterMarket(0);
+    state.tempAuthBypass = false;
+}
+
 // NEW: Market Hub (Ring Selection)
 export function enterLandingScreen() {
     console.log('[NAV] enterLandingScreen called');
@@ -199,6 +346,8 @@ export function enterLandingScreen() {
         // Reset App Theme just in case, though Landing Screen covers it usually
         if (appScreen) appScreen.className = "relative z-10 flex flex-col md:flex-row h-full transition-colors duration-500 theme-black-market hidden";
     }
+
+    updateMarketAccessUI();
 }
 
 // Legacy compat
@@ -206,170 +355,188 @@ export function enterGlobalMap() {
     enterCityIndex();
 }
 
-import { playerState } from './player.js'; // Ensure we have access to player data
-
 export function enterMarket(ringLevel) {
-    try {
-        // BLACK MARKET AUTHENTICATION CHECK
-        if (ringLevel === 0 && !state.blackMarketAuthenticated) {
-            console.log('[NAV] Ring 0 requires authentication. Showing login modal.');
-            openLoginModal();
-            return;
-        }
-
-        // ULTIMATE PERMISSION CHECK (Fix for Sombra)
-        const name = state.currentAdventurer || playerState.name || "";
-        if (name.toLowerCase() === "sombra" || name.toLowerCase() === "asolador" || name.toLowerCase() === "admin") {
-            state.currentUserMaxRing = 4;
-            state.currentAdventurer = name; // Ensure state is synced
-        }
-
-        if (ringLevel !== 0 && ringLevel > state.currentUserMaxRing) {
-            showToast(`⛔ Bloqueado: Nivel ${ringLevel} (Tu Rango: ${state.currentUserMaxRing})`);
-            return;
-        }
-
-        // Show Sidebar (Merged, always visible if wrapper is visible)
-        if (document.getElementById('game-area-wrapper')) document.getElementById('game-area-wrapper').classList.remove('hidden');
-
-        // SHOW SIDEBARS LOGIC
-        // User Request: "deberían salir las tiendas en el sidebar izquierdo, no el HUD"
-
-        // Hide Hub Sidebar (Profile/Stats)
-        if (document.getElementById('hub-sidebar')) document.getElementById('hub-sidebar').classList.add('hidden');
-
-        // Show Ring Sidebar (Shop List)
-        if (document.getElementById('ring-sidebar')) document.getElementById('ring-sidebar').classList.remove('hidden');
-
-        // Show Back Button Container in Market Mode
-        const hubNav = document.getElementById('hub-navigation');
-        if (hubNav) hubNav.classList.remove('hidden');
-
-        // CRITICAL FIX: Ensure Parent Container is Visible
-        const marketControls = document.getElementById('market-controls');
-        if (marketControls) marketControls.classList.remove('hidden');
-
-        // Show Back Button in Market Mode
-
-        // Show Back Button in Market Mode
-        // Show Back Button in Market Mode
-        const backBtn = document.getElementById('btn-back-to-hub');
-        if (backBtn) {
-            backBtn.classList.remove('hidden');
-            // Force reset to "Exit Ring" behavior every time we enter market
-            // Clone to remove old listeners (like from previous shop visits if any logic persisted)
-            const newBackBtn = backBtn.cloneNode(true);
-            backBtn.parentNode.replaceChild(newBackBtn, backBtn);
-
-            newBackBtn.innerHTML = '<i class="fas fa-city mr-1"></i> Salir del Anillo';
-            newBackBtn.onclick = () => exitMarket();
-        }
-
-        if (allShops) {
-            state.activeShops = allShops.filter(s => s.ring === ringLevel);
-        } else {
-            console.error("allShops not defined!");
-            state.activeShops = [];
-        }
-
-        state.currentRing = ringLevel; // Update State
-        let ringName = "", ringSub = "";
-        if (ringLevel === 1) { ringName = "El Mercado de Hierro"; ringSub = "Anillo 1 (Rangos E-D)"; }
-        if (ringLevel === 2) { ringName = "La Plaza de Plata"; ringSub = "Anillo 2 (Rangos C-B)"; }
-        if (ringLevel === 3) { ringName = "La Cumbre Dorada"; ringSub = "Anillo 3 (Rangos A-S)"; }
-        if (ringLevel === 0) { ringName = "Mercado Negro"; ringSub = "Anillo 0 (Sin Ley)"; }
-
-        if (appRingTitle) appRingTitle.innerText = ringName;
-        if (appRingSubtitle) appRingSubtitle.innerText = ringSub;
-
-        // Update District View Titles
-        const distTitle = document.getElementById('district-title');
-        const distSub = document.getElementById('district-subtitle');
-        if (distTitle) distTitle.innerText = ringName;
-        if (distSub) distSub.innerText = ringSub;
-
-        if (ringLevel === 0) {
-            if (patronageArea) patronageArea.classList.remove('hidden');
-            if (document.getElementById('bank-area')) document.getElementById('bank-area').classList.remove('hidden');
-            // Show Cursed Wheel, Hide Normal Wheel
-            if (document.getElementById('roulette-area')) document.getElementById('roulette-area').classList.add('hidden');
-            if (document.getElementById('cursed-roulette-area')) document.getElementById('cursed-roulette-area').classList.remove('hidden');
-        } else {
-            if (patronageArea) patronageArea.classList.add('hidden');
-            if (document.getElementById('bank-area')) document.getElementById('bank-area').classList.add('hidden');
-            // Show Normal Wheel, Hide Cursed Wheel
-            if (document.getElementById('roulette-area')) document.getElementById('roulette-area').classList.remove('hidden');
-            if (document.getElementById('cursed-roulette-area')) document.getElementById('cursed-roulette-area').classList.add('hidden');
-        }
-
-        // Force update of currency display (Gold -> Blood or vice versa)
-        updateGoldDisplay();
-
-        // Map Integration - REMOVED PER USER REQUEST
-        // if (document.getElementById('market-controls')) document.getElementById('market-controls').classList.remove('hidden');
-
-        // Hide Cart Button (Map/District Mode)
-        const cartBtn = document.getElementById('cart-fab-btn');
-        if (cartBtn) cartBtn.classList.add('hidden');
-
-        // Map Render Removed
-        // renderMap(ringLevel);
-
-        if (landingScreen) {
-            landingScreen.classList.add('animate-fade-out');
-            landingScreen.style.display = 'none'; // Also hide with style
-        }
-        setTimeout(() => {
-            if (landingScreen) {
-                landingScreen.classList.add('hidden');
-                landingScreen.style.display = 'none';
-            }
-            if (appScreen) {
-                appScreen.classList.remove('hidden');
-                appScreen.style.display = 'flex'; // CRITICAL: Reset style.display
-                void appScreen.offsetWidth;
-                appScreen.classList.remove('opacity-0', 'scale-95');
-                appScreen.classList.add('animate-fade-in');
-            }
-
-            // RENDER DISTRICT GRID
-            renderDistrictCards();
-
-            // RENDER SIDEBAR NAV
-            renderNav();
-
-            // View State: Show District Grid, Hide Items
-            const grid = document.getElementById('inventory-grid');
-            const casino = document.getElementById('casino-view');
-            const districtView = document.getElementById('district-selection-view');
-
-            if (grid) {
-                grid.innerHTML = ''; // CLEAR PREVIOUS ITEMS
-                grid.classList.add('hidden');
-                grid.style.display = 'none'; // Force Reset
-            }
-            if (casino) casino.classList.add('hidden');
-
-            // AUTO-LOAD FIRST SHOP LOGIC
-            // Instead of showing the District View, we jump straight to the first shop
-            if (state.activeShops && state.activeShops.length > 0) {
-                // If there are shops, load the first one immediately
-                // We don't need to show districtView because loadShop will hide it
-                loadShop(0);
-            } else {
-                // Fallback: If no shops, show the empty district view
-                if (districtView) {
-                    districtView.classList.remove('hidden');
-                    districtView.style.display = 'block';
+    // Check Bypass
+    if (state.tempAuthBypass && ringLevel === 0) {
+        // Proceed directly
+    } else {
+        try {
+            // BLACK MARKET AUTHENTICATION CHECK
+            // If coming from ring 0 (Black Market), check identity
+            if (ringLevel === 0) {
+                // Identity Check
+                if (!playerState.blackMarketIdentity) {
+                    console.log('[NAV] Ring 0 requires identity. Access Denied.');
+                    showToast("⛔ Acceso Denegado: Necesitas una invitación.");
+                    return;
                 }
+                // Show Login Modal for Authentication
+                openBlackMarketLogin();
+                return;
             }
 
-        }, 500);
+            // ULTIMATE PERMISSION CHECK (Fix for Sombra)
+            const name = state.currentAdventurer || playerState.name || "";
+            if (name.toLowerCase() === "sombra" || name.toLowerCase() === "asolador" || name.toLowerCase() === "admin") {
+                state.currentUserMaxRing = 4;
+                state.currentAdventurer = name; // Ensure state is synced
+            }
 
-    } catch (e) {
-        console.error("Critical Error in enterMarket:", e);
-        showToast("Error al entrar al mercado: " + e.message);
+            if (ringLevel !== 0 && ringLevel > state.currentUserMaxRing) {
+                showToast(`⛔ Bloqueado: Nivel ${ringLevel} (Tu Rango: ${state.currentUserMaxRing})`);
+                return;
+            }
+        } catch (e) {
+            console.error("Auth Error", e);
+        }
     }
+
+    // Show Sidebar (Merged, always visible if wrapper is visible)
+    if (document.getElementById('game-area-wrapper')) document.getElementById('game-area-wrapper').classList.remove('hidden');
+
+    // SHOW SIDEBARS LOGIC
+    // User Request: "deberían salir las tiendas en el sidebar izquierdo, no el HUD"
+
+    // Hide Hub Sidebar (Profile/Stats)
+    if (document.getElementById('hub-sidebar')) document.getElementById('hub-sidebar').classList.add('hidden');
+
+    // Show Ring Sidebar (Shop List)
+    if (document.getElementById('ring-sidebar')) document.getElementById('ring-sidebar').classList.remove('hidden');
+
+    // Show Back Button Container in Market Mode
+    const hubNav = document.getElementById('hub-navigation');
+    if (hubNav) hubNav.classList.remove('hidden');
+
+    // CRITICAL FIX: Ensure Parent Container is Visible
+    const marketControls = document.getElementById('market-controls');
+    if (marketControls) marketControls.classList.remove('hidden');
+
+    // Show Back Button in Market Mode
+    const backBtn = document.getElementById('btn-back-to-hub');
+    if (backBtn) {
+        backBtn.classList.remove('hidden');
+        // Force reset to "Exit Ring" behavior every time we enter market
+        // Clone to remove old listeners (like from previous shop visits if any logic persisted)
+        const newBackBtn = backBtn.cloneNode(true);
+        backBtn.parentNode.replaceChild(newBackBtn, backBtn);
+
+        newBackBtn.innerHTML = '<i class="fas fa-city mr-1"></i> Salir del Anillo';
+        newBackBtn.onclick = () => exitMarket();
+    }
+
+    if (allShops) {
+        state.activeShops = allShops.filter(s => s.ring === ringLevel);
+    } else {
+        console.error("allShops not defined!");
+        state.activeShops = [];
+    }
+
+    state.currentRing = ringLevel; // Update State
+    let ringName = "", ringSub = "";
+    if (ringLevel === 1) { ringName = "El Mercado de Hierro"; ringSub = "Anillo 1 (Rangos E-D)"; }
+    if (ringLevel === 2) { ringName = "La Plaza de Plata"; ringSub = "Anillo 2 (Rangos C-B)"; }
+    if (ringLevel === 3) { ringName = "La Cumbre Dorada"; ringSub = "Anillo 3 (Rangos A-S)"; }
+    if (ringLevel === 0) { ringName = "Mercado Negro"; ringSub = "Anillo 0 (Sin Ley)"; }
+
+    if (appRingTitle) appRingTitle.innerText = ringName;
+    if (appRingSubtitle) appRingSubtitle.innerText = ringSub;
+
+    // Update District View Titles
+    const distTitle = document.getElementById('district-title');
+    const distSub = document.getElementById('district-subtitle');
+    if (distTitle) distTitle.innerText = ringName;
+    if (distSub) distSub.innerText = ringSub;
+
+    // UPDATE HERO BANNER BACKGROUND
+    const heroBg = document.getElementById('district-hero-bg');
+    if (heroBg) {
+        heroBg.style.backgroundImage = `url('/img/rings/ring${ringLevel}.png')`;
+    }
+
+    // IMMERSIVE BACKGROUND FOR THE SCREEN
+    const districtView = document.getElementById('district-selection-view');
+    if (districtView) {
+        // Apply a darkened version of the ring image as the full background
+        const timestamp = new Date().getTime();
+        districtView.style.backgroundImage = `linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('/img/rings/ring${ringLevel}.png?t=${timestamp}')`;
+        districtView.style.backgroundSize = "cover";
+        districtView.style.backgroundPosition = "center";
+        districtView.style.backgroundAttachment = "fixed";
+    }
+
+
+
+    if (ringLevel === 0) {
+        if (patronageArea) patronageArea.classList.remove('hidden');
+        if (document.getElementById('bank-area')) document.getElementById('bank-area').classList.remove('hidden');
+        // Show Cursed Wheel, Hide Normal Wheel
+        if (document.getElementById('roulette-area')) document.getElementById('roulette-area').classList.add('hidden');
+        if (document.getElementById('cursed-roulette-area')) document.getElementById('cursed-roulette-area').classList.remove('hidden');
+    } else {
+        if (patronageArea) patronageArea.classList.add('hidden');
+        if (document.getElementById('bank-area')) document.getElementById('bank-area').classList.add('hidden');
+        // Show Normal Wheel, Hide Cursed Wheel
+        if (document.getElementById('roulette-area')) document.getElementById('roulette-area').classList.remove('hidden');
+        if (document.getElementById('cursed-roulette-area')) document.getElementById('cursed-roulette-area').classList.add('hidden');
+    }
+
+    // Force update of currency display (Gold -> Blood or vice versa)
+    updateGoldDisplay();
+
+    // Hide Cart Button (Map/District Mode)
+    const cartBtn = document.getElementById('cart-fab-btn');
+    if (cartBtn) cartBtn.classList.add('hidden');
+
+    if (landingScreen) {
+        landingScreen.classList.add('animate-fade-out');
+        landingScreen.style.display = 'none'; // Also hide with style
+    }
+    setTimeout(() => {
+        if (landingScreen) {
+            landingScreen.classList.add('hidden');
+            landingScreen.style.display = 'none';
+        }
+        if (appScreen) {
+            appScreen.classList.remove('hidden');
+            appScreen.style.display = 'flex'; // CRITICAL: Reset style.display
+            void appScreen.offsetWidth;
+            appScreen.classList.remove('opacity-0', 'scale-95');
+            appScreen.classList.add('animate-fade-in');
+        }
+
+        // RENDER DISTRICT GRID
+        renderDistrictCards();
+
+        // RENDER SIDEBAR NAV
+        renderNav();
+
+        // View State: Show District Grid, Hide Items
+        const grid = document.getElementById('inventory-grid');
+        const casino = document.getElementById('casino-view');
+        const districtView = document.getElementById('district-selection-view');
+
+        if (grid) {
+            grid.innerHTML = ''; // CLEAR PREVIOUS ITEMS
+            grid.classList.add('hidden');
+            grid.style.display = 'none'; // Force Reset
+        }
+        if (casino) casino.classList.add('hidden');
+
+        // AUTO-LOAD FIRST SHOP LOGIC
+        // Instead of showing the District View, we jump straight to the first shop
+        if (state.activeShops && state.activeShops.length > 0) {
+            // If there are shops, load the first one immediately
+            // We don't need to show districtView because loadShop will hide it
+            loadShop(0);
+        } else {
+            // Fallback: If no shops, show the empty district view
+            if (districtView) {
+                districtView.classList.remove('hidden');
+                districtView.style.display = 'block';
+            }
+        }
+
+    }, 500);
 }
 
 // --- MAP MODAL SYSTEM ---
@@ -380,10 +547,6 @@ export function openMapModal() {
 export function closeMapModal() {
     // No-op
 }
-
-// Global expose
-window.openMapModal = openMapModal;
-window.closeMapModal = closeMapModal;
 
 export function exitMarket() {
     if (appScreen) appScreen.classList.add('opacity-0', 'scale-95');
@@ -402,11 +565,6 @@ export function renderNav() {
     if (!navContainer) return;
     navContainer.innerHTML = '';
     const isRingZero = state.activeShops.length > 0 && state.activeShops[0].ring === 0;
-    // Removed className overwrite to preserve Sidebar layout styles
-    // if (isRingZero) navContainer.className = "flex-1 overflow-y-auto p-6 ring0-bg-pattern space-y-6 overflow-x-hidden";
-    // else navContainer.className = "flex-1 overflow-y-auto p-4 space-y-4";
-    // Instead, we just ensure the internal spacing is managed by the buttons or a wrapper if needed.
-    // The container "shop-nav" has its own styles in index.html (max-h, scroll, etc).
 
     state.activeShops.forEach((shop, index) => {
         const btn = document.createElement('button');
@@ -439,11 +597,7 @@ export function loadShop(index) {
         }
 
         // Close Map Modal when loading a shop
-        // Close Map Modal when loading a shop
         if (typeof closeMapModal === 'function') closeMapModal();
-
-        // Hide Map/District Controls if needed
-        // if (document.getElementById('market-controls')) document.getElementById('market-controls').classList.remove('hidden');
 
         // Show Cart Button in Shop
         const cartBtn = document.getElementById('cart-fab-btn');
@@ -466,7 +620,6 @@ export function loadShop(index) {
         if (appContainer) appContainer.className = `relative z-10 flex flex-col md:flex-row h-full transition-colors duration-500 ${shop.themeClass}`;
 
         // Hide District Grid, Show Inventory
-        // Hide District Grid, Show Inventory
         const districtView = document.getElementById('district-selection-view');
         if (districtView) {
             districtView.classList.add('hidden');
@@ -479,11 +632,6 @@ export function loadShop(index) {
         }
 
         console.log(`Loading Shop: ${shop.name} with ${shop.items ? shop.items.length : 0} items.`);
-
-        // CHANGE BACK BUTTON FUNCTIONALITY TO "BACK TO DISTRICT"
-        // CHANGE BACK BUTTON FUNCTIONALITY - REMOVED PER USER REQUEST
-        // The Sidebar is persistent, so "Back to District" is redundant.
-        // We keep "Exit Ring" as the main action.
 
         renderNav(); // Update navigation numbering/active state
 
@@ -565,10 +713,6 @@ function closeModal() {
 
 import { mapNodes } from '../data/locations.js';
 
-// ... (existing imports)
-
-// ...
-
 function renderDistrictCards() {
     const container = document.getElementById('district-cards-container');
     if (!container) return;
@@ -631,25 +775,9 @@ function renderDistrictCards() {
                 if (item.actionType === 'shop' && item.target) {
                     // Special Case: Portal to Shop (like Casino)
                     // We need to find the shop by ID in allShops and load it
-                    // But loadShop expects an index in state.activeShops.
-                    // If the target shop is NOT in activeShops (e.g. Ring 0 shop while in Ring 2), we might need a direct load strategy.
-
-                    // Hack: If target is 'casino-infernal', we Force Load it.
                     if (item.target === 'casino-infernal') {
-                        // We need to find the casino shop in allShops
-                        // Import allShops is available at top.
-                        const casinoShop = allShops.find(s => s.id === 'casino-infernal');
-                        if (casinoShop) {
-                            // Determine if we need to switch context or just display it
-                            // For now, let's push it to activeShops if not present, or handle it specially.
-                            // Simpler: Just find it in allShops, set it as current, and call loadShop logic manually/mocked.
-                            // OR: Switch navigation to that shop's ring? 
-                            // Casino is Ring 0. If we are in Ring 2, technically we are "entering" the market.
-                            // Let's rely on enterMarket(0) if we want to go fully there, OR just load the shop.
-
-                            // Strategy: enterMarket(0) is the cleanest way to switch context to the Black Market.
-                            enterMarket(0);
-                        }
+                        // Strategy: enterMarket(0) is the cleanest way to switch context to the Black Market.
+                        enterMarket(0);
                     } else if (item.target === 'bazar') {
                         // Find shop index
                         const idx = state.activeShops.findIndex(s => s.id === 'bazar');
@@ -798,93 +926,45 @@ function renderMissionList(container, rankFilter) {
 
         if (status === 'completed') {
             el.classList.add('opacity-70', 'grayscale');
-            el.innerHTML += '<div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"><span class="border-4 border-red-800 text-red-800 font-black text-4xl uppercase -rotate-12 px-4 py-2 opacity-80">Completado</span></div>';
-        }
-
-        const pinColor = m.rank === 'S' || m.rank === 'A' ? 'bg-red-600' : 'bg-yellow-600';
-        const pin = `<div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full ${pinColor} shadow-md border border-black/30 z-20"></div>`;
-
-        let reqHtml = '';
-        if (m.req) {
-            reqHtml = `<div class="text-[10px] text-red-800 mt-1 uppercase font-bold tracking-wider border-t border-red-800/20 pt-1"><i class="fas fa-thumbtack mr-1"></i> Requisito: ${m.req}</div>`;
-        }
-
-        let actionBtn = '';
-        if (status === 'new') {
-            actionBtn = `<button class="w-full mt-2 bg-[#2c1810] hover:bg-black text-[#f0e6d2] text-sm font-bold py-2 px-4 rounded shadow transition-colors uppercase tracking-widest" onclick="acceptMission(${m.id})">Firmar</button>`;
-        } else if (status === 'accepted') {
-            actionBtn = `<button class="w-full mt-2 bg-red-700 hover:bg-red-600 text-white text-sm font-bold py-2 px-4 rounded shadow transition-colors uppercase tracking-widest animate-pulse" onclick="claimMission(${m.id})">Reclamar</button>`;
-        } else {
-            actionBtn = '';
         }
 
         el.innerHTML = `
-            ${pin}
-            <div class="border-b-2 border-[#2c1810]/20 pb-2 mb-1 flex justify-between items-end">
-                <h3 class="font-bold text-xl leading-none">${m.title}</h3>
-                <span class="text-xs font-bold font-mono opacity-50">Rango ${m.rank}</span>
+            <div class="flex justify-between items-start border-b border-[#8d6e63]/30 pb-2">
+                <h3 class="font-bold text-lg leading-tight uppercase font-cinzel">${m.title}</h3>
+                <span class="text-xs font-bold bg-[#8d6e63] text-[#f0e6d2] px-2 py-1 rounded shadow-inner">${m.rarity}</span>
             </div>
+            <div class="text-sm italic opacity-90 leading-relaxed min-h-[3rem]">${m.desc}</div>
             
-            <div class="flex-1">
-                <p class="text-sm leading-relaxed italic opacity-90">"${m.desc}"</p>
-                ${reqHtml}
+            <div class="grid grid-cols-2 gap-2 text-xs border-t border-[#8d6e63]/30 pt-3 mt-auto">
+                <div>
+                   <div class="uppercase tracking-widest opacity-60 text-[9px] mb-1">Recompensa</div>
+                   <div class="font-bold font-mono text-[#5d4037]"><i class="fas fa-coins mr-1"></i>${m.reward}</div>
+                </div>
+                ${m.req ? `<div><div class="uppercase tracking-widest opacity-60 text-[9px] mb-1">Requiere</div><div class="font-bold text-red-900"><i class="fas fa-exclamation-triangle mr-1"></i>${m.req}</div></div>` : ''}
             </div>
 
-            <div class="flex items-center gap-3 mt-2 bg-[#2c1810]/5 p-2 rounded">
-                <div class="text-2xl opacity-70"><i class="fas ${m.icon}"></i></div>
-                <div class="flex-1 text-right">
-                    <div class="text-xs uppercase tracking-wider opacity-60">Recompensa</div>
-                    <div class="font-bold text-lg">${m.reward}</div>
-                </div>
+            <button onclick="acceptMission(${m.id})" ${status !== 'new' ? 'disabled' : ''} class="w-full mt-2 py-2 rounded font-bold uppercase tracking-widest text-xs transition-all shadow border border-[#5d4037]/20 ${status === 'new' ? 'bg-[#5d4037] text-[#f0e6d2] hover:bg-[#3e2723] hover:scale-105' : 'bg-transparent text-[#5d4037] opacity-60 cursor-not-allowed'}">
+                ${status === 'new' ? '<i class="fas fa-feather-alt mr-2"></i>Firmar Contrato' : (status === 'active' ? 'Contrato Activo' : 'Completado')}
+            </button>
+            <div class="absolute -top-2 -right-2 w-8 h-8 bg-[#8d6e63] rounded-full flex items-center justify-center text-[#f0e6d2] shadow-lg border-2 border-[#f0e6d2]">
+                <i class="fas ${m.icon}"></i>
             </div>
-            ${actionBtn}
         `;
         container.appendChild(el);
     });
 }
+
+// Map Mission Board -> Window
 window.acceptMission = function (id) {
     if (!playerState.missionStatus) playerState.missionStatus = {};
-    playerState.missionStatus[id] = 'accepted';
-    // Trigger Save
-    import('./player.js').then(m => m.saveGame());
-    showToast("Contrato firmado. Revisa los requisitos.");
-    renderMissionList(document.getElementById('mission-list'), currentRankTab);
-}
+    if (playerState.missionStatus[id] && playerState.missionStatus[id] !== 'new') return;
 
-window.claimMission = function (id) {
-    const mission = sampleMissions.find(m => m.id === id);
-    if (!mission) return;
+    // Logic to accept
+    playerState.missionStatus[id] = 'active';
+    showToast("📜 Contrato firmado. Consulta tu registro.");
 
-    if (mission.req) {
-        const hasItem = playerState.inventory.find(i => i.name === mission.req);
-        if (!hasItem) {
-            showToast(`❌ Falta: ${mission.req}`);
-            return;
-        }
-        const idx = playerState.inventory.indexOf(hasItem);
-        if (idx > -1) playerState.inventory.splice(idx, 1);
-        showToast(`Entregado: ${mission.req}`);
-    }
-
-    import('./player.js').then(m => {
-        if (mission.val > 0) m.addGold(mission.val);
-        if (mission.itemReward) m.addItem(mission.itemReward);
-        playerState.missionStatus[id] = 'completed';
-        m.saveGame();
+    // Refresh GUI
+    if (document.getElementById('mission-list')) {
         renderMissionList(document.getElementById('mission-list'), currentRankTab);
-        showToast(`Recompensa: +${mission.val} oro`);
-    });
+    }
 }
-
-window.closeMissionBoard = function () {
-    const modal = document.getElementById('mission-board');
-    if (!modal) return;
-    modal.classList.add('opacity-0');
-    modal.querySelector('.glass-modal').classList.add('scale-95');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 300);
-}
-
-// Global hook
-window.openMissionBoard = openMissionBoard;

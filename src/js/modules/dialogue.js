@@ -1,4 +1,4 @@
-import { addItem, playerState } from './player.js';
+import { addItem, playerState, saveGame } from './player.js';
 
 /*
     DIALOGUE MODULE
@@ -13,11 +13,12 @@ let failedOptions = {}; // Track failed skill checks per NPC: { npcId: [optionIn
 // Hardcoded here for now, could be moved to src/js/data/dialogues.js later
 const dialogueData = {
     // 1. BORG (Tabernero) - ETAPA 1
+    // 1. BORG (Tabernero) - ETAPA 1: INTRODUCCIÓN
     'owner_g': {
         name: "Borg",
         role: "Dueño del Grifo",
         avatar: "/img/npcs/borg.png",
-        greeting: "Borg deja un vaso sucio sobre la barra con un golpe seco. Su único ojo te escanea buscando problemas. 'Si vas a potar, hazlo fuera. ¿Qué quieres?'",
+        greeting: "Borg deja un vaso sucio sobre la barra con un golpe seco. Su único ojo te escanea. 'Si vas a potar, hazlo fuera. Si vas a pelear, no rompas nada. ¿Qué quieres?'",
         options: [
             {
                 label: "🍺 [Comercio] ¡Ponme una ronda!",
@@ -27,154 +28,91 @@ const dialogueData = {
             {
                 label: "🤝 [Amistoso] (Persuasión CD 12) Buen local. Debiste ser un grande en la Arena.",
                 check: { skill: "Persuasión", dc: 12 },
-                success: "Borg sonríe, mostrando dientes de oro. '¡JA! El mejor. Aplasté tres cabezas de ogro en una tarde. La clave es el equilibrio... y golpear primero. Toma, la primera invita la casa.' (Ganas una Cerveza)",
+                success: "Borg sonríe, mostrando dientes de oro. '¡JA! El mejor. Aplasté tres cabezas de ogro en una tarde. La clave es golpear primero.' (Ganas Cerveza)",
                 failure: "Borg gruñe. 'No me hagas la pelota. Cómprame algo o lárgate.'",
-                reward: { name: "Cerveza de la Casa", desc: "Una jarra de cerveza tibia. Recupera 1d4 PV.", type: "consumable", rarity: "common", image: "" },
-                successNext: 'borg_stage2_glory'
+                reward: { name: "Cerveza de la Casa", desc: "Tibia pero pega fuerte. +2 PV.", type: "consumable", rarity: "common", qty: 1 },
+                successNext: 'borg_stage2_respeto'
             },
             {
                 label: "🧐 [Investigar] (Investigación CD 14) ¿Quién es esa tal Zora?",
                 check: { skill: "Investigación", dc: 14 },
-                success: "Baja la voz. 'Zora... es peligrosa. Ex-Ignis. Busca algo o a alguien. Si yo fuera tú, no la molestaría a menos que tengas oro o una sentencia de muerte.'",
-                failure: "Te mira con desconfianza. 'Es una clienta. Yo no vendo información, vendo alcohol. Calla y bebe.'",
-                successNext: 'borg_stage2_zora'
+                success: "Baja la voz. 'Zora... es peligrosa. Ex-Ignis. Busca algo o a alguien. Si yo fuera tú, no la molestaría.'",
+                failure: "Te mira con desconfianza. 'Es una clienta. Yo no vendo información, vendo alcohol.'",
+                successNext: 'borg_stage2_respeto'
             },
             {
-                label: "😡 [Amenaza] (Intimidación CD 18) Dame lo mejor que tengas, gratis. Ahora.",
+                label: "😡 [Amenaza] (Intimidación CD 18) Dame lo mejor que tengas. Gratis.",
                 check: { skill: "Intimidación", dc: 18 },
-                success: "Borg se tensa, luego suelta una carcajada. '¡HUEVOS! Me gustas. Tienes agallas. Toma este 'Matarratas', invita la casa. Pero no lo vuelvas a hacer.'",
-                reward: { name: "Orujo Matarratas", desc: "Arde al bajar. Arde al subir. +5 FUE, -2 INT durante 1 hora.", type: "consumable", rarity: "uncommon", image: "" },
-                failure: "En un parpadeo, Borg saca una escopeta recortada y te apunta a la nariz. '¿Decías? Fuera de mi vista antes de que decore la pared con tus sesos.'",
+                success: "Borg se tensa, luego ríe. '¡HUEVOS! Me gustas. Toma este 'Matarratas', invita la casa. Pero no abuses.'",
+                reward: { name: "Orujo Matarratas", desc: "Arde como el infierno. +5 FUE, -2 INT.", type: "consumable", rarity: "uncommon", qty: 1 },
+                failure: "Saca una escopeta recortada. '¿Decías? Fuera de mi vista.'",
                 onFailure: "fight",
-                successNext: 'borg_stage2_threat'
+                successNext: 'borg_stage2_respeto'
             }
         ]
     },
 
-    // BORG - ETAPA 2: Gloria (después de halagarle)
-    'borg_stage2_glory': {
+    // BORG - ETAPA 2: RESPETO (El Foso)
+    'borg_stage2_respeto': {
         name: "Borg",
         role: "Ex-Campeón del Foso",
         avatar: "/img/npcs/borg.png",
-        greeting: "Borg llena dos jarras y desliza una hacia ti. 'Siéntate. Hace mucho que nadie pregunta por los viejos tiempos. ¿Sabes por qué perdí el ojo?'",
+        greeting: "Borg te saluda con la cabeza. 'Te mueves bien. Me recuerdas a mí cuando tenía dos ojos y menos cicatrices. No todo es fuerza bruta en el Foso, ¿sabes?'",
         options: [
             {
-                label: "👂 Cuéntamelo.",
-                success: "Borg se toca el parche. 'Un trol. Tercer combate del Guantelete. Me arrancó el ojo de un mordisco, pero yo le arranqué las tripas. Gané igual. Esa fue mi última pelea.'",
-                successNext: 'borg_stage3_troll'
+                label: "👂 Cuéntame sobre tus días de gloria.",
+                success: "'Gané el Guantelete tres años seguidos. Mi secreto no era la fuerza, era saber *quién* iba a caer antes de que sonara la campana.' Se toca el parche. 'Aunque a veces la casa pierde.'",
+                successNext: 'borg_stage3_apuestas'
             },
             {
-                label: "💀 ¿Por qué dejaste de pelear?",
-                success: "'Porque ya no tenía nada que demostrar. Y porque la edad te hace más lento, pero no más inteligente. Los jóvenes mueren rápido ahí dentro.'",
-                successNext: 'borg_stage3_retirement'
+                label: "⚔️ ¿Algún consejo para sobrevivir abajo?",
+                success: "'Nunca des la espalda a la pared. Y nunca confíes en un combate 'justo'. Todos hacen trampas. Incluso yo.'",
+                successNext: 'borg_stage3_apuestas'
             },
-            {
-                label: "🏆 ¿Quién es el mejor luchador que has visto?",
-                success: "Borg mira a la nada por un momento. 'Brunhilda. Sin duda. Esa mujer... no es humana. Lleva 37 victorias. Yo tenía 15 cuando me retiré. Ni me acerqué.'",
-                successNext: 'borg_stage3_brunhilda'
-            },
-            { label: "👋 Gracias por la charla.", nextDialogue: null }
+            { label: "👋 Nos vemos.", nextDialogue: null }
         ]
     },
 
-    // BORG - ETAPA 2: Zora (después de preguntar por ella)
-    'borg_stage2_zora': {
+    // BORG - ETAPA 3: APUESTAS (Corrupción)
+    'borg_stage3_apuestas': {
         name: "Borg",
-        role: "Informante Reacio",
+        role: "Corredor de Apuestas",
         avatar: "/img/npcs/borg.png",
-        greeting: "Borg mira alrededor nervioso. 'Oye, no debería contarte esto, pero... Zora ha estado preguntando por los túneles bajo la ciudad. Dice que busca a alguien que desapareció hace años.'",
+        greeting: "Borg mira a ambos lados y se inclina. 'Escucha. Manejo... ciertos números aquí. Apuestas reales, no esa basura oficial. Pero alguien me ha robado el *Libro Negro*. Sin él, estoy ciego.'",
         options: [
             {
-                label: "🕵️ [Investigación CD 15] ¿Los túneles? ¿Qué hay ahí abajo?",
-                check: { skill: "Investigación", dc: 15 },
-                success: "'Nadie lo sabe con certeza. Catacumbas antiguas, alcantarillas, y... celdas. Algunas de antes de que existiera Eranol. He oído que hay cosas vivas ahí abajo que nunca han visto el sol.'",
-                failure: "'No sé nada de túneles. Y tú tampoco si sabes lo que te conviene.'",
-                successNext: 'borg_stage3_tunnels'
+                label: "📕 [Misión] Recuperaré tu libro.",
+                check: { skill: "Investigación", dc: 12 },
+                success: "Misión Aceptada: El Cobrador de Deudas. 'Cree que lo tiene un novato llamado Rorn. Sacudaselo. Trae el libro.'",
+                mission: { id: 'mision_borg_libro', title: 'El Libro Negro', desc: 'Recupera el libro de apuestas de Borg.', reward: { name: 'Escopeta Recortada', rarity: 'rare' } },
+                successNext: 'borg_stage4_red'
             },
             {
-                label: "💰 [Soborno] Toma 50 monedas de oro. ¿A quién busca Zora?",
-                success: "Borg coge las monedas rápidamente. 'Un tal Aldric Vorn. Era... algo así como un alquimista. Desapareció hace 5 años. Dicen que experimentaba con cosas prohibidas.'",
-                successNext: 'borg_stage3_aldric'
+                label: "💰 ¿Qué gano yo?",
+                success: "'Acceso. Información. Y tal vez te deje apostar en las peleas a muerte de verdad.'",
+                successNext: 'borg_stage4_red' // Shortcut for dialogue flow testing, normally requires mission complete
             },
-            {
-                label: "☠️ ¿Zora es peligrosa para mí?",
-                success: "'Solo si te metes en su camino. O si tienes algo que ella quiere. De lo contrario, te ignorará. Pero cuidado: tiene ojos en todas partes.'",
-                successNext: null
-            },
-            { label: "👋 Mejor me voy.", nextDialogue: null }
+            { label: "👋 No me meto en líos.", nextDialogue: 'borg_stage2_respeto' }
         ]
     },
 
-    // BORG - ETAPA 2: Amenaza (después de intimidarlo con éxito)
-    'borg_stage2_threat': {
+    // BORG - ETAPA 4: LA RED DE ESPÍAS (Final)
+    'borg_stage4_red': {
         name: "Borg",
-        role: "Aliado Forzoso",
+        role: "Maestro de Espías",
         avatar: "/img/npcs/borg.png",
-        greeting: "Borg te mira con una mezcla de respeto y recelo. 'Tienes cojones, te lo concedo. Pero no tientes a la suerte. ¿Qué más quieres?'",
+        greeting: "Borg hojea el libro recuperado. 'Buen trabajo. Eres de fiar. ¿Sabes? Los taberneros vemos todo. Somos los verdaderos reyes de Eranol. Tengo ojos en cada rincón.'",
         options: [
             {
-                label: "🗡️ Información sobre trabajos peligrosos.",
-                success: "'Trabajos, ¿eh? Hay un tipo en la esquina, Dedos Vance. Siempre sabe de trabajos sucios. Dile que te mando yo.'",
-                successNext: null
+                label: "👁️ [Recompensa] Dame acceso a esa red.",
+                success: "'Toma. Es un monóculo encantado. Lo usábamos para ver quién estaba dopado en la arena. Te servirá.'",
+                reward: { name: "Ojo del Tabernero", desc: "Permite ver debilidades y stats ocultos de los enemigos.", type: "accessory", rarity: "epic", image: "/img/items/monoculo.png" }
             },
             {
-                label: "🔒 ¿Hay una habitación trasera aquí?",
-                check: { skill: "Intimidación", dc: 16 },
-                success: "Borg suspira. 'Sí. Para clientes VIP. Juegos privados, reuniones discretas. Pero necesitas invitación. O... podrías ganar en el Foso. Los campeones siempre tienen acceso.'",
-                failure: "'No sé de qué hablas. Y deja de amenazarme o te echo. Me da igual lo duro que parezcas.'",
-                successNext: 'borg_stage3_vip'
+                label: "📜 ¿Algún rumor jugoso hoy?",
+                success: "'El Capitán de la Guardia está comprando pasajes para salir de la ciudad. El Gran Colapso está cerca. Prepárate.' (Pista de Lore)",
             },
-            {
-                label: "🩸 ¿Puedo pelear en el Foso esta noche?",
-                success: "'El Foso siempre acepta carne fresca. Baja por el pasillo de la izquierda, busca a Krug. Él se encarga de las inscripciones. Pero cuidado... ahí abajo las apuestas son con sangre.'",
-                successNext: null
-            },
-            { label: "👋 Nos vemos, Borg.", nextDialogue: null }
-        ]
-    },
-
-    // BORG - ETAPA 3: Historia del Trol
-    'borg_stage3_troll': {
-        name: "Borg",
-        role: "Veterano Nostálgico",
-        avatar: "/img/npcs/borg.png",
-        greeting: "Borg se sirve un trago largo. 'Aquel trol... se llamaba Grunk. Tres metros de músculo y rabia. Todavía tengo su colmillo guardado. ¿Sabes qué? Te lo vendo por 200 monedas de oro.'",
-        options: [
-            {
-                label: "💰 [Comprar] Trato hecho. (200 MO)",
-                success: "Borg saca un enorme colmillo amarillento de debajo de la barra. 'Es tuyo. Dicen que trae suerte en combate.'",
-                reward: { name: "Colmillo de Trol", desc: "Amuleto de un trol derrotado. +1 a tiradas de daño crítico.", type: "accessory", rarity: "rare", image: "" }
-            },
-            {
-                label: "🤔 [Regatear] (Persuasión CD 14) 200 es mucho. ¿Qué tal 100?",
-                check: { skill: "Persuasión", dc: 14 },
-                success: "Borg gruñe pero asiente. 'Por los viejos tiempos. 100 monedas.'",
-                failure: "'No regateo. 200 o nada.'",
-                reward: { name: "Colmillo de Trol", desc: "Amuleto de un trol derrotado. +1 a tiradas de daño crítico.", type: "accessory", rarity: "rare", image: "" }
-            },
-            { label: "👋 Quizás otro día.", nextDialogue: null }
-        ]
-    },
-
-    // BORG - ETAPA 3: Brunhilda
-    'borg_stage3_brunhilda': {
-        name: "Borg",
-        role: "Admirador",
-        avatar: "/img/npcs/borg.png",
-        greeting: "Los ojos de Borg brillan al hablar de ella. 'Brunhilda... La vi pelear contra un minotauro. Tres golpes. Tres. El bicho ni la tocó. Si quieres un consejo: no la provoques. Jamás.'",
-        options: [
-            {
-                label: "⚔️ Quiero enfrentarme a ella.",
-                success: "'¿Estás loco? Bueno... si insistes. Primero tienes que ganar el Guantelete. Solo entonces Brunhilda te considerará digno de combatir. Buena suerte... la necesitarás.'",
-                mission: { id: 'challenge_brunhilda', name: 'Desafiar a Brunhilda', desc: 'Ganar el Guantelete para poder retar a la campeona.' }
-            },
-            {
-                label: "🏆 ¿Cuál es su debilidad?",
-                check: { skill: "Perspicacia", dc: 16 },
-                success: "Borg baja mucho la voz. 'Vi algo una vez. Su hombro izquierdo. Tiene una vieja herida que a veces le molesta. Nunca lo muestra, pero la vi tocárselo entre combates.'",
-                failure: "'¿Debilidad? No tiene ninguna. Es perfecta.'"
-            },
-            { label: "👋 Interesante. Me voy.", nextDialogue: null }
+            { label: "👋 Gracias, Borg.", nextDialogue: null }
         ]
     },
 
@@ -292,143 +230,141 @@ const dialogueData = {
 
     // 5. SILAS "EL MUDO" (Kenku Misterioso)
     // 5. SILAS "EL MUDO" (Kenku Misterioso)
+    // 5. EL MUDO (Kenku) - ETAPA 1: ENIGMA
     'npc_mudo': {
         name: "El Mudo",
-        role: "Dueño Kenku",
+        role: "Kenku Misterioso",
         avatar: "/img/npcs/elmudo.png",
-        greeting: "*El Kenku te mira con ojos de cuervo. Hace un gesto de beber y señala un cartel tosco que dice 'ORO = TRAGO'. Luego imita el sonido de una bolsa de monedas cayendo.*",
+        greeting: "*El Kenku te mira con ojos de cuervo. Intenta hablar, pero solo salen sonidos de monedas cayendo y el chirrido de una puerta oxidada.*",
         options: [
+            {
+                label: "🗣️ [Mímica] (Actuación CD 12) Intentar imitar sus sonidos.",
+                check: { skill: "Actuación", dc: 12 },
+                success: "*Ladras como un perro. El Kenku ladea la cabeza y responde con el maullido de un gato. Has captado su interés.*",
+                failure: "*Haces el ridículo. El Mudo te ignora y limpia la barra.*",
+                successNext: 'mudo_stage2_prueba'
+            },
+            {
+                label: "💰 [Comercio] Solo quiero comprar.",
+                success: "*Señala un cartel: 'NO HABLO. VENDO.'*",
+                type: "shop",
+                action: "openShop" // Standard shop for now
+            },
             {
                 label: "📜 [Misión] Busco trabajo... del tipo silencioso.",
                 check: { skill: "Sigilo", dc: 14 },
-                success: "*El Mudo te pasa una nota arrugada por debajo de la mesa. Huele a sangre seca.* 'Objetivo: Capataz de la Mina. Vivo o muerto. Preferiblemente muerto.'",
-                failure: "*Te ignora y sigue limpiando un vaso con un trapo sucio. No pareces lo suficientemente discreto.*",
-                mission: { id: 'mision_mudo_1', title: 'Silencio en la Mina', desc: 'El Mudo quiere que el Capataz de la Mina "desaparezca".', reward: { name: 'Daga de Sombras', rarity: 'rare' } }
+                success: "*Te pasa una nota arrugada: 'Mina. Capataz. Silencio.'*",
+                mission: { id: 'mision_mudo_1', title: 'Silencio en la Mina', desc: 'El Mudo quiere que el Capataz de la Mina desaparezca.', reward: { name: 'Daga de Sombras', rarity: 'rare' } },
+                successNext: 'mudo_stage2_prueba'
             },
-            {
-                label: "🪙 [Moneda del Cuervo] *Muestras una moneda negra con un cuervo grabado*",
-                requiresItem: "Moneda del Cuervo", // Must have this item in inventory
-                success: "*Los ojos del Kenku se abren como platos. Reconoce la moneda. Con reverencia, te hace pasar a la trastienda.*",
-                reward: { name: "Llave de la Trastienda", desc: "Acceso a los productos prohibidos.", type: "key", rarity: "rare", image: "" },
-                successNext: 'silas_stage2_backroom'
-            },
-            {
-                label: "🧐 [Perspicacia] (Sabiduría CD 13) ¿Qué intentas decirme?",
-                check: { skill: "Perspicacia", dc: 13 },
-                success: "*El Mudo imita el sonido de una espada desenvainándose y señala a un rincón oscuro.* Te está advirtiendo de un peligro.",
-                failure: "*El Mudo te hace un corte de manga y grazna como un cuervo. Claramente piensa que eres idiota.*",
-                successNext: 'silas_stage2_warning'
-            },
-            {
-                label: "🗣️ [Mímica] *Intentar imitar sus sonidos*",
-                check: { skill: "Actuación", dc: 14 },
-                success: "*Los ojos del Kenku se iluminan. Grazna con entusiasmo y te hace una reverencia. Has ganado su respeto.*",
-                failure: "*El Mudo te mira con desprecio. Tu imitación ha sido patética.*",
-                successNext: 'silas_stage2_friends'
-            },
-            { label: "👋 *Irte sin decir nada*", nextDialogue: null }
+            { label: "👋 *Irte*", nextDialogue: null }
         ]
     },
 
-    // SILAS - ETAPA 2: Interesado
-    'silas_stage2_interested': {
-        name: "Silas 'El Mudo'",
-        role: "Comerciante Curioso",
-        avatar: "/img/npcs/silas.png",
-        greeting: "*Silas inclina la cabeza estudiándote. Emite un sonido que parece... ¿una pregunta? Saca varios frascos pequeños y los coloca sobre el mostrador.*",
-        options: [
-            {
-                label: "💰 ¿Qué más tienes escondido?",
-                success: "*Silas se ríe (o lo que pasa por risa en un Kenku). Saca un mapa viejo y arrugado, y lo señala con insistencia.*",
-                reward: { name: "Mapa de las Catacumbas", desc: "Un mapa parcial de los túneles bajo Eranol.", type: "quest", rarity: "rare", image: "" }
-            },
-            { label: "👋 *Asentir y marcharte*", nextDialogue: null }
-        ]
-    },
-
-    // SILAS - ETAPA 2: Advertencia
-    // SILAS - ETAPA 2: Advertencia
-    'silas_stage2_warning': {
+    // EL MUDO - ETAPA 2: PRUEBA (Moneda del Cuervo)
+    'mudo_stage2_prueba': {
         name: "El Mudo",
-        role: "Vigía Silencioso",
+        role: "Observador Kenku",
         avatar: "/img/npcs/elmudo.png",
-        greeting: "*El Kenku mira nerviosamente hacia las sombras. Imita el sonido de pasos, luego de monedas, y finalmente... un grito ahogado. Algo está pasando en este local.*",
+        greeting: "*El Kenku te observa más de cerca. Saca una extraña moneda negra con un cuervo grabado y la hace bailar sobre sus nudillos. El sonido es hipnótico.*",
         options: [
             {
-                label: "👀 [Percepción CD 15] Buscar lo que indica",
-                check: { skill: "Percepción", dc: 15 },
-                success: "En el rincón oscuro ves una figura encapuchada que observa a todos. Lleva una daga oculta en la manga. Es un espía o un asesino.",
-                failure: "No ves nada especial. Solo borrachos y sombras."
+                label: "🪙 [Objeto] Tengo una Moneda del Cuervo.",
+                requiresItem: "Moneda del Cuervo",
+                hideIfMissing: true, // User requested invisibility
+                success: "*Al ver TU moneda, el Kenku se paraliza. Asiente lentamente. Te hace un gesto para que le sigas a una esquina oscura.*",
+                successNext: 'mudo_stage3_revelacion'
             },
-            { label: "👋 Gracias por el aviso...", nextDialogue: null }
+            {
+                label: "🧐 ¿Qué significa esa moneda?",
+                success: "*Imita el sonido de un cuello rompiéndose. Claramente, no deberías preguntar si no sabes la respuesta.*",
+                successNext: null
+            },
+            { label: "👋 Volver", nextDialogue: 'npc_mudo' }
         ]
     },
 
-    // SILAS - ETAPA 2: Amigos
-    // SILAS - ETAPA 2: Amigos
-    'silas_stage2_friends': {
+    // EL MUDO - ETAPA 3: REVELACIÓN (El Vigilante)
+    'mudo_stage3_revelacion': {
         name: "El Mudo",
-        role: "Aliado Kenku",
+        role: "El Vigilante",
         avatar: "/img/npcs/elmudo.png",
-        greeting: "*El Mudo te trata como a un igual. Te ofrece sentarte detrás de la barra y comparte un trago contigo. ¡Ahora eres bienvenido aquí!*",
+        greeting: "*En la oscuridad, el Kenku saca una pizarra y tiza. Escribe con caligrafía perfecta: 'NO SOY MUDO. SOY PRUDENTE. ERANOL TIENE OÍDOS EN LAS PAREDES.'*",
         options: [
             {
-                label: "🎁 ¿Tienes algo especial para mí?",
-                success: "*El Kenku te entrega una pluma de su propia cabeza. Es un gesto de gran confianza.*",
-                reward: { name: "Pluma del Cuervo", desc: "Una pluma de Kenku. Permite +5 a una tirada de sigilo (un uso).", type: "consumable", rarity: "rare", image: "" }
+                label: "🕵️ ¿Quién eres realmente?",
+                success: "*Escribe: 'Fui el Maestro de Susurros del Gremio. Ahora... solo observo. Pero veo potencial en ti.'*",
+                successNext: 'mudo_stage4_mercado'
             },
-            { label: "🍺 Solo quiero beber en paz.", nextDialogue: null }
+            {
+                label: "⚔️ ¿Para quién trabajas?",
+                success: "*Borra la pizarra y dibuja un ojo cerrado. 'Para nadie. Contra todos. El caos es una escalera, y yo vendo los peldaños.'*",
+                successNext: 'mudo_stage4_mercado'
+            }
         ]
     },
 
-    // SILAS - ETAPA ESPECIAL: Trastienda (requiere Moneda del Cuervo)
-    // SILAS - ETAPA ESPECIAL: Trastienda (requiere Moneda del Cuervo)
-    // SILAS - ETAPA ESPECIAL: Trastienda (requiere Moneda del Cuervo)
-    'silas_stage2_backroom': {
-        name: "El Mudo",
-        role: "Guardián de Secretos",
+    // EL MUDO - ETAPA 4: PREPARACIÓN (Identidad Personalizada)
+    'mudo_stage4_mercado': {
+        name: "El Vigilante",
+        role: "Señor del Mercado Negro",
         avatar: "/img/npcs/elmudo.png",
-        greeting: "*En la trastienda, El Mudo cambia de actitud. Ya no imita sonidos ridículos. Te mira con intensidad, saca un mapa antiguo de debajo de una tabla del suelo y lo extiende ante ti. Señala una 'X' marcada en sangre.*",
+        greeting: "*'En las sombras, dos llaves abren la puerta: Quién dices ser y Qué sabes en verdad. Primero, dime tu ALIAS Público.'*",
         options: [
             {
-                label: "🗺️ [Tomar Mapa] ¿Qué es esto?",
-                success: "*El Kenku grazna suavemente: 'El... Origen...'. Te entrega el mapa. Marca la entrada oculta a las Catacumbas Reales, debajo del Foso.*",
-                reward: { name: "Mapa de la Cripta Real", desc: "Revela la entrada secreta a las catacumbas bajo la Arena.", type: "quest", rarity: "epic", image: "" }
+                label: "✍️ [Escribir] Definir mi Alias (Usuario)",
+                type: "input",
+                inputPlaceholder: "Ej: Cuervo",
+                saveTo: "blackMarketUser", // CUSTOM SAVE
+                success: "*El Mudo anota tu alias. 'Bien. Ahora, la Contraseña. Solo tú debes saberla.'*",
+                successNext: 'mudo_stage4_password'
+            },
+            { label: "👋 Volveré luego.", nextDialogue: null }
+        ]
+    },
+
+    'mudo_stage4_password': {
+        name: "El Vigilante",
+        role: "Señor del Mercado Negro",
+        avatar: "/img/npcs/elmudo.png",
+        greeting: "*Espera con la pluma en el aire. 'Escribe tu contraseña. No la olvides.'*",
+        options: [
+            {
+                label: "🔑 [Escribir] Definir Contraseña",
+                type: "input",
+                inputType: "password", // Mask input
+                inputPlaceholder: "•••••••",
+                saveTo: "blackMarketPass", // CUSTOM SAVE
+                success: "*'Hecho. Alias y Contraseña registrados. No los pierdas.'*",
+                successNext: 'mudo_stage5_shop'
+            }
+        ]
+    },
+
+    // EL MUDO - ETAPA 5: TIENDA REAL
+    'mudo_stage5_shop': {
+        name: "El Vigilante",
+        role: "Mercader de Secretos",
+        avatar: "/img/npcs/elmudo.png",
+        greeting: "*Te entrega una llave oxidada con tu nuevo apodo grabado. 'Bienvenido al verdadero Eranol. No preguntes de dónde saco esto.'*",
+        options: [
+            {
+                label: "🛍️ [Tienda Secreta] Entrar al Mercado Negro.",
+                type: "shop",
+                action: "openShop",
+                shopId: "mercado-negro"
             },
             {
-                label: "🗝️ [Preguntar] ¿Quién eres realmente?",
-                success: "*Se baja la capucha un instante, revelando plumas grises marcadas con runas. Hace el gesto de 'silencio' y te da una llave negra. 'Vigilante'.*",
-                reward: { name: "Llave de Obsidiana", desc: "Una llave fría al tacto. Abre una puerta sellada en algún lugar.", type: "key", rarity: "legendary", image: "" }
+                label: "🎁 [Recompensa] ¿Algún consejo gratis?",
+                success: "*Escribe: 'Las ratas huyen del subsuelo. Algo despierta. Prepárate.' (Ganas +1 Sabiduría por la advertencia)*",
             },
-            { label: "👋 Guardaré el secreto.", nextDialogue: null }
+            { label: "👋 Gracias, Maestro.", nextDialogue: null }
         ]
     },
 
 
     // SILAS (Falso Cura)
-    'npc_silas': {
-        name: "Silas",
-        role: "Falso Cura",
-        avatar: "/img/npcs/silas.png",
-        greeting: "El hombre sonríe con demasiados dientes. 'Hijo mío... veo pecado en tus ojos. Pecado y MONEDAS. Por una donación modesta, los dioses mirarán hacia otro lado.'",
-        options: [
-            {
-                label: "💰 [Donar 10 oro] Perdona mis pecados.",
-                success: "'Ego te absolvo... de ser rico.' Te hace una señal sagrada mal hecha y se guarda las monedas a la velocidad del rayo.",
-                reward: { name: "Bendición Dudosa", desc: "Te sientes... más ligero de bolsillo. (+1 Moral, -10 Oro mentalmente)", type: "consumable", rarity: "common", qty: 1 }
-            },
-            {
-                label: "🤨 [Perspicacia CD 12] ¿Eres un sacerdote de verdad?",
-                check: { skill: "Perspicacia", dc: 12 },
-                success: "'¡Por supuesto! Orden de la... Mano Dorada. ¿No ves mi túnica? (Es claramente una cortina vieja).' Se pone nervioso.",
-                failure: "'¡Blasfemia! ¡Hereje! ¡Que te parta un rayo! (Mira al techo esperando un rayo, nada pasa)'"
-            },
-            {
-                label: "👋 No necesito perdón.",
-                nextDialogue: null
-            }
-        ]
-    },
+    // (Merged into Silas definition below)
 
     // --- NUEVOS NPC'S (EXPANSIÓN) ---
 
@@ -571,36 +507,7 @@ const dialogueData = {
     // --- DIÁLOGOS ANIDADOS (STAGE 2) PARA NPCS ORIGINALES ---
 
     // BORG BRANCHES
-    'borg_stage2_glory': {
-        name: "Borg",
-        role: "Veterano Nostálgico",
-        avatar: "/img/npcs/borg.png",
-        greeting: "'Esos eran días de gloria. Oye, aún guardo mi viejo equipo en el almacén. Si traes cuero de Basilisco, podría pedirle al herrero que te haga algo decente. ¿Te interesa?'",
-        options: [
-            { label: "🛡️ [Misión] Buscaré ese cuero.", success: "Misión Aceptada: Piel de Basilisco. 'Suerte. Tienen mal aliento.'", check: { skill: "Supervivencia", dc: 10 } },
-            { label: "👋 Volver", nextDialogue: 'owner_g' }
-        ]
-    },
-    'borg_stage2_zora': {
-        name: "Borg",
-        role: "Informante Cauteloso",
-        avatar: "/img/npcs/borg.png",
-        greeting: "'Zora busca a un desertor. Un tal 'Fantasma'. Si te enteras de algo, díselo a ella, no a mí. Pero ten cuidado, chico. En Eranol, el conocimiento pesa más que el hierro.'",
-        options: [
-            { label: "🕵️ ¿Quién es el Fantasma?", check: { skill: "Historia", dc: 15 }, success: "Borg susurra: 'Un asesino de magos. Dicen que puede caminar entre las sombras.'", failure: "'Ya he dicho demasiado. Bebe tu trago.'" },
-            { label: "👋 Volver", nextDialogue: 'owner_g' }
-        ]
-    },
-    'borg_stage2_threat': {
-        name: "Borg",
-        role: "Respeto Ganado",
-        avatar: "/img/npcs/borg.png",
-        greeting: "'Me recuerdas a mí de joven. Imprudente. Estúpido. Fuerte. Escucha, necesito a alguien que 'cobre' unas deudas a unos clientes morosos en el Anillo 3. ¿Te apuntas?'",
-        options: [
-            { label: "💰 [Misión] Iré a cobrar.", success: "Misión Aceptada: El Cobrador. Borg te da una lista. 'No los mates... si no es necesario.'", check: { skill: "Intimidación", dc: 10 }, mission: { id: 'el_cobrador', title: 'El Cobrador', desc: 'Borg necesita que alguien le recuerde a sus deudores quién manda.', obj: 'Cobra 3 deudas en el Anillo 3', reward: { name: 'Escopeta Recortada', rarity: 'rare' } } },
-            { label: "👋 No soy un matón.", nextDialogue: 'owner_g' }
-        ]
-    },
+    // (Merged into main Borg tree above)
 
     'zora_stage2_persuasion': {
         name: "Zora 'La Cicatriz'",
@@ -781,41 +688,7 @@ const dialogueData = {
     },
 
     // EL MUDO (Kenku Espía)
-    'pool_9': {
-        name: "El Mudo",
-        role: "Kenku Espía",
-        avatar: "/img/npcs/elmudo.png",
-        greeting: "El Kenku te mira con ojos negros como el vacío. Abre el pico y emite un sonido perfecto: el rugido de una Hidra, seguido del tintineo de monedas cayendo. Luego, el grito de un hombre muriendo.",
-        options: [
-            {
-                label: "🎭 [Interpretación] (CD 13) Intentar comunicarse con sonidos.",
-                check: { skill: "Interpretación", dc: 13 },
-                success: "Imitas el sonido de aplausos. El Mudo ladea la cabeza, impresionado. Responde con el sonido de una puerta abriéndose y pasos alejándose. ¿Una invitación?",
-                failure: "Haces un ruido. El Mudo te mira decepcionado y grazna como un cuervo enfadado.",
-                successNext: 'elmudo_stage2'
-            },
-            {
-                label: "💰 [Oro] Mostrar monedas.",
-                success: "Los ojos del Kenku brillan. Imita el sonido de una bolsa abriéndose y luego un susurro: 'Recompensa... por... el Rata...' Reproduce una risa conocida del Anillo 0."
-            },
-            {
-                label: "👀 [Percepción] (CD 15) Observar qué ha visto recientemente.",
-                check: { skill: "Percepción", dc: 15 },
-                success: "Notas manchas de sangre seca en sus plumas. Y un olor a azufre. Ha estado en el Anillo 0. Hace poco.",
-                failure: "Solo ves un pájaro raro. Probablemente inofensivo."
-            }
-        ]
-    },
-    'elmudo_stage2': {
-        name: "El Mudo",
-        role: "Guía Silencioso",
-        avatar: "/img/npcs/elmudo.png",
-        greeting: "El Kenku reproduce el sonido de tus propios pasos, luego los de alguien siguiéndote. Un gruñido. Y tu grito de dolor. ¿Una advertencia? ¿O una predicción?",
-        options: [
-            { label: "¿Quién me sigue?", success: "El Mudo imita el sonido de una capa ondeando y el clic de una ballesta amartillándose. 'Sombra... Cazador...'" },
-            { label: "👋 Retirarse", nextDialogue: 'pool_9' }
-        ]
-    },
+    // (Merged into main El Mudo tree)
 
     // REY RIKO (Halfling Rey de las Ratas)
     'pool_10': {
@@ -1214,6 +1087,11 @@ function renderOptions(options) {
             hasRequiredItem = playerState.inventory?.some(item => item.name === opt.requiresItem);
         }
 
+        // Feature: Hide option if item is missing (User Request)
+        if (opt.hideIfMissing && !hasRequiredItem) {
+            return; // Skip this iteration
+        }
+
         if (wasFailed) {
             // Disabled style for failed options
             btn.className = "w-full text-left p-4 rounded bg-red-950/20 border border-red-900/30 cursor-not-allowed opacity-50 flex items-center justify-between";
@@ -1266,6 +1144,12 @@ export function handleDialogueOption(optionIndex) {
     // If there is a CHECK, we wait for resolveManualRoll.
     // If there is NO CHECK, we grant immediately.
 
+    // Is it a custom text input?
+    if (opt.type === 'input') {
+        renderTextInput(optionIndex, opt);
+        return;
+    }
+
     // Is it a skill check?
     if (opt.check) {
         renderManualRollInput(optionIndex, opt);
@@ -1300,9 +1184,16 @@ export function handleDialogueOption(optionIndex) {
         return;
     }
 
+
     // Is it a skill check?
     if (opt.check) {
         renderManualRollInput(optionIndex, opt);
+        return;
+    }
+
+    // Fallback: It's a narrative option (auto-success)
+    if (opt.success) {
+        resolveAutoSuccess(optionIndex);
         return;
     }
 }
@@ -1318,7 +1209,7 @@ function renderManualRollInput(index, opt) {
                 <button onclick="resolveManualRoll(${index})" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded font-bold uppercase tracking-wider transition-colors flex-1 shadow-lg shadow-amber-900/20">
                     Confirmar Resultado
                 </button>
-                <button onclick="startDialogue(currentNpcId)" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded transition-colors" title="Cancelar">
+                <button onclick="startDialogue('${currentNpcId}')" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded transition-colors" title="Cancelar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1538,3 +1429,146 @@ function handleReward(item) {
 
     document.body.appendChild(rewardModal);
 }
+
+function resolveAutoSuccess(optionIndex) {
+    const data = dialogueData[currentNpcId];
+    if (!data) return;
+
+    const opt = data.options[optionIndex];
+    const nextStep = opt.successNext; // e.g. 'mudo_stage3_revelacion'
+
+    // Render Result (Simplified)
+    const resultContainer = document.getElementById('dialogue-result');
+
+    resultContainer.className = `mt-4 p-4 rounded border animate-fade-in bg-blue-900/30 border-blue-500/30`;
+
+    resultContainer.innerHTML = `
+        <div class="flex items-center gap-3 mb-2">
+            <i class="fas fa-comment-dots text-blue-400 text-xl"></i>
+            <div class="flex-1">
+                <p class="text-xs uppercase tracking-widest text-blue-400 font-bold">Respuesta</p>
+            </div>
+        </div>
+        <p class="text-sm text-blue-100 italic leading-relaxed mb-4">
+            "${opt.success}"
+        </p>
+    `;
+
+    // Render Next Action Button
+    if (nextStep) {
+        resultContainer.innerHTML += `
+            <div class="mt-4 flex justify-end animate-fade-in">
+                <button onclick="startDialogue('${nextStep}')" class="bg-white/10 hover:bg-white/20 border border-white/20 hover:border-amber-500 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold uppercase tracking-widest transition-all flex items-center gap-2 group shadow-lg">
+                    Continuar <i class="fas fa-chevron-right text-amber-500 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+        `;
+        document.getElementById('dialogue-options').innerHTML = '';
+
+    } else {
+        // End of conversation
+        document.getElementById('dialogue-options').innerHTML = '';
+        resultContainer.innerHTML += `
+            <div class="flex flex-col gap-2 mt-4 animate-fade-in">
+                <button onclick="event.stopPropagation(); closeDialogue()" class="w-full py-3 bg-blue-900/50 hover:bg-blue-800 border-2 border-blue-500 rounded text-center uppercase tracking-widest text-sm font-bold text-white shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all transform hover:scale-[1.02]">
+                    👋 Terminar
+                </button>
+            </div>
+        `;
+    }
+
+    resultContainer.classList.remove('hidden');
+}
+
+function renderTextInput(index, opt) {
+    const container = document.getElementById('dialogue-options');
+    container.innerHTML = `
+        <div class="p-4 bg-black/40 border border-blue-500/30 rounded animate-fade-in">
+            <p class="text-blue-400 font-bold mb-2 text-lg"><i class="fas fa-pen-nib mr-2"></i>Escribe tu respuesta:</p>
+            <div class="flex gap-2">
+                <input type="${opt.inputType || 'text'}" id="dialogue-text-input" class="bg-gray-800 border border-gray-600 text-white px-3 py-2 rounded w-full font-mono focus:border-blue-500 outline-none" placeholder="${opt.inputPlaceholder || 'Escribe aquí...'}">
+                <button onclick="resolveTextInput(${index})" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-bold uppercase tracking-wider transition-colors shadow-lg shadow-blue-900/20 whitespace-nowrap">
+                    Confirmar
+                </button>
+                <button onclick="startDialogue('${currentNpcId}')" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded transition-colors" title="Cancelar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    // Auto-focus
+    setTimeout(() => {
+        const input = document.getElementById('dialogue-text-input');
+        if (input) input.focus();
+    }, 100);
+}
+
+function resolveTextInput(optionIndex) {
+    const data = dialogueData[currentNpcId];
+    if (!data) return;
+
+    const opt = data.options[optionIndex];
+    const inputFn = document.getElementById('dialogue-text-input');
+    const userText = (inputFn.value || "Desconocido").trim(); // FORCE TRIM
+
+    const nextStep = opt.successNext;
+
+    // Replace placeholder %INPUT% in success message
+    const successMsg = opt.success ? opt.success.replace('%INPUT%', `<span class="text-amber-400 font-mono">${userText}</span>`) : `Has elegido: ${userText}`;
+
+    // SAVE IDENTITY
+    if (opt.saveTo) {
+        // Dynamic Save
+        playerState[opt.saveTo] = userText;
+        console.log(`[DIALOGUE] Saved ${opt.saveTo}: ${userText}`);
+
+        // If this is password, ALSO set the legacy identity flag to true/combined to ensure button visibility logic works
+        if (opt.saveTo === 'blackMarketPass') {
+            playerState.blackMarketIdentity = "REGISTERED"; // Flag to show button
+        }
+    } else {
+        // Fallback Legacy
+        playerState.blackMarketIdentity = userText;
+    }
+
+    saveGame();
+
+    // Render Result
+    const resultContainer = document.getElementById('dialogue-result');
+    resultContainer.className = `mt-4 p-4 rounded border animate-fade-in bg-blue-900/30 border-blue-500/30`;
+
+    resultContainer.innerHTML = `
+        <div class="flex items-center gap-3 mb-2">
+            <i class="fas fa-pen-fancy text-blue-400 text-xl"></i>
+            <div class="flex-1">
+                <p class="text-xs uppercase tracking-widest text-blue-400 font-bold">Registro Completado</p>
+            </div>
+        </div>
+        <p class="text-sm text-blue-100 italic leading-relaxed mb-4">
+            ${successMsg}
+        </p>
+    `;
+
+    if (nextStep) {
+        resultContainer.innerHTML += `
+            <div class="mt-4 flex justify-end animate-fade-in">
+                <button onclick="startDialogue('${nextStep}')" class="bg-white/10 hover:bg-white/20 border border-white/20 hover:border-amber-500 text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold uppercase tracking-widest transition-all flex items-center gap-2 group shadow-lg">
+                    Continuar <i class="fas fa-chevron-right text-amber-500 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+        `;
+        document.getElementById('dialogue-options').innerHTML = '';
+    }
+
+    resultContainer.classList.remove('hidden');
+}
+
+// --- EXPOSE TO WINDOW FOR HTML ONCLICK HANDLERS ---
+window.startDialogue = startDialogue;
+window.resolveManualRoll = resolveManualRoll;
+window.resolveTextInput = resolveTextInput; // New export
+window.retryDialogue = () => {
+    // Basic retry logic: just reload current
+    if (currentNpcId) startDialogue(currentNpcId);
+};
+window.closeDialogue = closeDialogue;

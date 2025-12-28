@@ -10,18 +10,21 @@ import { initGames } from './js/modules/games.js';
 import { initBank } from './js/modules/bank.js';
 import { initPatronage } from './js/modules/ui.js';
 import { initSheetUI } from './js/modules/sheet_ui.js';
+import { initCinematics } from './js/modules/cinematic.js';
 import './js/modules/lootChest.js'; // Loot chest system
 
 
 
-const initApp = () => {
-    initNavigation(); // Run first to set up UI vars and hide sidebars
+const initApp = async () => {
+    await initNavigation(); // Run first to set up UI vars and hide sidebars
     initCart();
     initAuth(); // Run later to restore session and potentially Show sidebars
     initGames();
     initBank();
     initPatronage();
+    initPatronage();
     initSheetUI();
+    initCinematics();
 };
 
 if (document.readyState === 'loading') {
