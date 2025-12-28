@@ -419,10 +419,21 @@ function useItem(itemName) {
     saveGame();
     renderInventory();
     // CHEST LOGIC
-    if (itemName === "Cofre Misterioso" || itemName === "Cofre Aleatorio") {
+    // General check for any chest item to trigger the loot system
+    if (itemName.includes("Cofre") || itemName.includes("Chest")) {
+        // Pass the item object itself so we can check tier/rarity if needed (though existing system uses rolling, 
+        // we might want to respect the item's implied tier in the future. 
+        // For now, the chest system is random (Gacha), but let's at least open it.)
+
+        // HACK: To support "Cofre Especial" mapping to specific LootChest tiers, 
+        // we might need to pass the item name/rarity to openLootChest?
+        // Current openLootChest uses random rolling. 
+        // If the user wants "Cofre Especial" to be BETTER, we need openLootChest to accept an override.
+
         if (window.openLootChest) {
-            window.openLootChest();
-            showToast(`¡Abriendo cofre!`);
+            // Check if we can pass config to openLootChest
+            window.openLootChest(item);
+            showToast(`¡Abriendo ${itemName}!`);
         } else {
             console.error("Loot chest system not found!");
             showToast("Error: No se puede abrir el cofre.");

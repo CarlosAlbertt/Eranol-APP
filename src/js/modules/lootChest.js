@@ -169,9 +169,9 @@ function generateClickProgression(finalTierName) {
 
 /**
  * Open a loot chest (Gacha style - 3 clicks to reveal)
- * Always uses the probability system - no forced tiers
+ * Accepts an optional chestItem to determine starting tier/bias
  */
-export function openLootChest() {
+export function openLootChest(chestItem = null) {
     const modal = document.getElementById('loot-chest-modal');
     if (!modal) return;
 
@@ -180,14 +180,30 @@ export function openLootChest() {
     isAnimating = false;
     generatedLoot = null;
 
-    // Always roll for final tier using probabilities
-    finalTier = rollFinalTier();
+    // Determine Tier
+    if (chestItem && chestItem.name) {
+        // Map Item Name to Tier directly
+        const n = chestItem.name.toLowerCase();
+        if (n.includes('maldito')) finalTier = 'cursed';
+        else if (n.includes('legendario')) finalTier = 'legendary';
+        else if (n.includes('épico')) finalTier = 'epic';
+        else if (n.includes('especial')) finalTier = 'special';
+        else if (n.includes('raro') || n.includes('misterioso')) finalTier = 'rare'; // Mystery defaults to Rare/Blue usually
+        else finalTier = 'common';
+
+        console.log(`[CHEST] Forced Tier from Item (${chestItem.name}): ${finalTier}`);
+    } else {
+        // Fallback to random roll if no specific item passed (e.g. debug or generic call)
+        finalTier = rollFinalTier();
+        console.log(`[CHEST] Random Roll: ${finalTier}`);
+    }
+
     currentChest = CHEST_TIERS[finalTier];
 
     // Generate click progression
     clickTiers = generateClickProgression(finalTier);
 
-    console.log(`🎲 Chest rolled: ${finalTier} | Progression: ${clickTiers.join(' → ')}`);
+    console.log(`🎲 Chest: ${finalTier} | Progression: ${clickTiers.join(' → ')}`);
 
     // Reset UI
     const title = document.getElementById('chest-title');
