@@ -95,7 +95,7 @@ const CHEST_TIERS = {
 };
 
 // Tier order for progression
-const TIER_ORDER = ['common', 'rare', 'special', 'epic', 'legendary', 'cursed'];
+const TIER_ORDER = ['common', 'special', 'rare', 'epic', 'legendary', 'cursed'];
 
 // ============================================
 // PROBABILITY SYSTEM
@@ -104,8 +104,8 @@ const TIER_ORDER = ['common', 'rare', 'special', 'epic', 'legendary', 'cursed'];
 // Common: 40%, Rare: 28%, Special: 17%, Epic: 10%, Legendary: 4%, Cursed: 1%
 const TIER_PROBABILITIES = {
     common: 0.40,      // 40%
-    rare: 0.28,        // 28%
-    special: 0.17,     // 17%
+    special: 0.28,     // 28%
+    rare: 0.17,        // 17%
     epic: 0.10,        // 10%
     legendary: 0.04,   // 4%
     cursed: 0.01       // 1%
