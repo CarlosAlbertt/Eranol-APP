@@ -126,6 +126,11 @@ export function resetPlayerState() {
         ring1: null, ring2: null, ring3: null, ring4: null, ring5: null, ring6: null,
         belt: null, boots: null, cape: null
     };
+
+    // Security Reset
+    playerState.blackMarketIdentity = null;
+    playerState.blackMarketUser = null;
+    playerState.blackMarketPass = null;
 }
 
 // import { showToast } from './ui.js'; // REMOVED TO FIX CIRCULAR DEPENDENCY

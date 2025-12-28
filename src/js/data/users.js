@@ -20,7 +20,7 @@ export const knownUsers = {
     "volibeer": {
         rank: "D",
         guild: "Oso de la Tormenta",
-        maxRing: 2,
+        maxRing: 1,
         title: "El Rugido",
         password: "voli",
         race: "Ursa",
@@ -34,7 +34,7 @@ export const knownUsers = {
             wis: 14,
             cha: 8
         },
-        gold: 1500,
+        gold: 1650,
         inventory: [
             { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
         ]
@@ -42,7 +42,7 @@ export const knownUsers = {
     "ulume": {
         rank: "D",
         guild: "Sombra Veloz",
-        maxRing: 2,
+        maxRing: 1,
         title: "Daga Silenciosa",
         password: "ulu",
         race: "Elfo",
@@ -56,7 +56,7 @@ export const knownUsers = {
             wis: 10,
             cha: 10
         },
-        gold: 1500,
+        gold: 1700,
         inventory: [
             { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
         ]
@@ -64,7 +64,7 @@ export const knownUsers = {
     "m": {
         rank: "D",
         guild: "El Enigma",
-        maxRing: 2,
+        maxRing: 1,
         title: "Mente Maestra",
         password: "eme",
         race: "Slime",
@@ -78,7 +78,7 @@ export const knownUsers = {
             wis: 17,
             cha: 10
         },
-        gold: 1500,
+        gold: 1800,
         inventory: [
             { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
         ]
@@ -86,7 +86,7 @@ export const knownUsers = {
     "janus": {
         rank: "D",
         guild: "Doble Cara",
-        maxRing: 2,
+        maxRing: 1,
         title: "El Observador",
         password: "jan",
         race: "Cambiante",
@@ -108,7 +108,7 @@ export const knownUsers = {
     "khan": {
         rank: "D",
         guild: "Garra de Hierro",
-        maxRing: 2,
+        maxRing: 1,
         title: "Señor de las Bestias",
         password: "khan",
         race: "Leonin",
@@ -122,7 +122,7 @@ export const knownUsers = {
             wis: 14,
             cha: 16
         },
-        gold: 1500,
+        gold: 2050,
         inventory: [
             { name: "Cofre Misterioso", type: "Consumible", desc: "Un cofre sellado con magia antigua. Puede contener cualquier cosa.", rarity: "Raro", qty: 2 }
         ]
@@ -130,7 +130,7 @@ export const knownUsers = {
     "didy": {
         rank: "D",
         guild: "Voz de Seda",
-        maxRing: 2,
+        maxRing: 1,
         title: "La Melodía",
         password: "did",
         race: "Humano",

@@ -1,6 +1,6 @@
 import { state } from '../../state.js';
 import { showToast, updateGoldDisplay } from './ui.js';
-import { addItem, removeGold, playerState } from './player.js';
+import { addItem, removeGold, removeBloodCoins, playerState } from './player.js';
 
 let cartSidebar;
 let cartCount;
