@@ -393,7 +393,8 @@ function generateLoot() {
 
             items.push(item);
         } else {
-            items.push(generateMundaneItem());
+            // Pass the current chest tier to get appropriate items
+            items.push(generateMundaneItem(currentChest));
         }
     }
 
@@ -401,23 +402,71 @@ function generateLoot() {
 }
 
 /**
- * Generate a mundane item
+ * Generate a mundane item based on chest tier
  */
-function generateMundaneItem() {
-    const mundaneItems = [
-        { name: 'Poción de Curación', desc: 'Recupera 2d4+2 HP', type: 'Poción', rarity: 'Común' },
-        { name: 'Cuerda de Seda (15m)', desc: 'Resistente y ligera', type: 'Equipo', rarity: 'Común' },
-        { name: 'Antorcha x5', desc: 'Ilumina 6m de radio', type: 'Equipo', rarity: 'Común' },
-        { name: 'Raciones (7 días)', desc: 'Comida para viajes', type: 'Equipo', rarity: 'Común' },
-        { name: 'Kit de Sanador', desc: '10 usos, estabiliza aliados', type: 'Equipo', rarity: 'Común' },
-        { name: 'Gema pequeña', desc: 'Vale 50 oro', type: 'Tesoro', rarity: 'Común' },
-        { name: 'Poción de Escalada', desc: '+10 a Atletismo por 1 hora', type: 'Poción', rarity: 'Poco Común' },
-        { name: 'Aceite de Resbalón', desc: 'Crea superficie resbaladiza', type: 'Consumible', rarity: 'Poco Común' },
-        { name: 'Pergamino de Protección', desc: 'Un uso, protege de un tipo', type: 'Pergamino', rarity: 'Poco Común' },
-        { name: 'Piedra de Luz', desc: 'Brilla como una antorcha', type: 'Objeto', rarity: 'Poco Común' }
-    ];
+function generateMundaneItem(chestData) {
+    // Define loot pools by tier/theme
+    const LOOT_POOLS = {
+        common: [
+            { name: 'Poción de Curación', desc: 'Recupera 2d4+2 HP', type: 'Poción', rarity: 'Común' },
+            { name: 'Antorcha', desc: 'Ilumina la oscuridad.', type: 'Equipo', rarity: 'Común' },
+            { name: 'Raciones de Viaje', desc: 'Suficiente para un día.', type: 'Comida', rarity: 'Común' },
+            { name: 'Daga de Hierro', desc: 'Simple pero efectiva.', type: 'Arma', rarity: 'Común' },
+            { name: 'Venda Sucia', desc: 'Detiene sangrados menores.', type: 'Consumible', rarity: 'Común' },
+            { name: 'Moneda de Cobre Antigua', desc: 'Tiene valor para coleccionistas.', type: 'Tesoro', rarity: 'Común' }
+        ],
+        rare: [
+            { name: 'Poción de Curación Mayor', desc: 'Recupera 4d4+4 HP', type: 'Poción', rarity: 'Poco Común' },
+            { name: 'Flechas de Plata (x5)', desc: 'Efectivas contra bestias.', type: 'Munición', rarity: 'Poco Común' },
+            { name: 'Pergamino de Identificación', desc: 'Revela propiedades mágicas.', type: 'Pergamino', rarity: 'Poco Común' },
+            { name: 'Aceite de Afilado', desc: '+1 al daño por 1 hora.', type: 'Consumible', rarity: 'Poco Común' },
+            { name: 'Gema de Ámbar', desc: 'Brilla con luz cálida.', type: 'Tesoro', rarity: 'Poco Común' }
+        ],
+        special: [ // Similar to Rare/Epic bridge
+            { name: 'Elixir de Salud', desc: 'Cura enfermedades comunes.', type: 'Poción', rarity: 'Raro' },
+            { name: 'Polvo de Desaparición', desc: 'Invisibilidad por 1 minuto.', type: 'Consumible', rarity: 'Raro' },
+            { name: 'Pergamino de Bola de Fuego', desc: 'Un clásico explosivo.', type: 'Pergamino', rarity: 'Raro' },
+            { name: 'Bolsa de Contención (Menor)', desc: 'Reduce el peso de lo que lleva.', type: 'Objeto Maravilloso', rarity: 'Raro' }
+        ],
+        epic: [
+            { name: 'Poción de Curación Superior', desc: 'Recupera 8d4+8 HP', type: 'Poción', rarity: 'Raro' },
+            { name: 'Piedra Elemental', desc: 'Crepita con energía pura.', type: 'Material', rarity: 'Muy Raro' },
+            { name: 'Ungüento de Keoghtom', desc: 'Cura y neutraliza venenos.', type: 'Consumible', rarity: 'Muy Raro' },
+            { name: 'Tomo de Conocimiento', desc: '+1 a una habilidad aleatoria.', type: 'Consumible', rarity: 'Muy Raro' }
+        ],
+        legendary: [
+            { name: 'Poción de Curación Suprema', desc: 'Recupera 10d4+20 HP', type: 'Poción', rarity: 'Muy Raro' },
+            { name: 'Diamante Astral', desc: 'Material de ascensión.', type: 'Tesoro', rarity: 'Legendario' },
+            { name: 'Pergamino de Deseo (Fragmento)', desc: 'Poder inestable de un solo uso.', type: 'Pergamino', rarity: 'Legendario' },
+            { name: 'Sangre de Dragón', desc: 'Otorga resistencia temporal.', type: 'Consumible', rarity: 'Legendario' }
+        ],
+        cursed: [
+            { name: 'Cenizas de Vampiro', desc: 'Maldito. Atrae no-muertos.', type: 'Restos', rarity: 'Maldito' },
+            { name: 'Moneda de la Traición', desc: 'Siempre vuelve a su dueño.', type: 'Tesoro', rarity: 'Maldito' },
+            { name: 'Poción de Veneno', desc: 'Parece curación, pero es letal.', type: 'Poción', rarity: 'Maldito' }
+        ]
+    };
 
-    return mundaneItems[Math.floor(Math.random() * mundaneItems.length)];
+    // Determine which pool to use based on chest name or internal key check
+    // Since we don't pass the key explicitly, we infer from name or pass the key in generateLoot if needed.
+    // Simplifying: map chest name/color to pool keys.
+
+    let poolKey = 'common';
+    if (chestData) {
+        const n = chestData.name.toLowerCase();
+        if (n.includes('común')) poolKey = 'common';
+        else if (n.includes('raro')) poolKey = 'rare';
+        else if (n.includes('especial')) poolKey = 'special';
+        else if (n.includes('épico')) poolKey = 'epic';
+        else if (n.includes('legendario')) poolKey = 'legendary';
+        else if (n.includes('maldito')) poolKey = 'cursed';
+    }
+
+    const pool = LOOT_POOLS[poolKey] || LOOT_POOLS['common'];
+    const item = pool[Math.floor(Math.random() * pool.length)];
+
+    // Clone to avoid reference issues
+    return { ...item };
 }
 
 /**
